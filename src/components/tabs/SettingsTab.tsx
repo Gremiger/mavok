@@ -13,6 +13,7 @@ import {
   exportQuickNotes,
   importCharacterJSON,
 } from "@/lib/export";
+import { LevelUpFlow } from "@/components/levelup/LevelUpFlow";
 
 export function SettingsTab() {
   const { character, update, updateCombat } = useCharacterContext();
@@ -25,6 +26,7 @@ export function SettingsTab() {
     data: ReturnType<typeof JSON.parse>;
   } | null>(null);
   const [shortRestLog, setShortRestLog] = useState<string[]>([]);
+  const [levelUpOpen, setLevelUpOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!character) return null;
@@ -161,8 +163,8 @@ export function SettingsTab() {
             {character.meta.subclass && ` — ${character.meta.subclass}`}
           </div>
           <button
+            onClick={() => setLevelUpOpen(true)}
             className="mt-3 px-6 py-2 bg-accent text-white rounded-lg font-heading text-sm active:scale-95 transition-transform"
-            id="level-up-trigger"
           >
             Subir de nivel
           </button>
@@ -310,6 +312,9 @@ export function SettingsTab() {
           </div>
         </div>
       </Modal>
+
+      {/* Level Up Flow */}
+      <LevelUpFlow open={levelUpOpen} onClose={() => setLevelUpOpen(false)} />
 
       {/* Import Preview Modal */}
       <Modal
