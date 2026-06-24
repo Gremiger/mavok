@@ -107,7 +107,7 @@ export function InventoryTab() {
   return (
     <div className="p-4 space-y-4">
       {/* Currency Bar */}
-      <div className="flex justify-around bg-card rounded-lg border border-border p-3">
+      <div className="flex justify-around stone-card rounded-lg p-3">
         {CURRENCY_LABELS.map(({ key, label }) => (
           <div key={key} className="text-center">
             {editingCurrency === key ? (
@@ -151,7 +151,7 @@ export function InventoryTab() {
             {group.items.map((item) => (
               <div
                 key={item.id}
-                className="bg-card rounded-lg border border-border overflow-hidden"
+                className="stone-card rounded-lg overflow-hidden"
               >
                 <div
                   className="flex items-center gap-3 p-3 cursor-pointer"

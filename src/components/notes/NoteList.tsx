@@ -99,7 +99,7 @@ export function NoteList({
         <div
           key={note.id}
           onClick={() => openEdit(note)}
-          className="bg-card rounded-lg border border-border p-3 cursor-pointer active:scale-[0.99] transition-transform"
+          className="stone-card rounded-lg p-3 cursor-pointer active:scale-[0.99] transition-transform"
         >
           <h4 className="font-heading text-accent text-sm">{note.title}</h4>
           {note.content && (

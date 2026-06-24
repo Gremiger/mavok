@@ -14,19 +14,24 @@ export function CollapsibleSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <section className="border border-border rounded-lg overflow-hidden mb-3">
+    <section className="cord-line pl-4 mb-4">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-3 bg-card font-heading text-sm text-accent"
+        className="relative cord-knot w-full flex items-center justify-between py-2 font-heading text-sm text-accent tracking-wide uppercase"
       >
         {title}
         <span
-          className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`transition-transform duration-200 text-muted text-xs ${open ? "rotate-180" : ""}`}
         >
           ▾
         </span>
       </button>
-      {open && <div className="p-3">{children}</div>}
+      {open && (
+        <>
+          <div className="crack-divider mb-3" />
+          <div>{children}</div>
+        </>
+      )}
     </section>
   );
 }

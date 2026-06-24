@@ -1,44 +1,106 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-heading: var(--font-cinzel);
-  --font-body: var(--font-inter);
+  --font-heading: var(--font-cormorant);
+  --font-body: var(--font-dm-sans);
 
   --color-background: var(--bg);
   --color-card: var(--card);
   --color-accent: var(--accent);
+  --color-cord: var(--cord);
   --color-foreground: var(--fg);
   --color-muted: var(--muted);
   --color-border: var(--border-color);
-  --color-danger: #dc2626;
-  --color-success: #16a34a;
-  --color-rage: var(--accent);
+  --color-danger: #8b3a3a;
+  --color-success: #4a7c59;
+  --color-rage: var(--cord);
+}
+
+:root,
+[data-theme="piedra-viva"] {
+  --bg: #0f0f0f;
+  --card: #1a1917;
+  --accent: #b87333;
+  --cord: #a63d2f;
+  --fg: #d4cfc4;
+  --muted: #5c5647;
+  --border-color: #2a2822;
 }
 
 [data-theme="dark-fantasy"] {
   --bg: #1a1a2e;
   --card: #16213e;
-  --accent: #8b2d2d;
+  --accent: #8b6d2d;
+  --cord: #8b2d2d;
   --fg: #e8e0d4;
   --muted: #7a7568;
   --border-color: #2a2a4a;
-}
-
-:root,
-[data-theme="dnd-classic"] {
-  --bg: #0d1117;
-  --card: #161b22;
-  --accent: #c0392b;
-  --fg: #ffffff;
-  --muted: #8b949e;
-  --border-color: #30363d;
 }
 
 body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Dialog centering fix for iOS/Safari */
+/* Stone texture cards */
+.stone-card {
+  background: var(--card);
+  border: 1px solid var(--border-color);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), inset 0 -1px 0 rgba(0,0,0,0.2);
+}
+
+/* Red cord line */
+.cord-line {
+  position: relative;
+}
+.cord-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--cord) 10%,
+    var(--cord) 90%,
+    transparent 100%
+  );
+  opacity: 0.4;
+  border-radius: 1px;
+}
+
+/* Cord knot dot */
+.cord-knot::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: var(--cord);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+/* Stone crack divider */
+.crack-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-color) 15%,
+    var(--accent) 30%,
+    var(--border-color) 50%,
+    transparent 60%,
+    var(--border-color) 75%,
+    transparent 100%
+  );
+  opacity: 0.5;
+}
+
+/* Dialog centering */
 dialog {
   margin: auto;
   position: fixed;
@@ -48,9 +110,10 @@ dialog {
 }
 
 dialog::backdrop {
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
 }
 
+/* Safe areas */
 .safe-area-pb {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }

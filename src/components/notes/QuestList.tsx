@@ -112,7 +112,7 @@ export function QuestList() {
         <div
           key={quest.id}
           onClick={() => openEdit(quest)}
-          className="bg-card rounded-lg border border-border p-3 cursor-pointer active:scale-[0.99] transition-transform"
+          className="stone-card rounded-lg p-3 cursor-pointer active:scale-[0.99] transition-transform"
         >
           <div className="flex items-center gap-2">
             <h4 className="font-heading text-accent text-sm flex-1">

@@ -5,7 +5,7 @@ import { loadSettings, saveSettings } from "@/lib/storage";
 import type { AppSettings } from "@/lib/types";
 
 export function useTheme() {
-  const [theme, setTheme] = useState<AppSettings["theme"]>("dnd-classic");
+  const [theme, setTheme] = useState<AppSettings["theme"]>("piedra-viva");
 
   useEffect(() => {
     const settings = loadSettings();
@@ -16,7 +16,7 @@ export function useTheme() {
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {
       const next =
-        prev === "dark-fantasy" ? "dnd-classic" : "dark-fantasy";
+        prev === "piedra-viva" ? "dark-fantasy" : "piedra-viva";
       document.documentElement.setAttribute("data-theme", next);
       const settings = loadSettings();
       saveSettings({ ...settings, theme: next });

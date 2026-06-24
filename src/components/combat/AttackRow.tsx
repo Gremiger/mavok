@@ -56,7 +56,7 @@ export function AttackRow({
   const clearRoll = useCallback(() => setLastRoll(null), []);
 
   return (
-    <div className="bg-card rounded-lg border border-border overflow-hidden mb-2">
+    <div className="stone-card rounded-lg overflow-hidden mb-2">
       <div
         className="flex items-center justify-between p-3 cursor-pointer"
         onClick={() => setExpanded(!expanded)}

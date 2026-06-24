@@ -123,7 +123,7 @@ export function SettingsTab() {
           className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border"
         >
           <span className="text-sm">
-            {theme === "dark-fantasy" ? "Dark Fantasy" : "D&D Classic"}
+            {theme === "piedra-viva" ? "Piedra Viva" : "Dark Fantasy"}
           </span>
           <span className="text-xs text-muted">Tap para cambiar</span>
         </button>

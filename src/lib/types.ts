@@ -142,6 +142,6 @@ export interface QuickNote {
 }
 
 export interface AppSettings {
-  theme: "dark-fantasy" | "dnd-classic";
+  theme: "piedra-viva" | "dark-fantasy";
   lastCharacterId: string;
 }

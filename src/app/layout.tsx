@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
-import { Cinzel, Inter } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import "./globals.css";
 
-const cinzel = Cinzel({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  variable: "--font-cinzel",
+  weight: ["400", "600", "700"],
+  variable: "--font-cormorant",
   display: "swap",
 });
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-dm-sans",
   display: "swap",
 });
 
@@ -26,10 +27,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${cinzel.variable} ${inter.variable}`}>
+    <html lang="es" className={`${cormorant.variable} ${dmSans.variable}`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#1a1a2e" />
+        <meta name="theme-color" content="#0f0f0f" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover"

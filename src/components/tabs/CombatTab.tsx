@@ -76,10 +76,10 @@ export function CombatTab() {
     <div className="p-4 space-y-3">
       {/* Top Bar */}
       <div
-        className={`rounded-lg p-3 border transition-all ${
+        className={`stone-card rounded-lg p-3 transition-all ${
           rageActive
-            ? "border-rage bg-rage/10 shadow-[0_0_12px_rgba(139,45,45,0.3)]"
-            : "border-border bg-card"
+            ? "!border-cord/50 shadow-[0_0_16px_rgba(166,61,47,0.3)]"
+            : ""
         }`}
       >
         {isDying ? (

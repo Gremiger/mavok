@@ -53,14 +53,19 @@ export function SheetTab() {
   return (
     <div className="p-4 space-y-0">
       {/* Header */}
-      <div className="mb-4">
-        <h1 className="font-heading text-2xl text-accent">{meta.name}</h1>
-        <p className="text-muted text-sm mt-1">
-          {meta.class} {meta.subclass ? `(${meta.subclass})` : ""} — Nivel{" "}
-          {meta.level} · {meta.species} · {meta.background}
+      <div className="mb-6 cord-line pl-4">
+        <div className="relative cord-knot">
+          <h1 className="font-heading text-3xl text-accent font-bold tracking-wide">
+            {meta.name}
+          </h1>
+        </div>
+        <div className="crack-divider mt-2 mb-2" />
+        <p className="text-muted text-sm">
+          {meta.class} {meta.subclass ? `· ${meta.subclass}` : ""} — Nivel{" "}
+          {meta.level}
         </p>
         <p className="text-muted text-xs mt-0.5">
-          {meta.origin} · {meta.age} años · {meta.giantAncestry}
+          {meta.species} · {meta.giantAncestry} · {meta.background} · {meta.origin}
         </p>
       </div>
 
@@ -71,13 +76,13 @@ export function SheetTab() {
             <button
               key={ab}
               onClick={() => rollAbility(ab)}
-              className="bg-card rounded-lg p-2 text-center border border-border active:scale-95 transition-transform cursor-pointer"
+              className="stone-card rounded-lg p-2 text-center active:scale-95 transition-transform cursor-pointer"
             >
-              <div className="text-muted text-xs">{abilityLabel(ab)}</div>
-              <div className="font-heading text-2xl text-accent">
+              <div className="text-muted text-[0.6rem] uppercase tracking-widest">{abilityLabel(ab)}</div>
+              <div className="font-heading text-3xl text-accent font-bold leading-tight">
                 {attributes[ab]}
               </div>
-              <div className="text-sm text-foreground">
+              <div className="text-xs text-foreground/70 font-heading">
                 {formatModifier(abilityModifier(attributes[ab]))}
               </div>
             </button>
@@ -197,16 +202,16 @@ export function SheetTab() {
       <CollapsibleSection title="Rasgos y características">
         <div className="space-y-3">
           {features.map((f, i) => (
-            <div key={i} className="bg-card rounded-lg p-3 border border-border">
+            <div key={i} className="stone-card rounded-lg p-3">
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-heading text-accent text-sm">
+                <span className="font-heading text-accent text-base font-semibold">
                   {f.name}
                 </span>
-                <span className="text-muted text-xs px-1.5 py-0.5 bg-background rounded">
+                <span className="text-muted text-[0.6rem] px-1.5 py-0.5 border border-border rounded uppercase tracking-wider">
                   {f.source}
                 </span>
               </div>
-              <p className="text-sm text-foreground/80">{f.description}</p>
+              <p className="text-sm text-foreground/70 leading-relaxed">{f.description}</p>
             </div>
           ))}
         </div>

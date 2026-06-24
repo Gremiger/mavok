@@ -70,7 +70,7 @@ export function QuickNotes() {
         {character.notes.quick.map((note) => (
           <div
             key={note.id}
-            className="flex items-start gap-2 bg-card rounded-lg border border-border p-3"
+            className="flex items-start gap-2 stone-card rounded-lg p-3"
           >
             <div className="flex-1 min-w-0">
               <p className="text-sm">{note.text}</p>

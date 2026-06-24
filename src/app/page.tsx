@@ -96,7 +96,7 @@ export default function Home() {
             {tabContent[activeTab]}
           </motion.main>
 
-          <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
+          <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50" style={{ boxShadow: "0 -4px 12px rgba(0,0,0,0.3)" }}>
             <div className="flex items-center justify-around h-14">
               {TAB_META.map((tab) => (
                 <button
