@@ -6,6 +6,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { CharacterContext, ThemeContext } from "@/lib/context";
 import { SheetTab } from "@/components/tabs/SheetTab";
 import { CombatTab } from "@/components/tabs/CombatTab";
+import { InventoryTab } from "@/components/tabs/InventoryTab";
 
 type Tab = "ficha" | "combate" | "inventario" | "notas" | "ajustes";
 
@@ -29,9 +30,7 @@ export default function Home() {
           <main className="flex-1 overflow-y-auto pb-16">
             {activeTab === "ficha" && <SheetTab />}
             {activeTab === "combate" && <CombatTab />}
-            {activeTab === "inventario" && (
-              <div className="p-4 text-muted">Inventario — próximamente</div>
-            )}
+            {activeTab === "inventario" && <InventoryTab />}
             {activeTab === "notas" && (
               <div className="p-4 text-muted">Notas — próximamente</div>
             )}
