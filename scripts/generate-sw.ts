@@ -1,4 +1,14 @@
-const CACHE_NAME = "mavok-7b5552f";
+import { execSync } from "child_process";
+import { writeFileSync } from "fs";
+import { resolve } from "path";
+
+const sha =
+  process.env.VERCEL_GIT_COMMIT_SHA ||
+  execSync("git rev-parse HEAD").toString().trim();
+
+const short = sha.slice(0, 7);
+
+const sw = `const CACHE_NAME = "mavok-${short}";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -30,3 +40,7 @@ self.addEventListener("fetch", (event) => {
     }).catch(() => caches.match("/"))
   );
 });
+`;
+
+writeFileSync(resolve(__dirname, "../public/sw.js"), sw);
+console.log(`Generated sw.js with cache: mavok-${short}`);
