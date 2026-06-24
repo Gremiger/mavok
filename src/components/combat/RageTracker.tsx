@@ -3,8 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 
 interface RageTrackerProps {
-  total: number;
-  remaining: number;
+  slots: boolean[];
   active: boolean;
   onToggleSlot: (index: number) => void;
   onToggleActive: () => void;
@@ -38,13 +37,12 @@ function Ember({ delay }: { delay: number }) {
 }
 
 export function RageTracker({
-  total,
-  remaining,
+  slots,
   active,
   onToggleSlot,
   onToggleActive,
 }: RageTrackerProps) {
-  const used = total - remaining;
+  const remaining = slots.filter(Boolean).length;
   const canActivate = !active && remaining > 0;
 
   return (
@@ -99,8 +97,8 @@ export function RageTracker({
         <div className="relative flex items-center justify-center gap-3">
           {/* Rage slots */}
           <div className="flex gap-2">
-            {Array.from({ length: total }).map((_, i) => {
-              const isUsed = i < used;
+            {slots.map((available, i) => {
+              const isUsed = !available;
               return (
                 <motion.button
                   key={i}

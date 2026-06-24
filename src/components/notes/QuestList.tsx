@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCharacterContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { Tag } from "@/components/ui/Tag";
+import { Plus } from "lucide-react";
 import type { QuestEntry } from "@/lib/types";
 
 const STATUS_CONFIG = {
@@ -148,9 +149,9 @@ export function QuestList() {
 
       <button
         onClick={openNew}
-        className="fixed right-4 bottom-20 w-12 h-12 rounded-full bg-accent text-white text-2xl shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
+        className="fixed right-4 bottom-20 w-12 h-12 rounded-full bg-accent text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
       >
-        +
+        <Plus size={24} />
       </button>
 
       <Modal

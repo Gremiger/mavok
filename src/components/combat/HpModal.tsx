@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Modal } from "@/components/ui/Modal";
 
 export function HpModal({
@@ -41,6 +42,9 @@ export function HpModal({
       newHp = Math.max(0, newHp - remaining);
       onApply(newHp, newTemp);
     }
+    if (mode === "damage") toast(`-${val} HP`, { icon: "💥" });
+    else if (mode === "heal") toast(`+${val} HP`, { icon: "💚" });
+    else toast(`Temp HP: ${Math.max(tempHp, val)}`, { icon: "🛡️" });
     setAmount("");
     onClose();
   }

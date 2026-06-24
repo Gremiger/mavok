@@ -12,6 +12,7 @@ import {
 } from "@/data/barbarian-progression";
 import { SUBCLASSES } from "@/data/subclasses";
 import { FEATS, type FeatData } from "@/data/feats";
+import { toast } from "sonner";
 import type { AbilityScore, Character, Feature } from "@/lib/types";
 
 const ABILITIES: AbilityScore[] = ["str", "dex", "con", "int", "wis", "cha"];
@@ -171,6 +172,7 @@ export function LevelUpFlow({
       if (levelData.rages !== currentLevelData.rages) {
         updated.resources.rpiRages.total = levelData.rages;
         updated.resources.rpiRages.remaining = levelData.rages;
+        updated.resources.rpiRages.slots = Array(levelData.rages).fill(true);
       }
 
       // Speed (Fast Movement at level 5)
@@ -232,6 +234,7 @@ export function LevelUpFlow({
 
       return updated;
     });
+    toast.success(`¡Nivel ${newLevel}!`, { icon: "⬆️" });
     onClose();
     resetState();
   }

@@ -9,15 +9,19 @@ import { CombatTab } from "@/components/tabs/CombatTab";
 import { InventoryTab } from "@/components/tabs/InventoryTab";
 import { NotesTab } from "@/components/tabs/NotesTab";
 import { SettingsTab } from "@/components/tabs/SettingsTab";
+import { Toaster } from "sonner";
+import { Shield, Swords, Backpack, BookOpen, Settings } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import type { ReactNode } from "react";
 
 type Tab = "ficha" | "combate" | "inventario" | "notas" | "ajustes";
 
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "ficha", label: "Ficha", icon: "🛡️" },
-  { id: "combate", label: "Combate", icon: "⚔️" },
-  { id: "inventario", label: "Inventario", icon: "🎒" },
-  { id: "notas", label: "Notas", icon: "📖" },
-  { id: "ajustes", label: "Ajustes", icon: "⚙️" },
+const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
+  { id: "ficha", label: "Ficha", icon: <Shield size={20} /> },
+  { id: "combate", label: "Combate", icon: <Swords size={20} /> },
+  { id: "inventario", label: "Inventario", icon: <Backpack size={20} /> },
+  { id: "notas", label: "Notas", icon: <BookOpen size={20} /> },
+  { id: "ajustes", label: "Ajustes", icon: <Settings size={20} /> },
 ];
 
 export default function Home() {
@@ -28,13 +32,34 @@ export default function Home() {
   return (
     <CharacterContext.Provider value={charState}>
       <ThemeContext.Provider value={themeState}>
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: "var(--card)",
+              color: "var(--fg)",
+              border: "1px solid var(--border-color)",
+              fontFamily: "var(--font-inter)",
+            },
+          }}
+        />
         <div className="flex flex-col min-h-dvh">
           <main className="flex-1 overflow-y-auto pb-16">
-            {activeTab === "ficha" && <SheetTab />}
-            {activeTab === "combate" && <CombatTab />}
-            {activeTab === "inventario" && <InventoryTab />}
-            {activeTab === "notas" && <NotesTab />}
-            {activeTab === "ajustes" && <SettingsTab />}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.15 }}
+              >
+                {activeTab === "ficha" && <SheetTab />}
+                {activeTab === "combate" && <CombatTab />}
+                {activeTab === "inventario" && <InventoryTab />}
+                {activeTab === "notas" && <NotesTab />}
+                {activeTab === "ajustes" && <SettingsTab />}
+              </motion.div>
+            </AnimatePresence>
           </main>
 
           <nav className="fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border flex items-center justify-around z-50 safe-area-pb">
@@ -42,11 +67,18 @@ export default function Home() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center justify-center gap-0.5 text-xs w-16 h-full transition-colors ${
+                className={`relative flex flex-col items-center justify-center gap-0.5 text-xs w-16 h-full transition-colors ${
                   activeTab === tab.id ? "text-accent" : "text-muted"
                 }`}
               >
-                <span className="text-lg">{tab.icon}</span>
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="tab-indicator"
+                    className="absolute top-0 left-2 right-2 h-0.5 bg-accent rounded-full"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                {tab.icon}
                 <span>{tab.label}</span>
               </button>
             ))}

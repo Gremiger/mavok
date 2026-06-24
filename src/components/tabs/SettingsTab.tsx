@@ -7,6 +7,7 @@ import { Modal } from "@/components/ui/Modal";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { rollDice } from "@/lib/dice";
 import { abilityModifier } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   exportCharacterJSON,
   exportInventoryCSV,
@@ -53,6 +54,7 @@ export function SettingsTab() {
       `1d12+${conMod} = [${roll.rolls[0]}]+${conMod} = ${healing} HP (${newHp}/${character!.combat.maxHp})`,
       ...prev,
     ]);
+    toast(`+${healing} HP curados`, { icon: "💚" });
   }
 
   function applyLongRest() {
@@ -81,10 +83,12 @@ export function SettingsTab() {
           ...c.resources.rpiRages,
           remaining: c.resources.rpiRages.total,
           active: false,
+          slots: Array(c.resources.rpiRages.total).fill(true),
         },
       },
     }));
     setLongRestOpen(false);
+    toast.success("Descanso largo completado");
   }
 
   async function handleImport(file: File) {
@@ -195,6 +199,7 @@ export function SettingsTab() {
                     const RAGES_BY_LEVEL = [2,2,3,3,3,4,4,4,4,4,4,5,5,5,5,5,6,6,6,6];
                     prev.resources.rpiRages.total = RAGES_BY_LEVEL[prev.meta.level - 1];
                     prev.resources.rpiRages.remaining = Math.min(prev.resources.rpiRages.remaining, prev.resources.rpiRages.total);
+                    prev.resources.rpiRages.slots = Array(prev.resources.rpiRages.total).fill(false).map((_, i) => i < prev.resources.rpiRages.remaining);
                     prev.combat.hitDice.total = prev.meta.level;
                     prev.combat.hitDice.remaining = Math.min(prev.combat.hitDice.remaining, prev.combat.hitDice.total);
                     prev.features = prev.features.filter(f => f.level <= prev.meta.level);

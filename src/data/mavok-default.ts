@@ -47,7 +47,7 @@ export const MAVOK_DEFAULT: Character = {
     conditions: [],
   },
   resources: {
-    rpiRages: { total: 2, remaining: 2, active: false },
+    rpiRages: { total: 2, remaining: 2, active: false, slots: [true, true] },
     healerKit: { total: 10, remaining: 10 },
   },
   savingThrows: {

@@ -13,6 +13,7 @@ import { DiceRoller } from "@/components/combat/DiceRoller";
 import { RageTracker } from "@/components/combat/RageTracker";
 import { CONDITIONS } from "@/data/conditions";
 import { formatModifier } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function CombatTab() {
   const { character, updateCombat, updateResources, updateMeta } =
@@ -29,24 +30,26 @@ export function CombatTab() {
   const rageActive = resources.rpiRages.active;
   const rageDamage = 2;
 
+  const slots = resources.rpiRages.slots?.length === resources.rpiRages.total
+    ? resources.rpiRages.slots
+    : Array.from({ length: resources.rpiRages.total }, (_, i) => i < resources.rpiRages.remaining);
+
   function toggleRageSlot(index: number) {
-    const used = resources.rpiRages.total - resources.rpiRages.remaining;
-    let newRemaining: number;
-    if (index < used) {
-      newRemaining = resources.rpiRages.total - index;
-    } else {
-      newRemaining = resources.rpiRages.total - (index + 1);
-    }
-    newRemaining = Math.max(0, Math.min(resources.rpiRages.total, newRemaining));
+    const newSlots = [...slots];
+    newSlots[index] = !newSlots[index];
+    const newRemaining = newSlots.filter(Boolean).length;
     updateResources({
-      rpiRages: { ...resources.rpiRages, remaining: newRemaining },
+      rpiRages: { ...resources.rpiRages, remaining: newRemaining, slots: newSlots },
     });
   }
 
   function toggleRageActive() {
+    const next = !rageActive;
     updateResources({
-      rpiRages: { ...resources.rpiRages, active: !rageActive },
+      rpiRages: { ...resources.rpiRages, active: next },
     });
+    if (next) toast("Rage activado", { icon: "🔥" });
+    else toast("Rage desactivado", { icon: "💨" });
   }
 
   function addCondition(name: string) {
@@ -122,8 +125,7 @@ export function CombatTab() {
 
         {/* Rage */}
         <RageTracker
-          total={resources.rpiRages.total}
-          remaining={resources.rpiRages.remaining}
+          slots={slots}
           active={rageActive}
           onToggleSlot={toggleRageSlot}
           onToggleActive={toggleRageActive}

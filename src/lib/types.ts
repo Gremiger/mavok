@@ -52,7 +52,7 @@ export interface CombatState {
 }
 
 export interface Resources {
-  rpiRages: { total: number; remaining: number; active: boolean };
+  rpiRages: { total: number; remaining: number; active: boolean; slots: boolean[] };
   healerKit: { total: number; remaining: number };
 }
 

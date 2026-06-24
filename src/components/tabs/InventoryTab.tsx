@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useCharacterContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
-import { abilityModifier } from "@/lib/utils";
 import { exportInventoryCSV } from "@/lib/export";
+import { toast } from "sonner";
+import { Sword, Shield, Wrench, FlaskConical, Heart, Plus } from "lucide-react";
 import type { InventoryItem } from "@/lib/types";
+import type { ReactNode } from "react";
 import { WEAPONS } from "@/data/weapons";
 
 const CURRENCY_LABELS = [
@@ -24,12 +26,12 @@ const CATEGORIES: { value: InventoryItem["category"]; label: string }[] = [
   { value: "personal", label: "Personal" },
 ];
 
-const CATEGORY_ICONS: Record<string, string> = {
-  weapon: "⚔️",
-  armor: "🛡️",
-  gear: "🔧",
-  consumable: "🧪",
-  personal: "❤️",
+const CATEGORY_ICONS: Record<string, ReactNode> = {
+  weapon: <Sword size={14} />,
+  armor: <Shield size={14} />,
+  gear: <Wrench size={14} />,
+  consumable: <FlaskConical size={14} />,
+  personal: <Heart size={14} />,
 };
 
 export function InventoryTab() {
@@ -78,6 +80,7 @@ export function InventoryTab() {
       description: newItem.description,
     };
     addInventoryItem(item);
+    toast(`${item.name} agregado`, { icon: "📦" });
     setNewItem({
       name: "",
       quantity: 1,
@@ -252,9 +255,9 @@ export function InventoryTab() {
       {/* Add Item FAB */}
       <button
         onClick={() => setAddModalOpen(true)}
-        className="fixed right-4 bottom-20 w-12 h-12 rounded-full bg-accent text-white text-2xl shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
+        className="fixed right-4 bottom-20 w-12 h-12 rounded-full bg-accent text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
       >
-        +
+        <Plus size={24} />
       </button>
 
       {/* Add Item Modal */}
