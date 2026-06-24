@@ -8,6 +8,7 @@ import { SheetTab } from "@/components/tabs/SheetTab";
 import { CombatTab } from "@/components/tabs/CombatTab";
 import { InventoryTab } from "@/components/tabs/InventoryTab";
 import { NotesTab } from "@/components/tabs/NotesTab";
+import { SettingsTab } from "@/components/tabs/SettingsTab";
 
 type Tab = "ficha" | "combate" | "inventario" | "notas" | "ajustes";
 
@@ -33,9 +34,7 @@ export default function Home() {
             {activeTab === "combate" && <CombatTab />}
             {activeTab === "inventario" && <InventoryTab />}
             {activeTab === "notas" && <NotesTab />}
-            {activeTab === "ajustes" && (
-              <div className="p-4 text-muted">Ajustes — próximamente</div>
-            )}
+            {activeTab === "ajustes" && <SettingsTab />}
           </main>
 
           <nav className="fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border flex items-center justify-around z-50 safe-area-pb">
