@@ -144,8 +144,8 @@ export function InventoryTab() {
       {/* Inventory List */}
       {grouped.map((group) => (
         <div key={group.value}>
-          <h3 className="font-heading text-xs text-muted uppercase mb-2">
-            {CATEGORY_ICONS[group.value]} {group.label}
+          <h3 className="font-heading text-xs text-muted uppercase mb-2 flex items-center gap-1.5">
+            {CATEGORY_ICONS[group.value]} <span>{group.label}</span>
           </h3>
           <div className="space-y-1">
             {group.items.map((item) => (

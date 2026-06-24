@@ -5,7 +5,7 @@ import { loadSettings, saveSettings } from "@/lib/storage";
 import type { AppSettings } from "@/lib/types";
 
 export function useTheme() {
-  const [theme, setTheme] = useState<AppSettings["theme"]>("dark-fantasy");
+  const [theme, setTheme] = useState<AppSettings["theme"]>("dnd-classic");
 
   useEffect(() => {
     const settings = loadSettings();

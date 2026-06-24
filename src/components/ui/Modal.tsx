@@ -22,13 +22,19 @@ export function Modal({
     else if (!open && el.open) el.close();
   }, [open]);
 
+  if (!open) return null;
+
   return (
     <dialog
       ref={dialogRef}
       onClose={onClose}
-      className="bg-card text-foreground rounded-xl p-0 w-[90vw] max-w-md backdrop:bg-black/60 border border-border"
+      onClick={(e) => {
+        if (e.target === dialogRef.current) onClose();
+      }}
+      className="fixed inset-0 m-auto bg-card text-foreground rounded-xl p-0 w-[90vw] max-w-md max-h-[85vh] overflow-y-auto border border-border shadow-xl"
+      style={{ zIndex: 100 }}
     >
-      <div className="flex items-center justify-between p-4 border-b border-border">
+      <div className="sticky top-0 flex items-center justify-between p-4 border-b border-border bg-card z-10">
         <h2 className="font-heading text-accent text-lg">{title}</h2>
         <button
           onClick={onClose}

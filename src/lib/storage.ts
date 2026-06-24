@@ -42,14 +42,14 @@ export function getCharacterStorageKey(id: string): string {
 
 export function loadSettings(): AppSettings {
   if (typeof window === "undefined")
-    return { theme: "dark-fantasy", lastCharacterId: "mavok-1" };
+    return { theme: "dnd-classic", lastCharacterId: "mavok-1" };
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
     return raw
       ? JSON.parse(raw)
-      : { theme: "dark-fantasy", lastCharacterId: "mavok-1" };
+      : { theme: "dnd-classic", lastCharacterId: "mavok-1" };
   } catch {
-    return { theme: "dark-fantasy", lastCharacterId: "mavok-1" };
+    return { theme: "dnd-classic", lastCharacterId: "mavok-1" };
   }
 }
 
