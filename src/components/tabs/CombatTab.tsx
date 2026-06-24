@@ -19,27 +19,33 @@ export function CombatTab() {
   const [hpModalOpen, setHpModalOpen] = useState(false);
   const [conditionModalOpen, setConditionModalOpen] = useState(false);
   const [tempHpInput, setTempHpInput] = useState(false);
+  const [tempAcMod, setTempAcMod] = useState(0);
+  const [acModalOpen, setAcModalOpen] = useState(false);
 
   if (!character) return null;
 
   const { combat, resources, meta, attacks } = character;
   const rageActive = resources.rpiRages.active;
-  const rageDamage = 2; // Level 1-8, will be dynamic via progression data
+  const rageDamage = 2;
 
-  function toggleRage() {
-    if (rageActive) {
-      updateResources({
-        rpiRages: { ...resources.rpiRages, active: false },
-      });
-    } else if (resources.rpiRages.remaining > 0) {
-      updateResources({
-        rpiRages: {
-          ...resources.rpiRages,
-          active: true,
-          remaining: resources.rpiRages.remaining - 1,
-        },
-      });
+  function toggleRageSlot(index: number) {
+    const used = resources.rpiRages.total - resources.rpiRages.remaining;
+    let newRemaining: number;
+    if (index < used) {
+      newRemaining = resources.rpiRages.total - index;
+    } else {
+      newRemaining = resources.rpiRages.total - (index + 1);
     }
+    newRemaining = Math.max(0, Math.min(resources.rpiRages.total, newRemaining));
+    updateResources({
+      rpiRages: { ...resources.rpiRages, remaining: newRemaining },
+    });
+  }
+
+  function toggleRageActive() {
+    updateResources({
+      rpiRages: { ...resources.rpiRages, active: !rageActive },
+    });
   }
 
   function addCondition(name: string) {
@@ -60,6 +66,7 @@ export function CombatTab() {
   }
 
   const isDying = combat.currentHp === 0;
+  const displayAc = combat.armorClass + tempAcMod;
 
   return (
     <div className="p-4 space-y-3">
@@ -93,7 +100,12 @@ export function CombatTab() {
               onClick={() => setTempHpInput(true)}
               highlight={combat.tempHp > 0}
             />
-            <StatBadge label="AC" value={combat.armorClass} />
+            <StatBadge
+              label="AC"
+              value={tempAcMod !== 0 ? `${displayAc} (${formatModifier(tempAcMod)})` : displayAc}
+              onClick={() => setAcModalOpen(true)}
+              highlight={tempAcMod !== 0}
+            />
             <StatBadge
               label="Init"
               value={formatModifier(combat.initiative)}
@@ -104,14 +116,40 @@ export function CombatTab() {
               onClick={toggleInspiration}
               highlight={meta.inspiration}
             />
-            <StatBadge
-              label="Rage"
-              value={`${resources.rpiRages.remaining}/${resources.rpiRages.total}`}
-              onClick={toggleRage}
-              highlight={rageActive}
-            />
           </div>
         )}
+
+        {/* Rage Squares */}
+        <div className="mt-3 flex items-center justify-center gap-3">
+          <button
+            onClick={toggleRageActive}
+            className={`text-xs font-heading px-2 py-1 rounded transition-colors ${
+              rageActive
+                ? "bg-rage text-white"
+                : "bg-card border border-border text-muted"
+            }`}
+          >
+            {rageActive ? "RAGE ON" : "Rage"}
+          </button>
+          <div className="flex gap-1.5">
+            {Array.from({ length: resources.rpiRages.total }).map((_, i) => {
+              const used = resources.rpiRages.total - resources.rpiRages.remaining;
+              const isUsed = i < used;
+              return (
+                <button
+                  key={i}
+                  onClick={() => toggleRageSlot(i)}
+                  className={`w-6 h-6 rounded border-2 transition-colors ${
+                    isUsed
+                      ? "bg-muted/30 border-muted"
+                      : "bg-rage/20 border-rage"
+                  }`}
+                  title={isUsed ? "Usado" : "Disponible"}
+                />
+              );
+            })}
+          </div>
+        </div>
 
         {rageActive && (
           <div className="text-center mt-2">
@@ -151,7 +189,7 @@ export function CombatTab() {
       <CollapsibleSection title="Acciones adicionales">
         <div className="space-y-2 text-sm">
           <button
-            onClick={toggleRage}
+            onClick={toggleRageActive}
             className={`w-full p-3 rounded-lg border text-left ${
               rageActive
                 ? "border-rage bg-rage/10 text-rage"
@@ -255,6 +293,45 @@ export function CombatTab() {
           <p className="text-xs text-muted text-center">
             Los Temp HP no se acumulan — se usa el valor más alto
           </p>
+        </div>
+      </Modal>
+
+      {/* AC Temp Modifier Modal */}
+      <Modal
+        open={acModalOpen}
+        onClose={() => setAcModalOpen(false)}
+        title="Modificador temporal de AC"
+      >
+        <div className="space-y-3">
+          <p className="text-xs text-muted text-center">
+            AC base: {combat.armorClass} · Temporal: {formatModifier(tempAcMod)} · Total: {displayAc}
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <button
+              onClick={() => setTempAcMod((p) => p - 1)}
+              className="w-12 h-12 rounded-lg bg-card border border-border text-xl font-heading text-foreground active:scale-95 transition-transform"
+            >
+              -
+            </button>
+            <span className="font-heading text-3xl text-accent w-16 text-center">
+              {formatModifier(tempAcMod)}
+            </span>
+            <button
+              onClick={() => setTempAcMod((p) => p + 1)}
+              className="w-12 h-12 rounded-lg bg-card border border-border text-xl font-heading text-foreground active:scale-95 transition-transform"
+            >
+              +
+            </button>
+          </div>
+          <button
+            onClick={() => {
+              setTempAcMod(0);
+              setAcModalOpen(false);
+            }}
+            className="w-full py-2 text-sm text-muted border border-border rounded-lg"
+          >
+            Resetear a 0
+          </button>
         </div>
       </Modal>
     </div>

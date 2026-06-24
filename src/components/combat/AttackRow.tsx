@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { Attack } from "@/lib/types";
 import { rollD20, rollDice, type DiceRoll } from "@/lib/dice";
+import { DiceResult } from "@/components/ui/DiceResult";
 
 export function AttackRow({
   attack,
@@ -14,8 +15,7 @@ export function AttackRow({
   rageDamage: number;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const [lastRoll, setLastRoll] = useState<DiceRoll | null>(null);
-  const [rollType, setRollType] = useState<"hit" | "damage" | null>(null);
+  const [lastRoll, setLastRoll] = useState<{ roll: DiceRoll; type: "hit" | "damage" } | null>(null);
 
   const isStrBased = !attack.properties.includes("Finesse");
   const rageBonus = rageActive && isStrBased && !attack.range.includes("/") ? rageDamage : 0;
@@ -34,8 +34,7 @@ export function AttackRow({
 
   function handleRollHit() {
     const result = rollD20(attack.attackBonus);
-    setLastRoll(result);
-    setRollType("hit");
+    setLastRoll({ roll: result, type: "hit" });
   }
 
   function handleRollDamage() {
@@ -51,9 +50,10 @@ export function AttackRow({
       }
     }
     const result = rollDice(expr);
-    setLastRoll(result);
-    setRollType("damage");
+    setLastRoll({ roll: result, type: "damage" });
   }
+
+  const clearRoll = useCallback(() => setLastRoll(null), []);
 
   return (
     <div className="bg-card rounded-lg border border-border overflow-hidden mb-2">
@@ -99,26 +99,12 @@ export function AttackRow({
       </div>
 
       {lastRoll && (
-        <div
-          className={`px-3 py-2 text-sm border-t border-border ${
-            rollType === "hit" ? "bg-accent/5" : "bg-danger/5"
-          }`}
-        >
-          <span className="text-muted">{lastRoll.expression}: </span>
-          <span className="text-foreground">
-            [{lastRoll.rolls.join(", ")}]
-            {lastRoll.modifier !== 0 &&
-              ` ${lastRoll.modifier >= 0 ? "+" : ""}${lastRoll.modifier}`}
-          </span>
-          <span className="font-heading text-accent ml-2">
-            = {lastRoll.total}
-          </span>
-          {rollType === "hit" && lastRoll.rolls[0] === 20 && (
-            <span className="ml-2 text-success font-heading">¡CRÍTICO!</span>
-          )}
-          {rollType === "hit" && lastRoll.rolls[0] === 1 && (
-            <span className="ml-2 text-danger font-heading">Pifia</span>
-          )}
+        <div className="px-3 py-1 border-t border-border">
+          <DiceResult
+            roll={lastRoll.roll}
+            label={lastRoll.type === "hit" ? "Hit" : "Dmg"}
+            onClear={clearRoll}
+          />
         </div>
       )}
 

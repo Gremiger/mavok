@@ -1,8 +1,11 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { useCharacterContext } from "@/lib/context";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
+import { DiceResult } from "@/components/ui/DiceResult";
 import type { AbilityScore } from "@/lib/types";
+import { rollD20, type DiceRoll } from "@/lib/dice";
 import {
   abilityModifier,
   formatModifier,
@@ -17,10 +20,35 @@ const ABILITIES: AbilityScore[] = ["str", "dex", "con", "int", "wis", "cha"];
 
 export function SheetTab() {
   const { character } = useCharacterContext();
+  const [activeRoll, setActiveRoll] = useState<{
+    key: string;
+    roll: DiceRoll;
+  } | null>(null);
+
+  const clearRoll = useCallback(() => setActiveRoll(null), []);
+
   if (!character) return null;
 
   const { meta, attributes, skills, savingThrows, proficiencies, features } =
     character;
+
+  function rollAbility(ab: AbilityScore) {
+    const mod = abilityModifier(attributes[ab]);
+    const result = rollD20(mod);
+    setActiveRoll({ key: `ability-${ab}`, roll: result });
+  }
+
+  function rollSave(ab: AbilityScore) {
+    const total = saveTotal(character!, ab);
+    const result = rollD20(total);
+    setActiveRoll({ key: `save-${ab}`, roll: result });
+  }
+
+  function rollSkill(key: string) {
+    const total = skillTotal(character!, key);
+    const result = rollD20(total);
+    setActiveRoll({ key: `skill-${key}`, roll: result });
+  }
 
   return (
     <div className="p-4 space-y-0">
@@ -40,9 +68,10 @@ export function SheetTab() {
       <CollapsibleSection title="Atributos" defaultOpen>
         <div className="grid grid-cols-3 gap-2">
           {ABILITIES.map((ab) => (
-            <div
+            <button
               key={ab}
-              className="bg-card rounded-lg p-2 text-center border border-border"
+              onClick={() => rollAbility(ab)}
+              className="bg-card rounded-lg p-2 text-center border border-border active:scale-95 transition-transform cursor-pointer"
             >
               <div className="text-muted text-xs">{abilityLabel(ab)}</div>
               <div className="font-heading text-2xl text-accent">
@@ -51,18 +80,28 @@ export function SheetTab() {
               <div className="text-sm text-foreground">
                 {formatModifier(abilityModifier(attributes[ab]))}
               </div>
-            </div>
+            </button>
           ))}
         </div>
+        {activeRoll?.key.startsWith("ability-") && (
+          <div className="mt-2">
+            <DiceResult
+              roll={activeRoll.roll}
+              label={abilityLabel(activeRoll.key.replace("ability-", "") as AbilityScore)}
+              onClear={clearRoll}
+            />
+          </div>
+        )}
       </CollapsibleSection>
 
       {/* Tiradas de salvación */}
       <CollapsibleSection title="Tiradas de salvación">
         <div className="space-y-1">
           {ABILITIES.map((ab) => (
-            <div
+            <button
               key={ab}
-              className="flex items-center justify-between py-1 text-sm"
+              onClick={() => rollSave(ab)}
+              className="w-full flex items-center justify-between py-1.5 px-1 text-sm rounded hover:bg-card/50 active:scale-[0.99] transition-transform cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <span
@@ -77,9 +116,18 @@ export function SheetTab() {
               <span className="font-heading text-accent">
                 {formatModifier(saveTotal(character, ab))}
               </span>
-            </div>
+            </button>
           ))}
         </div>
+        {activeRoll?.key.startsWith("save-") && (
+          <div className="mt-2">
+            <DiceResult
+              roll={activeRoll.roll}
+              label={`Salvación ${abilityLabel(activeRoll.key.replace("save-", "") as AbilityScore)}`}
+              onClear={clearRoll}
+            />
+          </div>
+        )}
       </CollapsibleSection>
 
       {/* Habilidades */}
@@ -88,9 +136,10 @@ export function SheetTab() {
           {Object.entries(skills)
             .sort(([a], [b]) => skillLabel(a).localeCompare(skillLabel(b)))
             .map(([key, skill]) => (
-              <div
+              <button
                 key={key}
-                className="flex items-center justify-between py-1 text-sm"
+                onClick={() => rollSkill(key)}
+                className="w-full flex items-center justify-between py-1.5 px-1 text-sm rounded hover:bg-card/50 active:scale-[0.99] transition-transform cursor-pointer"
               >
                 <div className="flex items-center gap-2">
                   <span
@@ -108,9 +157,18 @@ export function SheetTab() {
                 <span className="font-heading text-accent">
                   {formatModifier(skillTotal(character, key))}
                 </span>
-              </div>
+              </button>
             ))}
         </div>
+        {activeRoll?.key.startsWith("skill-") && (
+          <div className="mt-2">
+            <DiceResult
+              roll={activeRoll.roll}
+              label={skillLabel(activeRoll.key.replace("skill-", ""))}
+              onClear={clearRoll}
+            />
+          </div>
+        )}
       </CollapsibleSection>
 
       {/* Competencias */}

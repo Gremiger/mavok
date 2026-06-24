@@ -27,6 +27,7 @@ export function SettingsTab() {
   } | null>(null);
   const [shortRestLog, setShortRestLog] = useState<string[]>([]);
   const [levelUpOpen, setLevelUpOpen] = useState(false);
+  const [levelUpDryRun, setLevelUpDryRun] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!character) return null;
@@ -162,12 +163,51 @@ export function SettingsTab() {
             {character.meta.class}
             {character.meta.subclass && ` — ${character.meta.subclass}`}
           </div>
-          <button
-            onClick={() => setLevelUpOpen(true)}
-            className="mt-3 px-6 py-2 bg-accent text-white rounded-lg font-heading text-sm active:scale-95 transition-transform"
-          >
-            Subir de nivel
-          </button>
+          <div className="flex gap-2 justify-center mt-3">
+            <button
+              onClick={() => {
+                setLevelUpDryRun(false);
+                setLevelUpOpen(true);
+              }}
+              className="px-5 py-2 bg-accent text-white rounded-lg font-heading text-sm active:scale-95 transition-transform"
+            >
+              Subir de nivel
+            </button>
+            <button
+              onClick={() => {
+                setLevelUpDryRun(true);
+                setLevelUpOpen(true);
+              }}
+              className="px-5 py-2 border border-accent text-accent rounded-lg font-heading text-sm active:scale-95 transition-transform"
+            >
+              Dry Run ↑
+            </button>
+          </div>
+          {character.meta.level > 1 && (
+            <button
+              onClick={() => {
+                if (confirm(`¿Bajar a nivel ${character.meta.level - 1}? Esto revertirá los cambios del último nivel.`)) {
+                  update((c) => {
+                    const prev = structuredClone(c);
+                    prev.meta.level -= 1;
+                    const PROF_BY_LEVEL = [2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6];
+                    prev.meta.proficiencyBonus = PROF_BY_LEVEL[prev.meta.level - 1];
+                    const RAGES_BY_LEVEL = [2,2,3,3,3,4,4,4,4,4,4,5,5,5,5,5,6,6,6,6];
+                    prev.resources.rpiRages.total = RAGES_BY_LEVEL[prev.meta.level - 1];
+                    prev.resources.rpiRages.remaining = Math.min(prev.resources.rpiRages.remaining, prev.resources.rpiRages.total);
+                    prev.combat.hitDice.total = prev.meta.level;
+                    prev.combat.hitDice.remaining = Math.min(prev.combat.hitDice.remaining, prev.combat.hitDice.total);
+                    prev.features = prev.features.filter(f => f.level <= prev.meta.level);
+                    if (prev.meta.level < 3) prev.meta.subclass = null;
+                    return prev;
+                  });
+                }
+              }}
+              className="mt-2 text-xs text-muted hover:text-danger"
+            >
+              Bajar de nivel
+            </button>
+          )}
         </div>
       </CollapsibleSection>
 
@@ -314,7 +354,7 @@ export function SettingsTab() {
       </Modal>
 
       {/* Level Up Flow */}
-      <LevelUpFlow open={levelUpOpen} onClose={() => setLevelUpOpen(false)} />
+      <LevelUpFlow open={levelUpOpen} onClose={() => setLevelUpOpen(false)} dryRun={levelUpDryRun} />
 
       {/* Import Preview Modal */}
       <Modal

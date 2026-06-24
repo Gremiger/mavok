@@ -36,9 +36,11 @@ type Step = "confirm" | "hp" | "subclass" | "asi" | "features" | "summary";
 export function LevelUpFlow({
   open,
   onClose,
+  dryRun = false,
 }: {
   open: boolean;
   onClose: () => void;
+  dryRun?: boolean;
 }) {
   const { character, update } = useCharacterContext();
   const [step, setStep] = useState<Step>("confirm");
@@ -267,7 +269,7 @@ export function LevelUpFlow({
         onClose();
         resetState();
       }}
-      title={`Subir a nivel ${newLevel}`}
+      title={`${dryRun ? "🔍 Dry Run — " : ""}Subir a nivel ${newLevel}`}
     >
       {/* Confirm */}
       {step === "confirm" && (
@@ -457,12 +459,29 @@ export function LevelUpFlow({
             ))}
             {newLevel === 5 && <li>Velocidad: +10 ft</li>}
           </ul>
-          <button
-            onClick={applyAll}
-            className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
-          >
-            Confirmar nivel {newLevel}
-          </button>
+          {dryRun ? (
+            <div className="space-y-2">
+              <div className="text-center text-xs text-muted bg-card border border-border rounded-lg py-2">
+                🔍 Dry Run — no se aplicarán cambios
+              </div>
+              <button
+                onClick={() => {
+                  onClose();
+                  resetState();
+                }}
+                className="w-full py-3 border border-accent text-accent rounded-lg font-heading active:scale-95 transition-transform"
+              >
+                Cerrar preview
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={applyAll}
+              className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+            >
+              Confirmar nivel {newLevel}
+            </button>
+          )}
         </div>
       )}
     </Modal>
