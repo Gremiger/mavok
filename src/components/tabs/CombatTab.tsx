@@ -10,6 +10,7 @@ import { HpModal } from "@/components/combat/HpModal";
 import { DeathSaves } from "@/components/combat/DeathSaves";
 import { AttackRow } from "@/components/combat/AttackRow";
 import { DiceRoller } from "@/components/combat/DiceRoller";
+import { RageTracker } from "@/components/combat/RageTracker";
 import { CONDITIONS } from "@/data/conditions";
 import { formatModifier } from "@/lib/utils";
 
@@ -120,58 +121,13 @@ export function CombatTab() {
         )}
 
         {/* Rage */}
-        <div className="mt-3">
-          <div className="flex items-center justify-center gap-2">
-            {Array.from({ length: resources.rpiRages.total }).map((_, i) => {
-              const used = resources.rpiRages.total - resources.rpiRages.remaining;
-              const isUsed = i < used;
-              return (
-                <button
-                  key={i}
-                  onClick={() => toggleRageSlot(i)}
-                  className={`relative w-9 h-9 rounded-md transition-all duration-200 ${
-                    isUsed
-                      ? "bg-muted/10 border border-muted/30"
-                      : rageActive
-                        ? "bg-rage/30 border-2 border-rage shadow-[0_0_8px_rgba(139,45,45,0.5)]"
-                        : "bg-rage/15 border-2 border-rage/60"
-                  }`}
-                >
-                  {!isUsed && (
-                    <span className={`absolute inset-0 flex items-center justify-center text-lg ${
-                      rageActive ? "animate-pulse" : ""
-                    }`}>
-                      🔥
-                    </span>
-                  )}
-                  {isUsed && (
-                    <span className="absolute inset-0 flex items-center justify-center text-muted/40 text-xs">✕</span>
-                  )}
-                </button>
-              );
-            })}
-
-            <button
-              onClick={toggleRageActive}
-              className={`ml-2 px-3 py-1.5 rounded-md text-xs font-heading tracking-wider transition-all duration-300 ${
-                rageActive
-                  ? "bg-rage text-white shadow-[0_0_16px_rgba(139,45,45,0.6)] scale-105"
-                  : resources.rpiRages.remaining > 0
-                    ? "border border-rage/50 text-rage/80 hover:border-rage hover:text-rage"
-                    : "border border-muted/30 text-muted/40 cursor-not-allowed"
-              }`}
-              disabled={!rageActive && resources.rpiRages.remaining === 0}
-            >
-              {rageActive ? "RAGING" : "RAGE"}
-            </button>
-          </div>
-
-          {rageActive && (
-            <div className="text-center mt-2 overflow-hidden">
-              <div className="h-0.5 bg-gradient-to-r from-transparent via-rage to-transparent animate-pulse" />
-            </div>
-          )}
-        </div>
+        <RageTracker
+          total={resources.rpiRages.total}
+          remaining={resources.rpiRages.remaining}
+          active={rageActive}
+          onToggleSlot={toggleRageSlot}
+          onToggleActive={toggleRageActive}
+        />
       </div>
 
       {/* Conditions */}
