@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cinzel, Inter } from "next/font/google";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -35,6 +36,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body bg-background text-foreground min-h-dvh">
+        <ServiceWorkerRegistration />
         {children}
       </body>
     </html>
