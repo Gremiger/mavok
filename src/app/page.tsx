@@ -29,6 +29,14 @@ export default function Home() {
   const charState = useCharacter();
   const themeState = useTheme();
 
+  if (!charState.character) {
+    return (
+      <div className="flex items-center justify-center min-h-dvh bg-background">
+        <div className="text-accent font-heading text-xl animate-pulse">Mavok</div>
+      </div>
+    );
+  }
+
   return (
     <CharacterContext.Provider value={charState}>
       <ThemeContext.Provider value={themeState}>
@@ -45,13 +53,13 @@ export default function Home() {
         />
         <div className="flex flex-col min-h-dvh">
           <main className="flex-1 overflow-y-auto pb-16">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="popLayout">
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.15 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.12 }}
               >
                 {activeTab === "ficha" && <SheetTab />}
                 {activeTab === "combate" && <CombatTab />}

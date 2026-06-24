@@ -11,17 +11,30 @@ import type {
 import { loadCharacter, saveCharacter } from "@/lib/storage";
 import { MAVOK_DEFAULT } from "@/data/mavok-default";
 
+function migrateCharacter(c: Character): Character {
+  if (!c.resources.rpiRages.slots || c.resources.rpiRages.slots.length !== c.resources.rpiRages.total) {
+    c.resources.rpiRages.slots = Array.from(
+      { length: c.resources.rpiRages.total },
+      (_, i) => i < c.resources.rpiRages.remaining
+    );
+  }
+  return c;
+}
+
 export function useCharacter(id: string = "mavok-1") {
   const [character, setCharacter] = useState<Character | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const loaded = loadCharacter(id);
-    setCharacter(loaded ?? MAVOK_DEFAULT);
+    const data = loadCharacter(id);
+    const char = data ? migrateCharacter(data) : MAVOK_DEFAULT;
+    setCharacter(char);
+    setLoaded(true);
   }, [id]);
 
   useEffect(() => {
-    if (character) saveCharacter(character);
-  }, [character]);
+    if (loaded && character) saveCharacter(character);
+  }, [character, loaded]);
 
   const update = useCallback(
     (updater: (prev: Character) => Character) => {
