@@ -1,4 +1,4 @@
-const CACHE_NAME = "mavok-v1";
+const CACHE_NAME = "mavok-v2";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

@@ -304,7 +304,7 @@ export function SettingsTab() {
       {/* About */}
       <div className="text-center text-xs text-muted py-4 border-t border-border">
         <p className="font-heading text-accent">Mavok PWA</p>
-        <p className="mt-1">v1.0.0 · {character.meta.name}</p>
+        <p className="mt-1">v0.2.0 · {character.meta.name}</p>
         <p className="mt-1">
           D&D 5.5e (2024) · Data v{CURRENT_DATA_VERSION}
         </p>
