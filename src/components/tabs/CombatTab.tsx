@@ -119,19 +119,9 @@ export function CombatTab() {
           </div>
         )}
 
-        {/* Rage Squares */}
-        <div className="mt-3 flex items-center justify-center gap-3">
-          <button
-            onClick={toggleRageActive}
-            className={`text-xs font-heading px-2 py-1 rounded transition-colors ${
-              rageActive
-                ? "bg-rage text-white"
-                : "bg-card border border-border text-muted"
-            }`}
-          >
-            {rageActive ? "RAGE ON" : "Rage"}
-          </button>
-          <div className="flex gap-1.5">
+        {/* Rage */}
+        <div className="mt-3">
+          <div className="flex items-center justify-center gap-2">
             {Array.from({ length: resources.rpiRages.total }).map((_, i) => {
               const used = resources.rpiRages.total - resources.rpiRages.remaining;
               const isUsed = i < used;
@@ -139,25 +129,49 @@ export function CombatTab() {
                 <button
                   key={i}
                   onClick={() => toggleRageSlot(i)}
-                  className={`w-6 h-6 rounded border-2 transition-colors ${
+                  className={`relative w-9 h-9 rounded-md transition-all duration-200 ${
                     isUsed
-                      ? "bg-muted/30 border-muted"
-                      : "bg-rage/20 border-rage"
+                      ? "bg-muted/10 border border-muted/30"
+                      : rageActive
+                        ? "bg-rage/30 border-2 border-rage shadow-[0_0_8px_rgba(139,45,45,0.5)]"
+                        : "bg-rage/15 border-2 border-rage/60"
                   }`}
-                  title={isUsed ? "Usado" : "Disponible"}
-                />
+                >
+                  {!isUsed && (
+                    <span className={`absolute inset-0 flex items-center justify-center text-lg ${
+                      rageActive ? "animate-pulse" : ""
+                    }`}>
+                      🔥
+                    </span>
+                  )}
+                  {isUsed && (
+                    <span className="absolute inset-0 flex items-center justify-center text-muted/40 text-xs">✕</span>
+                  )}
+                </button>
               );
             })}
-          </div>
-        </div>
 
-        {rageActive && (
-          <div className="text-center mt-2">
-            <span className="text-xs text-rage font-heading animate-pulse">
-              ⚡ RAGE ACTIVO ⚡
-            </span>
+            <button
+              onClick={toggleRageActive}
+              className={`ml-2 px-3 py-1.5 rounded-md text-xs font-heading tracking-wider transition-all duration-300 ${
+                rageActive
+                  ? "bg-rage text-white shadow-[0_0_16px_rgba(139,45,45,0.6)] scale-105"
+                  : resources.rpiRages.remaining > 0
+                    ? "border border-rage/50 text-rage/80 hover:border-rage hover:text-rage"
+                    : "border border-muted/30 text-muted/40 cursor-not-allowed"
+              }`}
+              disabled={!rageActive && resources.rpiRages.remaining === 0}
+            >
+              {rageActive ? "RAGING" : "RAGE"}
+            </button>
           </div>
-        )}
+
+          {rageActive && (
+            <div className="text-center mt-2 overflow-hidden">
+              <div className="h-0.5 bg-gradient-to-r from-transparent via-rage to-transparent animate-pulse" />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Conditions */}

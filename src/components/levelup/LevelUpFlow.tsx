@@ -89,8 +89,7 @@ export function LevelUpFlow({
     setHpRoll(result.rolls[0]);
   }
 
-  function confirmHp(rolled: boolean) {
-    const dieValue = rolled && hpRoll ? hpRoll : 7;
+  function confirmHp(dieValue: number) {
     setChanges((prev) => ({
       ...prev,
       hpIncrease: dieValue + conMod + toughBonus,
@@ -289,46 +288,13 @@ export function LevelUpFlow({
 
       {/* HP */}
       {step === "hp" && (
-        <div className="space-y-4">
-          <p className="text-sm">
-            Tirar 1d12 o tomar 7 (promedio). Se suma CON mod (
-            {formatModifier(conMod)}) y Tough (+{toughBonus}).
-          </p>
-
-          <div className="flex gap-2">
-            <button
-              onClick={rollHp}
-              className="flex-1 py-3 bg-card border border-border rounded-lg font-heading text-accent active:scale-95 transition-transform"
-            >
-              Tirar 1d12
-            </button>
-            <button
-              onClick={() => confirmHp(false)}
-              className="flex-1 py-3 bg-card border border-border rounded-lg font-heading text-accent active:scale-95 transition-transform"
-            >
-              Tomar 7
-            </button>
-          </div>
-
-          {hpRoll !== null && (
-            <div className="text-center space-y-2">
-              <p className="text-sm">
-                Tirada: <span className="font-heading text-accent text-xl">{hpRoll}</span>
-                {" + "}{conMod} (CON) + {toughBonus} (Tough) ={" "}
-                <span className="font-heading text-accent text-xl">
-                  {hpRoll + conMod + toughBonus}
-                </span>{" "}
-                HP
-              </p>
-              <button
-                onClick={() => confirmHp(true)}
-                className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
-              >
-                Confirmar ({hpRoll + conMod + toughBonus} HP)
-              </button>
-            </div>
-          )}
-        </div>
+        <HpStep
+          conMod={conMod}
+          toughBonus={toughBonus}
+          hpRoll={hpRoll}
+          onRoll={rollHp}
+          onConfirm={confirmHp}
+        />
       )}
 
       {/* Subclass */}
@@ -662,6 +628,108 @@ function ASIStep({
               Usar dote personalizada
             </button>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function HpStep({
+  conMod,
+  toughBonus,
+  hpRoll,
+  onRoll,
+  onConfirm,
+}: {
+  conMod: number;
+  toughBonus: number;
+  hpRoll: number | null;
+  onRoll: () => void;
+  onConfirm: (dieValue: number) => void;
+}) {
+  const [manualValue, setManualValue] = useState("");
+  const [useManual, setUseManual] = useState(false);
+
+  const dieValue = useManual
+    ? parseInt(manualValue) || 0
+    : hpRoll;
+  const isValid = dieValue !== null && dieValue > 0 && dieValue <= 12;
+  const totalHp = isValid ? dieValue! + conMod + toughBonus : 0;
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm">
+        Resultado del d12 + CON mod ({formatModifier(conMod)}) + Tough (+
+        {toughBonus}).
+      </p>
+
+      <div className="flex gap-2">
+        <button
+          onClick={() => {
+            setUseManual(false);
+            onRoll();
+          }}
+          className="flex-1 py-3 bg-card border border-border rounded-lg font-heading text-accent active:scale-95 transition-transform"
+        >
+          Tirar 1d12
+        </button>
+        <button
+          onClick={() => onConfirm(7)}
+          className="flex-1 py-3 bg-card border border-border rounded-lg font-heading text-accent active:scale-95 transition-transform"
+        >
+          Tomar 7
+        </button>
+      </div>
+
+      {/* Manual input */}
+      <div className="border-t border-border pt-3">
+        <label className="text-xs text-muted">
+          Ingresá tu tirada real del d12:
+        </label>
+        <div className="flex gap-2 mt-1">
+          <input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={12}
+            value={manualValue}
+            onChange={(e) => {
+              setManualValue(e.target.value);
+              setUseManual(true);
+            }}
+            placeholder="1-12"
+            className="flex-1 bg-background border border-border rounded-lg p-2 text-center text-lg font-heading text-foreground"
+          />
+        </div>
+      </div>
+
+      {/* Result preview */}
+      {((useManual && isValid) || (!useManual && hpRoll !== null)) && (
+        <div className="bg-card border border-border rounded-lg p-3 text-center space-y-2">
+          <div className="flex items-center justify-center gap-2 text-sm">
+            <span className="font-heading text-accent text-xl">
+              {dieValue}
+            </span>
+            <span className="text-muted">+</span>
+            <span>
+              {conMod} <span className="text-muted text-xs">(CON)</span>
+            </span>
+            <span className="text-muted">+</span>
+            <span>
+              {toughBonus} <span className="text-muted text-xs">(Tough)</span>
+            </span>
+            <span className="text-muted">=</span>
+            <span className="font-heading text-accent text-xl">
+              {totalHp}
+            </span>
+            <span className="text-muted text-xs">HP</span>
+          </div>
+          <button
+            onClick={() => onConfirm(dieValue!)}
+            className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+          >
+            Confirmar +{totalHp} HP
+          </button>
         </div>
       )}
     </div>
