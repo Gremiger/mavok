@@ -96,20 +96,28 @@ export default function Home() {
             {tabContent[activeTab]}
           </motion.main>
 
-          <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50" style={{ boxShadow: "0 -4px 12px rgba(0,0,0,0.3)" }}>
-            <div className="flex items-center justify-around h-14">
+          <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 nav-island-bottom">
+            <div
+              className="mx-auto max-w-md flex items-center justify-around h-14 rounded-2xl border border-border/60"
+              style={{
+                background: "rgba(26,25,23,0.92)",
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)",
+              }}
+            >
               {TAB_META.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex flex-col items-center justify-center gap-0.5 text-xs w-16 h-full transition-colors ${
+                  className={`relative flex flex-col items-center justify-center gap-0.5 text-[0.65rem] flex-1 h-full transition-colors ${
                     activeTab === tab.id ? "text-accent" : "text-muted"
                   }`}
                 >
                   {activeTab === tab.id && (
                     <motion.div
                       layoutId="tab-indicator"
-                      className="absolute top-0 left-2 right-2 h-0.5 bg-accent rounded-full"
+                      className="absolute -bottom-0.5 left-3 right-3 h-0.5 bg-accent rounded-full"
                       transition={{
                         type: "spring",
                         stiffness: 400,
@@ -122,7 +130,6 @@ export default function Home() {
                 </button>
               ))}
             </div>
-            <div className="safe-area-pb bg-card" />
           </nav>
         </div>
       </ThemeContext.Provider>
