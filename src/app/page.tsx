@@ -5,6 +5,7 @@ import { useCharacter } from "@/hooks/useCharacter";
 import { useTheme } from "@/hooks/useTheme";
 import { CharacterContext, ThemeContext } from "@/lib/context";
 import { SheetTab } from "@/components/tabs/SheetTab";
+import { CombatTab } from "@/components/tabs/CombatTab";
 
 type Tab = "ficha" | "combate" | "inventario" | "notas" | "ajustes";
 
@@ -27,9 +28,7 @@ export default function Home() {
         <div className="flex flex-col min-h-dvh">
           <main className="flex-1 overflow-y-auto pb-16">
             {activeTab === "ficha" && <SheetTab />}
-            {activeTab === "combate" && (
-              <div className="p-4 text-muted">Combate — próximamente</div>
-            )}
+            {activeTab === "combate" && <CombatTab />}
             {activeTab === "inventario" && (
               <div className="p-4 text-muted">Inventario — próximamente</div>
             )}
