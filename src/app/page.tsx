@@ -7,6 +7,7 @@ import { CharacterContext, ThemeContext } from "@/lib/context";
 import { SheetTab } from "@/components/tabs/SheetTab";
 import { CombatTab } from "@/components/tabs/CombatTab";
 import { InventoryTab } from "@/components/tabs/InventoryTab";
+import { NotesTab } from "@/components/tabs/NotesTab";
 
 type Tab = "ficha" | "combate" | "inventario" | "notas" | "ajustes";
 
@@ -31,9 +32,7 @@ export default function Home() {
             {activeTab === "ficha" && <SheetTab />}
             {activeTab === "combate" && <CombatTab />}
             {activeTab === "inventario" && <InventoryTab />}
-            {activeTab === "notas" && (
-              <div className="p-4 text-muted">Notas — próximamente</div>
-            )}
+            {activeTab === "notas" && <NotesTab />}
             {activeTab === "ajustes" && (
               <div className="p-4 text-muted">Ajustes — próximamente</div>
             )}
