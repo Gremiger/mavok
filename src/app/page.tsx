@@ -52,7 +52,7 @@ export default function Home() {
           }}
         />
         <div className="flex flex-col min-h-dvh">
-          <main className="flex-1 overflow-y-auto pb-16">
+          <main className="flex-1 overflow-y-auto pb-safe-nav">
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={activeTab}
@@ -70,7 +70,7 @@ export default function Home() {
             </AnimatePresence>
           </main>
 
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border flex items-center justify-around z-50 safe-area-pb">
+          <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border flex items-center justify-around z-50 pt-2 safe-area-pb">
             {TABS.map((tab) => (
               <button
                 key={tab.id}

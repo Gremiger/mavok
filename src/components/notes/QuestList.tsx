@@ -149,7 +149,7 @@ export function QuestList() {
 
       <button
         onClick={openNew}
-        className="fixed right-4 bottom-20 w-12 h-12 rounded-full bg-accent text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
+        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full bg-accent text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
       >
         <Plus size={24} />
       </button>

@@ -39,5 +39,13 @@ body {
 }
 
 .safe-area-pb {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 8px);
+}
+
+.pb-safe-nav {
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 8px));
+}
+
+.bottom-safe-fab {
+  bottom: calc(5.5rem + env(safe-area-inset-bottom, 8px));
 }
