@@ -15,6 +15,9 @@ import {
   importCharacterJSON,
 } from "@/lib/export";
 import { LevelUpFlow } from "@/components/levelup/LevelUpFlow";
+import { getBackups, restoreBackup } from "@/lib/migrations";
+import { getCharacterStorageKey } from "@/lib/storage";
+import { CURRENT_DATA_VERSION } from "@/lib/types";
 
 export function SettingsTab() {
   const { character, update, updateCombat } = useCharacterContext();
@@ -257,11 +260,54 @@ export function SettingsTab() {
         </div>
       </CollapsibleSection>
 
+      {/* Backups */}
+      <CollapsibleSection title="Backups automáticos">
+        <div className="space-y-2">
+          {getBackups().length === 0 ? (
+            <p className="text-xs text-muted text-center py-2">
+              Los backups se crean automáticamente antes de cada migración de datos.
+            </p>
+          ) : (
+            getBackups().map((b) => (
+              <div
+                key={b.key}
+                className="flex items-center justify-between p-2 bg-card rounded-lg border border-border"
+              >
+                <div>
+                  <span className="text-xs text-foreground">v{b.version}</span>
+                  <span className="text-xs text-muted ml-2">
+                    {b.date.toLocaleString("es")}
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    if (confirm("¿Restaurar este backup? Se reemplazarán los datos actuales.")) {
+                      const key = getCharacterStorageKey(character.id);
+                      if (restoreBackup(b.key, key)) {
+                        toast.success("Backup restaurado — recargando...");
+                        setTimeout(() => window.location.reload(), 500);
+                      } else {
+                        toast.error("Error al restaurar backup");
+                      }
+                    }
+                  }}
+                  className="text-xs text-accent hover:underline"
+                >
+                  Restaurar
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </CollapsibleSection>
+
       {/* About */}
       <div className="text-center text-xs text-muted py-4 border-t border-border">
         <p className="font-heading text-accent">Mavok PWA</p>
         <p className="mt-1">v1.0.0 · {character.meta.name}</p>
-        <p className="mt-1">D&D 5.5e (2024)</p>
+        <p className="mt-1">
+          D&D 5.5e (2024) · Data v{CURRENT_DATA_VERSION}
+        </p>
       </div>
 
       {/* Short Rest Modal */}

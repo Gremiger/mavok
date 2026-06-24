@@ -1,6 +1,8 @@
 import type { Character } from "@/lib/types";
+import { CURRENT_DATA_VERSION } from "@/lib/types";
 
 export const MAVOK_DEFAULT: Character = {
+  _version: CURRENT_DATA_VERSION,
   id: "mavok-1",
   meta: {
     name: "Mavok Toro-de-casa Toduk-Rojum",

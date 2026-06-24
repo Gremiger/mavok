@@ -1,6 +1,9 @@
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
+export const CURRENT_DATA_VERSION = 2;
+
 export interface Character {
+  _version: number;
   id: string;
   meta: CharacterMeta;
   attributes: Record<AbilityScore, number>;
