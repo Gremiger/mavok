@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-heading: var(--font-cinzel);
+  --font-body: var(--font-inter);
+
+  --color-background: var(--bg);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-foreground: var(--fg);
+  --color-muted: var(--muted);
+  --color-border: var(--border-color);
+  --color-danger: #dc2626;
+  --color-success: #16a34a;
+  --color-rage: var(--accent);
+}
+
+:root,
+[data-theme="dark-fantasy"] {
+  --bg: #1a1a2e;
+  --card: #16213e;
+  --accent: #8b2d2d;
+  --fg: #e8e0d4;
+  --muted: #7a7568;
+  --border-color: #2a2a4a;
+}
+
+[data-theme="dnd-classic"] {
+  --bg: #0d1117;
+  --card: #161b22;
+  --accent: #c0392b;
+  --fg: #ffffff;
+  --muted: #8b949e;
+  --border-color: #30363d;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
