@@ -142,8 +142,9 @@ export function InventoryTab() {
       </div>
 
       {/* Inventory List */}
-      {grouped.map((group) => (
+      {grouped.map((group, gi) => (
         <div key={group.value}>
+          {gi > 0 && <div className="crack-divider mb-4" />}
           <h3 className="font-heading text-xs text-muted uppercase mb-2 flex items-center gap-1.5">
             {CATEGORY_ICONS[group.value]} <span>{group.label}</span>
           </h3>
@@ -240,7 +241,8 @@ export function InventoryTab() {
       ))}
 
       {/* Encumbrance Footer */}
-      <div className="flex items-center justify-between text-xs text-muted py-2 border-t border-border">
+      <div className="crack-divider" />
+      <div className="flex items-center justify-between text-xs text-muted py-2">
         <span>
           Peso: {totalWeight} / {carryCapacity} lbs
         </span>

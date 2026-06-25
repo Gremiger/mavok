@@ -302,7 +302,8 @@ export function SettingsTab() {
       </CollapsibleSection>
 
       {/* About */}
-      <div className="text-center text-xs text-muted py-4 border-t border-border">
+      <div className="crack-divider mb-4" />
+      <div className="text-center text-xs text-muted py-4">
         <p className="font-heading text-accent">Mavok PWA</p>
         <p className="mt-1">{character.meta.name}</p>
         <p className="mt-1">

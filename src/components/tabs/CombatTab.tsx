@@ -132,6 +132,8 @@ export function CombatTab() {
         />
       </div>
 
+      <div className="crack-divider" />
+
       {/* Conditions */}
       <div className="flex flex-wrap items-center gap-1.5">
         {combat.conditions.map((c) => (

@@ -43,9 +43,18 @@ body {
 
 /* Stone texture cards */
 .stone-card {
-  background: var(--card);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--card) 95%, rgba(255,255,255,0.03)) 0%,
+      var(--card) 50%,
+      color-mix(in srgb, var(--card) 95%, rgba(0,0,0,0.1)) 100%
+    );
   border: 1px solid var(--border-color);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), inset 0 -1px 0 rgba(0,0,0,0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    inset 0 -1px 0 rgba(0,0,0,0.2),
+    0 1px 3px rgba(0,0,0,0.2);
 }
 
 /* Red cord — braided wool string */
@@ -99,14 +108,26 @@ body {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    var(--border-color) 15%,
-    var(--accent) 30%,
-    var(--border-color) 50%,
-    transparent 60%,
-    var(--border-color) 75%,
+    var(--accent) 8%,
+    color-mix(in srgb, var(--accent) 40%, transparent) 20%,
+    transparent 28%,
+    var(--accent) 35%,
+    color-mix(in srgb, var(--accent) 60%, transparent) 55%,
+    transparent 62%,
+    color-mix(in srgb, var(--accent) 30%, transparent) 70%,
+    var(--accent) 82%,
     transparent 100%
   );
-  opacity: 0.5;
+  position: relative;
+}
+.crack-divider::after {
+  content: '';
+  position: absolute;
+  inset: -1px 0;
+  height: 3px;
+  background: inherit;
+  filter: blur(3px);
+  opacity: 0.4;
 }
 
 /* Dialog centering */
