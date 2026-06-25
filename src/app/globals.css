@@ -70,11 +70,11 @@ body {
   border-radius: 1px;
 }
 
-/* Cord knot dot */
+/* Cord knot dot — sits centered on the cord line */
 .cord-knot::before {
   content: '';
   position: absolute;
-  left: -3px;
+  left: calc(-1rem - 3px);
   top: 50%;
   transform: translateY(-50%);
   width: 8px;
@@ -119,9 +119,9 @@ dialog::backdrop {
 }
 
 .pb-safe-nav {
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 .bottom-safe-fab {
-  bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
 }

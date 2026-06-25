@@ -98,7 +98,7 @@ export default function Home() {
 
           <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 nav-island-bottom">
             <div
-              className="mx-auto max-w-md flex items-center justify-around h-14 rounded-2xl border border-border/60"
+              className="mx-auto max-w-md flex items-center justify-around h-16 rounded-2xl border border-border/60"
               style={{
                 background: "rgba(26,25,23,0.92)",
                 backdropFilter: "blur(16px)",
