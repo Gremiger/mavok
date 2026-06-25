@@ -39,6 +39,53 @@
 
 body {
   -webkit-font-smoothing: antialiased;
+  background:
+    /* crack 1 — long diagonal */
+    linear-gradient(
+      157deg,
+      transparent 22%,
+      rgba(184,115,51,0.06) 22.1%,
+      rgba(184,115,51,0.04) 22.3%,
+      transparent 22.4%,
+      transparent 58%,
+      rgba(184,115,51,0.05) 58.1%,
+      rgba(184,115,51,0.03) 58.2%,
+      transparent 58.3%
+    ),
+    /* crack 2 — branching */
+    linear-gradient(
+      203deg,
+      transparent 35%,
+      rgba(184,115,51,0.05) 35.1%,
+      rgba(184,115,51,0.03) 35.2%,
+      transparent 35.3%,
+      transparent 71%,
+      rgba(184,115,51,0.04) 71.1%,
+      rgba(184,115,51,0.02) 71.3%,
+      transparent 71.4%
+    ),
+    /* crack 3 — horizontal stress line */
+    linear-gradient(
+      93deg,
+      transparent 40%,
+      rgba(184,115,51,0.04) 40.1%,
+      rgba(184,115,51,0.02) 40.2%,
+      transparent 40.3%,
+      transparent 78%,
+      rgba(184,115,51,0.03) 78.1%,
+      transparent 78.2%
+    ),
+    /* stone grain — fine noise */
+    repeating-conic-gradient(
+      rgba(255,255,255,0.01) 0%,
+      transparent 0.5%,
+      transparent 1%,
+      rgba(0,0,0,0.015) 1.5%,
+      transparent 2%
+    ),
+    /* base color */
+    var(--bg);
+  background-attachment: fixed;
 }
 
 /* Stone texture cards */
