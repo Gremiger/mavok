@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLongPress } from "@/hooks/useLongPress";
 import { useCharacterContext } from "@/lib/context";
 import { StatBadge } from "@/components/ui/StatBadge";
 import { Tag } from "@/components/ui/Tag";
@@ -30,6 +31,8 @@ export function CombatTab() {
   const [tempAcMod, setTempAcMod] = useState(0);
   const [acModalOpen, setAcModalOpen] = useState(false);
   const [standardActionsOpen, setStandardActionsOpen] = useState<"actions" | "bonus" | "reactions" | null>(null);
+  const [stoneEnduranceEditing, setStoneEnduranceEditing] = useState(false);
+  const [healerKitEditing, setHealerKitEditing] = useState(false);
 
   if (!character) return null;
 
@@ -39,6 +42,11 @@ export function CombatTab() {
   const rageDamage =
     BARBARIAN_LEVELS.find((l) => l.level === meta.level)?.rageDamage ?? 2;
   const offhandAttack = attacks.find((a) => a.properties.includes("Light"));
+
+  const stoneEnduranceLongPress = useLongPress(() =>
+    setStoneEnduranceEditing(true)
+  );
+  const healerKitLongPress = useLongPress(() => setHealerKitEditing(true));
 
   const slots = resources.rpiRages.slots?.length === resources.rpiRages.total
     ? resources.rpiRages.slots
@@ -196,18 +204,70 @@ export function CombatTab() {
         >
           <div className="flex items-center justify-between mb-1">
             <span className="font-heading text-accent">Healer&apos;s Kit</span>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted font-heading">
-                {healerKit.remaining}/{healerKit.total}
-              </span>
-              <button
-                onClick={spendHealerKit}
-                disabled={healerKit.remaining <= 0}
-                className="text-xs px-2 py-0.5 border border-border rounded hover:border-accent hover:text-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                Usar
-              </button>
-            </div>
+            {healerKitEditing ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() =>
+                    updateResources({
+                      healerKit: {
+                        ...healerKit,
+                        remaining: Math.max(0, healerKit.remaining - 1),
+                      },
+                    })
+                  }
+                  disabled={healerKit.remaining <= 0}
+                  className="w-6 h-6 rounded bg-background border border-border text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  -
+                </button>
+                <span className="text-xs text-muted font-heading w-6 text-center">
+                  {healerKit.remaining}
+                </span>
+                <button
+                  onClick={() =>
+                    updateResources({
+                      healerKit: {
+                        ...healerKit,
+                        remaining: Math.min(
+                          healerKit.total,
+                          healerKit.remaining + 1
+                        ),
+                      },
+                    })
+                  }
+                  disabled={healerKit.remaining >= healerKit.total}
+                  className="w-6 h-6 rounded bg-background border border-border text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  +
+                </button>
+                <button
+                  onClick={() => setHealerKitEditing(false)}
+                  className="text-xs px-2 py-0.5 border border-accent text-accent rounded"
+                >
+                  ✓
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted font-heading">
+                  {healerKit.remaining}/{healerKit.total}
+                </span>
+                <button
+                  {...healerKitLongPress.handlers}
+                  onClick={() => {
+                    if (healerKitLongPress.wasLongPress()) return;
+                    spendHealerKit();
+                  }}
+                  className={`text-xs px-2 py-0.5 border rounded transition-colors select-none [-webkit-touch-callout:none] ${
+                    healerKit.remaining <= 0
+                      ? "border-border text-muted opacity-40 cursor-not-allowed"
+                      : "border-border hover:border-accent hover:text-accent"
+                  }`}
+                >
+                  Usar
+                </button>
+              </div>
+            )}
           </div>
           <p className="text-xs text-muted">
             Acción · estabiliza o cura 1d6+4 HP a una criatura · usos no se recuperan con descansos
@@ -278,18 +338,70 @@ export function CombatTab() {
           >
             <div className="flex items-center justify-between mb-1">
               <span className="font-heading text-accent">Stone&apos;s Endurance</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted font-heading">
-                  {stoneEndurance.remaining}/{stoneEndurance.total}
-                </span>
-                <button
-                  onClick={spendStoneEndurance}
-                  disabled={stoneEndurance.remaining <= 0}
-                  className="text-xs px-2 py-0.5 border border-border rounded hover:border-accent hover:text-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  Usar
-                </button>
-              </div>
+              {stoneEnduranceEditing ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      updateResources({
+                        stoneEndurance: {
+                          ...stoneEndurance,
+                          remaining: Math.max(0, stoneEndurance.remaining - 1),
+                        },
+                      })
+                    }
+                    disabled={stoneEndurance.remaining <= 0}
+                    className="w-6 h-6 rounded bg-background border border-border text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    -
+                  </button>
+                  <span className="text-xs text-muted font-heading w-6 text-center">
+                    {stoneEndurance.remaining}
+                  </span>
+                  <button
+                    onClick={() =>
+                      updateResources({
+                        stoneEndurance: {
+                          ...stoneEndurance,
+                          remaining: Math.min(
+                            stoneEndurance.total,
+                            stoneEndurance.remaining + 1
+                          ),
+                        },
+                      })
+                    }
+                    disabled={stoneEndurance.remaining >= stoneEndurance.total}
+                    className="w-6 h-6 rounded bg-background border border-border text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    +
+                  </button>
+                  <button
+                    onClick={() => setStoneEnduranceEditing(false)}
+                    className="text-xs px-2 py-0.5 border border-accent text-accent rounded"
+                  >
+                    ✓
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted font-heading">
+                    {stoneEndurance.remaining}/{stoneEndurance.total}
+                  </span>
+                  <button
+                    {...stoneEnduranceLongPress.handlers}
+                    onClick={() => {
+                      if (stoneEnduranceLongPress.wasLongPress()) return;
+                      spendStoneEndurance();
+                    }}
+                    className={`text-xs px-2 py-0.5 border rounded transition-colors select-none [-webkit-touch-callout:none] ${
+                      stoneEndurance.remaining <= 0
+                        ? "border-border text-muted opacity-40 cursor-not-allowed"
+                        : "border-border hover:border-accent hover:text-accent"
+                    }`}
+                  >
+                    Usar
+                  </button>
+                </div>
+              )}
             </div>
             <p className="text-xs text-muted">
               Reacción · tira 1d12 + CON mod · reduce el daño entrante por ese total
