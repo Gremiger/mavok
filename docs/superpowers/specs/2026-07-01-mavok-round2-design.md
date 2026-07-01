@@ -20,6 +20,7 @@ Three independent UX/feature gaps identified after the first improvement round: 
   3. Drop groups whose category is in `hiddenCategories` (`.filter((g) => !hiddenCategories.has(g.value))`).
   4. Sort each remaining group's `items` array in place by `sortBy` (the chosen comparator applies independently within each category group, never across the whole flattened list — the grouped layout itself never changes).
 - All three pieces of state (`searchQuery`, `sortBy`, `hiddenCategories`) are local `useState` — not persisted to the character JSON. They reset to defaults on tab remount. This is intentional: these are viewing conveniences, not character data.
+- **Empty state**: if every group is filtered/hidden away (search matches nothing, or all categories are toggled off), `grouped` is an empty array and today's code renders nothing between the currency bar and the encumbrance footer — which looks broken, not empty. Add a centered message in that case, consistent with the empty-state copy convention already used elsewhere (`NoteList`/`QuestList`/`JournalList` all show a centered "Sin ... Toca + para agregar" line): something like "Sin objetos que coincidan. Ajusta la búsqueda o los filtros."
 - No changes to `InventoryItem` type, no migration needed.
 
 ## Section 2 — Long-press-to-restore on Stone's Endurance and Healer's Kit
@@ -75,11 +76,12 @@ Three independent UX/feature gaps identified after the first improvement round: 
   - Search `journal`: same match on `title`/`content`.
   - Search `quick`: match on `text`.
   - Each result row shows a small type badge (Mundo / NPC / Misión / Diario / Rápida) and the title (or truncated text for quick notes), styled consistent with existing `stone-card` list rows.
-  - Tapping a result: `NotesTab` holds state `pendingOpenId: string | undefined`. On tap, set `activeSubTab` to the entry's section, set `pendingOpenId` to the entry's id, and clear `searchQuery`. Pass `initialOpenId={pendingOpenId}` and `onInitialOpenHandled={() => setPendingOpenId(undefined)}` to the active sub-tab component, consumed in a `useEffect` keyed on `[initialOpenId]` that does nothing when `initialOpenId` is falsy (guards against the reset re-triggering anything), and otherwise calls `onInitialOpenHandled?.()` after opening. **Opening the modal is not just "set `editingId`/`viewingId`" — each component's actual open path differs, and the effect must reuse the component's existing open function rather than reimplement it:**
+  - Tapping a result: `NotesTab` holds state `pendingOpenId: string | undefined`. On tap, set `activeSubTab` to the entry's section, set `pendingOpenId` to the entry's id, and clear `searchQuery` (all in the same event handler / batched update). Pass `initialOpenId={pendingOpenId}` to the active sub-tab component, consumed in a plain mount-only `useEffect(() => { ... }, [])`. **No reset callback or dependency-array key on `[initialOpenId]` is needed** — `NotesTab` already conditionally renders each sub-tab component only when `activeSubTab === thatSection` (see the existing `{activeSubTab === "world" && <NoteList .../>}` pattern), and it renders the flat results list instead of any sub-tab component whenever `searchQuery` is non-empty. That means the target component is unmounted the entire time the user is typing a search query, and only mounts fresh at the exact moment `searchQuery` clears back to `""` after a tap — so every "open via search result" event is a genuine first mount of a new component instance, never a prop change on an already-mounted one. A mount-only effect is therefore sufficient and correct; no scenario exists where the same instance needs to see `initialOpenId` change twice. **Opening the modal is not just "set `editingId`/`viewingId`" — each component's actual open path differs, and the effect must reuse the component's existing open function rather than reimplement it:**
     - `NoteList`: `openEdit(note)` (already defined, `src/components/notes/NoteList.tsx:38`) is what actually opens the modal — it populates the `form` state (title/content/tags/fields) from the note **and** calls `setFormOpen(true)`; setting `editingId` alone does nothing visible, since visibility is gated on the separate `formOpen` flag. The effect must do: `const note = notes.find(n => n.id === initialOpenId); if (note) openEdit(note);`.
     - `QuestList`: same shape as `NoteList` — `openEdit(quest)` (`src/components/notes/QuestList.tsx:43`) populates `form` and calls `setFormOpen(true)`; the effect must look the quest up from `character.notes.quests` by `initialOpenId` and call `openEdit(quest)`, not set `editingId` directly.
     - `JournalList`: simpler — there is no `formOpen`/`openEdit`; the modal's `open` prop is derived inline as `!!viewingEntry` where `viewingEntry = journal.find(j => j.id === viewingId)` (`src/components/notes/JournalList.tsx:23`). The effect can call `setViewingId(initialOpenId)` directly; if the id doesn't resolve to an entry, `viewingEntry` is `undefined` and the modal simply doesn't open (safe no-op).
   - `QuickNotes` has no per-entry modal — confirmed by reading `src/components/notes/QuickNotes.tsx` (flat list with an inline "⋯" promote/delete menu, no separate edit modal). Tapping a quick-note search result just switches to the Quick sub-tab; no auto-open needed there.
+  - **Empty state**: if `searchQuery` is non-empty but matches nothing across all five note types, show a centered message in place of the flat results list, e.g. `Sin resultados para "{searchQuery}".`, matching the existing empty-state copy convention.
 - No data model changes.
 
 ---
@@ -92,9 +94,9 @@ Three independent UX/feature gaps identified after the first improvement round: 
 | `src/hooks/useLongPress.ts` | New file — reusable long-press gesture hook |
 | `src/components/tabs/CombatTab.tsx` | Wire long-press stepper onto Stone's Endurance and Healer's Kit cards |
 | `src/components/tabs/NotesTab.tsx` | Add cross-note search bar, flat filtered results view |
-| `src/components/notes/NoteList.tsx` | Add optional `initialOpenId` / `onInitialOpenHandled` props |
-| `src/components/notes/QuestList.tsx` | Add optional `initialOpenId` / `onInitialOpenHandled` props |
-| `src/components/notes/JournalList.tsx` | Add optional `initialOpenId` / `onInitialOpenHandled` props |
+| `src/components/notes/NoteList.tsx` | Add optional `initialOpenId` prop |
+| `src/components/notes/QuestList.tsx` | Add optional `initialOpenId` prop |
+| `src/components/notes/JournalList.tsx` | Add optional `initialOpenId` prop |
 
 ## Explicitly Out of Scope
 
