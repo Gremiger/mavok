@@ -27,6 +27,10 @@ npx tsc --noEmit     # Type check without emitting
 
 There are no tests. Verify changes by running `npx tsc --noEmit && npm run build`.
 
+## Commit Messages
+
+Never include a "Co-authored-by" (or similar attribution) trailer in commit messages for this repo.
+
 ## Architecture
 
 **Static export SPA**: Next.js 15 with `output: 'export'`. Everything is `"use client"` — no server components, no API routes. The app is a single page (`src/app/page.tsx`) with 5 tabs rendered conditionally via state, not routes.
