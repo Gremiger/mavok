@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Link from "next/link";
 import { useCharacterContext } from "@/lib/context";
 import { useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
@@ -255,6 +256,12 @@ export function SettingsTab() {
           >
             Exportar notas rápidas (TXT)
           </button>
+          <Link
+            href="/print"
+            className="block w-full p-3 bg-card rounded-lg border border-border text-left text-sm"
+          >
+            Imprimir / Exportar PDF
+          </Link>
           <input
             ref={fileInputRef}
             type="file"

@@ -207,3 +207,11 @@ dialog::backdrop {
 .bottom-safe-fab {
   bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
 }
+
+/* Print view */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+}
