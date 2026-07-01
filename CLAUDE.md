@@ -8,6 +8,14 @@ A phone-first PWA for managing a D&D 5.5e (2024 rules) Barbarian character (Mavo
 
 **Language**: Spanish UI labels, English D&D terms (Rage, Perception, etc.).
 
+## Source of Truth: 5etools
+
+`../dnd/5etools-src` is the **sole authoritative source** for all D&D 5.5e (XPHB/2024) rules, mechanics, and reference data in this project — feature text, progression tables, weapon/armor stats, conditions, mastery properties, feats, subclass features, spell data, everything. Never rely on training-data memory of D&D rules; always check `5etools-src` first.
+
+- Before adding, fixing, or verifying any rules-derived content (a feature description, a level table, a damage value, a mechanic), grep `../dnd/5etools-src/data/` for the canonical text or values.
+- If existing app data conflicts with `5etools-src`, the app is wrong — fix the app to match, not the other way around.
+- If `5etools-src` doesn't have something the app needs, say so explicitly rather than inventing plausible-sounding D&D content.
+
 ## Commands
 
 ```bash
