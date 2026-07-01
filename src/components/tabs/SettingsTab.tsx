@@ -88,6 +88,10 @@ export function SettingsTab() {
           active: false,
           slots: Array(c.resources.rpiRages.total).fill(true),
         },
+        stoneEndurance: {
+          ...c.resources.stoneEndurance,
+          remaining: c.resources.stoneEndurance.total,
+        },
       },
     }));
     setLongRestOpen(false);
@@ -143,7 +147,7 @@ export function SettingsTab() {
               Descanso corto
             </span>
             <span className="text-xs text-muted block mt-0.5">
-              Gastar dados de golpe para curarse
+              Gastar dados de golpe · Recuperar 1 Rage
             </span>
           </button>
           <button
@@ -360,7 +364,27 @@ export function SettingsTab() {
           )}
 
           <button
-            onClick={() => setShortRestOpen(false)}
+            onClick={() => {
+              // XPHB: regain 1 Rage use on short rest
+              const rages = character.resources.rpiRages;
+              if (rages.remaining < rages.total) {
+                const newRemaining = Math.min(rages.remaining + 1, rages.total);
+                const newSlots = rages.slots.map((s, i) => i < newRemaining ? true : s);
+                update((c) => ({
+                  ...c,
+                  resources: {
+                    ...c.resources,
+                    rpiRages: {
+                      ...c.resources.rpiRages,
+                      remaining: newRemaining,
+                      slots: newSlots,
+                    },
+                  },
+                }));
+                toast("Rage +1 recuperado", { icon: "🔥" });
+              }
+              setShortRestOpen(false);
+            }}
             className="w-full py-2 text-sm text-muted border border-border rounded-lg"
           >
             Terminar descanso
@@ -383,6 +407,9 @@ export function SettingsTab() {
             <li>
               Rage → {character.resources.rpiRages.total}/
               {character.resources.rpiRages.total}
+            </li>
+            <li>
+              Stone's Endurance → {character.resources.stoneEndurance.total}/{character.resources.stoneEndurance.total}
             </li>
             <li>
               Dados de golpe: +
