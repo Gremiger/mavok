@@ -13,7 +13,7 @@ Three independent UX/feature gaps identified after the first improvement round: 
 
 - Add a search input above the currency bar. Local state `searchQuery: string`, default `""`.
 - Add a sort control (a small `<select>` or segmented toggle) with three options: **Nombre** (`.sort((a,b) => a.name.localeCompare(b.name))` — note this changes today's implicit insertion-order display to true alphabetical order), **Peso** (`.sort((a,b) => (b.weight ?? 0) - (a.weight ?? 0))`, heaviest first), **Equipado** (equipped items first, then unequipped). Default: Nombre. Local state `sortBy: "name" | "weight" | "equipped"`.
-- Add category filter chips: one toggle chip per category (`CATEGORIES` array already defines the 5: weapon/armor/gear/consumable/personal). Local state `hiddenCategories: Set<InventoryItem["category"]>`, default empty (all visible). Tapping a chip toggles membership in the set.
+- Add category filter chips: one toggle chip per category (`CATEGORIES` array already defines the 5: weapon/armor/gear/consumable/personal). Local state `hiddenCategories: Set<InventoryItem["category"]>`, default empty (all visible). Tapping a chip toggles membership in the set — the updater must construct a new `Set` from the previous one (e.g. `setHiddenCategories(prev => { const next = new Set(prev); next.has(cat) ? next.delete(cat) : next.add(cat); return next; })`); mutating the existing `Set` in place won't trigger a re-render.
 - **Order of operations**, all applied inside the existing `grouped` computation (category grouping itself is unchanged — items still display under their category headers):
   1. Filter `inventory` by `item.name.toLowerCase().includes(searchQuery.toLowerCase())` when `searchQuery` is non-empty.
   2. Group the filtered items by category, as today.
@@ -48,7 +48,7 @@ Three independent UX/feature gaps identified after the first improvement round: 
   - Search `journal`: same match on `title`/`content`.
   - Search `quick`: match on `text`.
   - Each result row shows a small type badge (Mundo / NPC / Misión / Diario / Rápida) and the title (or truncated text for quick notes), styled consistent with existing `stone-card` list rows.
-  - Tapping a result: set `activeSubTab` to the entry's section and clear `searchQuery`. The underlying sub-tab component needs to open that entry's edit/view modal. Existing components (`NoteList`, `QuestList`, `JournalList`) each manage their own `editingId`/`viewingId` state internally: add an optional prop `initialOpenId?: string`, consumed in a `useEffect` keyed on `[initialOpenId]` (fires whenever the prop value changes, not only on mount — the sub-tab may already be active and mounted when the user taps a result within the same section) to open that entry's edit/view modal, then the parent clears the passed value so re-tapping the same result still fires.
+  - Tapping a result: `NotesTab` holds state `pendingOpenId: string | undefined`. On tap, set `activeSubTab` to the entry's section, set `pendingOpenId` to the entry's id, and clear `searchQuery`. Pass `initialOpenId={pendingOpenId}` and `onInitialOpenHandled={() => setPendingOpenId(undefined)}` to the active sub-tab component. Existing components (`NoteList`, `QuestList`, `JournalList`) each manage their own `editingId`/`viewingId` state internally: add these two optional props, consumed in a `useEffect` keyed on `[initialOpenId]` that does nothing when `initialOpenId` is falsy (guards against the reset below re-triggering anything) and, when truthy, opens that entry's edit/view modal via the component's existing internal state and then calls `onInitialOpenHandled?.()`. `NotesTab` resets `pendingOpenId` back to `undefined` from that callback, immediately after the modal has opened — this guarantees a later tap on the same result (`pendingOpenId` transitioning `undefined → id` again) is a real state change React will pick up, so the effect reliably refires.
   - `QuickNotes` has no per-entry modal — confirmed by reading `src/components/notes/QuickNotes.tsx` (flat list with an inline "⋯" promote/delete menu, no separate edit modal). Tapping a quick-note search result just switches to the Quick sub-tab; no auto-open needed there.
 - No data model changes.
 
@@ -62,9 +62,9 @@ Three independent UX/feature gaps identified after the first improvement round: 
 | `src/hooks/useLongPress.ts` | New file — reusable long-press gesture hook |
 | `src/components/tabs/CombatTab.tsx` | Wire long-press stepper onto Stone's Endurance and Healer's Kit cards |
 | `src/components/tabs/NotesTab.tsx` | Add cross-note search bar, flat filtered results view |
-| `src/components/notes/NoteList.tsx` | Add optional `initialOpenId` prop |
-| `src/components/notes/QuestList.tsx` | Add optional `initialOpenId` prop |
-| `src/components/notes/JournalList.tsx` | Add optional `initialOpenId` prop |
+| `src/components/notes/NoteList.tsx` | Add optional `initialOpenId` / `onInitialOpenHandled` props |
+| `src/components/notes/QuestList.tsx` | Add optional `initialOpenId` / `onInitialOpenHandled` props |
+| `src/components/notes/JournalList.tsx` | Add optional `initialOpenId` / `onInitialOpenHandled` props |
 
 ## Explicitly Out of Scope
 
