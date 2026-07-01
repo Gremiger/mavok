@@ -26,12 +26,39 @@ Three independent UX/feature gaps identified after the first improvement round: 
 
 **Files:** `src/components/tabs/CombatTab.tsx`, new hook `src/hooks/useLongPress.ts`
 
-- New hook `useLongPress(onLongPress: () => void, delay = 500)`: returns pointer event handlers (`onPointerDown`, `onPointerUp`, `onPointerLeave`, `onPointerCancel`) that start a `setTimeout` on down, call `onLongPress` and clear on fire, and cancel the timeout on early up/leave/cancel (so a normal tap, or a touch the browser reinterprets as a scroll, does not trigger it).
-- The hook also tracks whether the timer fired (`firedRef.current`, a ref so it doesn't trigger re-renders) and exposes a `wasLongPress()` accessor. This matters because the "Usar" button will carry both the long-press handlers *and* its existing `onClick`: after a successful long-press, the browser still dispatches a native `click` on pointer-up. Without this guard, that trailing click would call `spendStoneEndurance`/`spendHealerKit` immediately after entering edit mode, silently burning a use at the exact moment the user meant to correct one. The `onClick` handler must check `wasLongPress()` first and, if true, no-op and reset the flag instead of spending.
+- New hook `useLongPress(onLongPress: () => void, delay = 500)`. Return shape — a single flat object spread onto the target element plus one accessor pulled out separately:
+  ```ts
+  function useLongPress(onLongPress: () => void, delay = 500) {
+    const timerRef = useRef<ReturnType<typeof setTimeout>>();
+    const firedRef = useRef(false);
+    const start = () => {
+      firedRef.current = false;
+      timerRef.current = setTimeout(() => {
+        firedRef.current = true;
+        onLongPress();
+      }, delay);
+    };
+    const clear = () => clearTimeout(timerRef.current);
+    return {
+      handlers: {
+        onPointerDown: start,
+        onPointerUp: clear,
+        onPointerLeave: clear,
+        onPointerCancel: clear,
+        onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
+      },
+      wasLongPress: () => firedRef.current,
+    };
+  }
+  ```
+  Usage: `const { handlers, wasLongPress } = useLongPress(() => setStoneEnduranceEditing(true));` then `<button {...handlers} onClick={...}>`.
+- **Mobile touch-callout**: holding a finger on a button for ~500ms is exactly the gesture mobile browsers use to trigger the native text-selection/context-menu callout (iOS Safari's copy/share popup, Android's selection handles). Without suppression this visually clashes with the stepper appearing underneath it. The hook's `onContextMenu` preventDefault (above) stops the context menu; additionally give the wrapped button `className` (or inline style) `select-none [-webkit-touch-callout:none]` so iOS doesn't show its callout bubble before the context menu would even fire.
+- The hook also tracks whether the timer fired (`firedRef.current`, a ref so it doesn't trigger re-renders) via the returned `wasLongPress()` accessor. This matters because the "Usar" button will carry both the long-press handlers *and* its existing `onClick`: after a successful long-press, the browser still dispatches a native `click` on pointer-up. Without this guard, that trailing click would call `spendStoneEndurance`/`spendHealerKit` immediately after entering edit mode, silently burning a use at the exact moment the user meant to correct one. The `onClick` handler must check `wasLongPress()` first and, if true, no-op instead of spending.
 - In `CombatTab.tsx`, both the Stone's Endurance card and the Healer's Kit card get:
   - Local state per card: `stoneEnduranceEditing: boolean`, `healerKitEditing: boolean` (default `false`).
-  - The long-press hook wraps the card's "Usar" button. On long-press fire, set the corresponding `*Editing` state to `true` (and the button's `onClick` no-ops per the guard above).
-  - When `*Editing` is `true`, replace the remaining/total display + "Usar" button with an inline stepper: `-` button (decrements remaining, floor 0), the current remaining count, `+` button (increments remaining, ceiling `total`), and a checkmark button that sets `*Editing` back to `false`. These stepper buttons are plain `onClick` handlers with no long-press wiring.
+  - **Two separate hook instances** — `useLongPress(() => setStoneEnduranceEditing(true))` and `useLongPress(() => setHealerKitEditing(true))`. Each hook call owns its own `timerRef`/`firedRef`; reusing a single instance's handlers across both cards would let a long-press on one button flip the other card's editing state.
+  - The long-press hook's `handlers` wrap the card's "Usar" button. On long-press fire, the corresponding `*Editing` state becomes `true` (and the button's `onClick` no-ops per the guard above).
+  - When `*Editing` is `true`, replace the remaining/total display + "Usar" button with an inline stepper: `-` button (decrements remaining, floor 0, disabled when remaining is already 0 — same convention as the existing "Usar" button's disabled state), the current remaining count, `+` button (increments remaining, ceiling `total`, disabled when remaining already equals total), and a checkmark button that sets `*Editing` back to `false`. These stepper buttons are plain `onClick` handlers with no long-press wiring.
   - A normal tap (release before the 500ms threshold, `wasLongPress()` false) on the "Usar" button outside of editing mode behaves exactly as today — spends one use via the existing `spendStoneEndurance` / `spendHealerKit` functions.
   - No change to Rage — its existing per-slot tap-to-toggle UI already provides full manual control over `remaining`.
 - No data model changes — both resources already have `{ total, remaining }` shape.
@@ -48,7 +75,10 @@ Three independent UX/feature gaps identified after the first improvement round: 
   - Search `journal`: same match on `title`/`content`.
   - Search `quick`: match on `text`.
   - Each result row shows a small type badge (Mundo / NPC / Misión / Diario / Rápida) and the title (or truncated text for quick notes), styled consistent with existing `stone-card` list rows.
-  - Tapping a result: `NotesTab` holds state `pendingOpenId: string | undefined`. On tap, set `activeSubTab` to the entry's section, set `pendingOpenId` to the entry's id, and clear `searchQuery`. Pass `initialOpenId={pendingOpenId}` and `onInitialOpenHandled={() => setPendingOpenId(undefined)}` to the active sub-tab component. Existing components (`NoteList`, `QuestList`, `JournalList`) each manage their own `editingId`/`viewingId` state internally: add these two optional props, consumed in a `useEffect` keyed on `[initialOpenId]` that does nothing when `initialOpenId` is falsy (guards against the reset below re-triggering anything) and, when truthy, opens that entry's edit/view modal via the component's existing internal state and then calls `onInitialOpenHandled?.()`. `NotesTab` resets `pendingOpenId` back to `undefined` from that callback, immediately after the modal has opened — this guarantees a later tap on the same result (`pendingOpenId` transitioning `undefined → id` again) is a real state change React will pick up, so the effect reliably refires.
+  - Tapping a result: `NotesTab` holds state `pendingOpenId: string | undefined`. On tap, set `activeSubTab` to the entry's section, set `pendingOpenId` to the entry's id, and clear `searchQuery`. Pass `initialOpenId={pendingOpenId}` and `onInitialOpenHandled={() => setPendingOpenId(undefined)}` to the active sub-tab component, consumed in a `useEffect` keyed on `[initialOpenId]` that does nothing when `initialOpenId` is falsy (guards against the reset re-triggering anything), and otherwise calls `onInitialOpenHandled?.()` after opening. **Opening the modal is not just "set `editingId`/`viewingId`" — each component's actual open path differs, and the effect must reuse the component's existing open function rather than reimplement it:**
+    - `NoteList`: `openEdit(note)` (already defined, `src/components/notes/NoteList.tsx:38`) is what actually opens the modal — it populates the `form` state (title/content/tags/fields) from the note **and** calls `setFormOpen(true)`; setting `editingId` alone does nothing visible, since visibility is gated on the separate `formOpen` flag. The effect must do: `const note = notes.find(n => n.id === initialOpenId); if (note) openEdit(note);`.
+    - `QuestList`: same shape as `NoteList` — `openEdit(quest)` (`src/components/notes/QuestList.tsx:43`) populates `form` and calls `setFormOpen(true)`; the effect must look the quest up from `character.notes.quests` by `initialOpenId` and call `openEdit(quest)`, not set `editingId` directly.
+    - `JournalList`: simpler — there is no `formOpen`/`openEdit`; the modal's `open` prop is derived inline as `!!viewingEntry` where `viewingEntry = journal.find(j => j.id === viewingId)` (`src/components/notes/JournalList.tsx:23`). The effect can call `setViewingId(initialOpenId)` directly; if the id doesn't resolve to an entry, `viewingEntry` is `undefined` and the modal simply doesn't open (safe no-op).
   - `QuickNotes` has no per-entry modal — confirmed by reading `src/components/notes/QuickNotes.tsx` (flat list with an inline "⋯" promote/delete menu, no separate edit modal). Tapping a quick-note search result just switches to the Quick sub-tab; no auto-open needed there.
 - No data model changes.
 
