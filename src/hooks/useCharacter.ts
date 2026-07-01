@@ -107,6 +107,20 @@ export function useCharacter(id: string = "mavok-1") {
     [update]
   );
 
+  const updateQuickNote = useCallback(
+    (noteId: string, text: string) =>
+      update((c) => ({
+        ...c,
+        notes: {
+          ...c.notes,
+          quick: c.notes.quick.map((n) =>
+            n.id === noteId ? { ...n, text } : n
+          ),
+        },
+      })),
+    [update]
+  );
+
   const removeQuickNote = useCallback(
     (noteId: string) =>
       update((c) => ({
@@ -222,6 +236,7 @@ export function useCharacter(id: string = "mavok-1") {
     removeInventoryItem,
     updateInventoryItem,
     addQuickNote,
+    updateQuickNote,
     removeQuickNote,
     addNote,
     updateNote,

@@ -1,13 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCharacterContext } from "@/lib/context";
 
 export function QuickNotes() {
-  const { character, addQuickNote, removeQuickNote, addNote, addQuest } =
-    useCharacterContext();
+  const {
+    character,
+    addQuickNote,
+    updateQuickNote,
+    removeQuickNote,
+    addNote,
+    addQuest,
+  } = useCharacterContext();
   const [text, setText] = useState("");
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClickOutside(e: PointerEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(null);
+      }
+    }
+    document.addEventListener("pointerdown", handleClickOutside);
+    return () =>
+      document.removeEventListener("pointerdown", handleClickOutside);
+  }, [menuOpen]);
 
   if (!character) return null;
 
@@ -16,6 +37,20 @@ export function QuickNotes() {
       addQuickNote(text.trim());
       setText("");
     }
+  }
+
+  function startEdit(noteId: string, currentText: string) {
+    setEditingId(noteId);
+    setEditText(currentText);
+    setMenuOpen(null);
+  }
+
+  function saveEdit() {
+    if (editingId && editText.trim()) {
+      updateQuickNote(editingId, editText.trim());
+    }
+    setEditingId(null);
+    setEditText("");
   }
 
   function promoteNote(noteId: string, target: "world" | "npcs" | "quests") {
@@ -73,12 +108,41 @@ export function QuickNotes() {
             className="flex items-start gap-2 stone-card rounded-lg p-3"
           >
             <div className="flex-1 min-w-0">
-              <p className="text-sm">{note.text}</p>
-              <p className="text-xs text-muted mt-1">
-                {new Date(note.createdAt).toLocaleString("es")}
-              </p>
+              {editingId === note.id ? (
+                <div className="flex gap-2">
+                  <input
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && saveEdit()}
+                    autoFocus
+                    className="flex-1 bg-background border border-accent rounded px-2 py-1 text-sm text-foreground"
+                  />
+                  <button
+                    onClick={saveEdit}
+                    className="text-xs px-2 py-1 bg-accent text-white rounded"
+                  >
+                    Guardar
+                  </button>
+                  <button
+                    onClick={() => setEditingId(null)}
+                    className="text-xs px-2 py-1 border border-border rounded text-muted"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm">{note.text}</p>
+                  <p className="text-xs text-muted mt-1">
+                    {new Date(note.createdAt).toLocaleString("es")}
+                  </p>
+                </>
+              )}
             </div>
-            <div className="relative">
+            <div
+              className="relative"
+              ref={menuOpen === note.id ? menuRef : undefined}
+            >
               <button
                 onClick={() =>
                   setMenuOpen(menuOpen === note.id ? null : note.id)
@@ -89,6 +153,12 @@ export function QuickNotes() {
               </button>
               {menuOpen === note.id && (
                 <div className="absolute right-0 top-6 bg-card border border-border rounded-lg shadow-lg z-10 py-1 w-40">
+                  <button
+                    onClick={() => startEdit(note.id, note.text)}
+                    className="w-full text-left px-3 py-2 text-xs hover:bg-background"
+                  >
+                    Editar
+                  </button>
                   <button
                     onClick={() => promoteNote(note.id, "world")}
                     className="w-full text-left px-3 py-2 text-xs hover:bg-background"
