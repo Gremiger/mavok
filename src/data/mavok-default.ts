@@ -92,7 +92,14 @@ export const MAVOK_DEFAULT: Character = {
       name: "Rage",
       source: "Bárbaro",
       description:
-        "Bonus Action para entrar en Rage. 2 usos por descanso largo. +2 daño con ataques cuerpo a cuerpo basados en Fuerza. Resistencia a daño Bludgeoning, Piercing y Slashing. Ventaja en pruebas y salvaciones de Fuerza. Duración: 10 minutos.",
+        "Bonus Action para entrar en Rage (no puedes llevar Heavy Armor). " +
+        "2 usos — recuperas 1 uso tras descanso corto, todos tras descanso largo. " +
+        "Mientras activo: +2 daño en ataques de Fuerza (arma o Unarmed Strike), " +
+        "Resistencia a Bludgeoning/Piercing/Slashing, Ventaja en pruebas y salvaciones de FUE. " +
+        "No puedes concentrarte ni lanzar hechizos. " +
+        "La Rage termina al final de tu siguiente turno salvo que la extiendas atacando, " +
+        "forzando una salvación o gastando una Bonus Action. " +
+        "Máximo 10 minutos. Termina antes si equipas Heavy Armor o quedas Incapacitated.",
       level: 1,
     },
     {
@@ -113,7 +120,16 @@ export const MAVOK_DEFAULT: Character = {
       name: "Giant Ancestry: Stone Giant",
       source: "Goliath",
       description:
-        "Conexión con la piedra y la tierra. Resistencia sobrenatural.",
+        "Descendiente de Stone Giants. Boon elegido: Stone's Endurance. " +
+        "Usos iguales a tu Proficiency Bonus; se recuperan todos en un descanso largo.",
+      level: 1,
+    },
+    {
+      name: "Stone's Endurance",
+      source: "Goliath",
+      description:
+        "Reacción: cuando recibes daño, tira 1d12 y añade tu modificador de CON. " +
+        "Reduce el daño entrante por ese total. Usos: 2 por descanso largo.",
       level: 1,
     },
     {
@@ -127,8 +143,10 @@ export const MAVOK_DEFAULT: Character = {
       name: "Large Form",
       source: "Goliath",
       description:
-        "Puede adoptar temporalmente forma Large una vez por descanso largo.",
-      level: 1,
+        "A partir del nivel 5: Bonus Action para adoptar forma Large si hay espacio suficiente. " +
+        "Dura 10 minutos o hasta cancelarla (sin acción). Durante la transformación: " +
+        "Ventaja en pruebas de FUE y +10 ft a tu Velocidad. 1 uso por descanso largo.",
+      level: 5,
     },
     {
       name: "Tough",
