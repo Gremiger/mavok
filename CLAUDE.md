@@ -25,7 +25,9 @@ npm run lint         # ESLint
 npx tsc --noEmit     # Type check without emitting
 ```
 
-There are no tests. Verify changes by running `npx tsc --noEmit && npm run build`.
+There are no tests. Verify changes by running `npx tsc --noEmit && npm run build && npm run lint`. **Always include lint** — `tsc`/`build` do not catch React Hooks ordering violations (see Key Constraints below); only `npm run lint`'s `react-hooks/rules-of-hooks` rule does. A change that skips lint can look clean and still ship a real bug.
+
+`npm run lint` currently reports 8 pre-existing errors across 5 files, unrelated to any one feature: `react-hooks/purity` (`Math.random()` called during render) x4 in `RageTracker.tsx`, `react-hooks/set-state-in-effect` x1 each in `JournalList.tsx`, `useCharacter.ts`, and `useTheme.ts`, and one `react/no-unescaped-entities` in `SettingsTab.tsx`. These are known/accepted debt — don't treat them as regressions caused by your own change; only investigate a lint failure that's new.
 
 ## Commit Messages
 
@@ -41,9 +43,11 @@ Never include a "Co-authored-by" (or similar attribution) trailer in commit mess
 
 **Versioned migrations** (`src/lib/migrations.ts`): When the data model changes, add a migration function keyed by the new version number, increment `CURRENT_DATA_VERSION` in `types.ts`. On load, `storage.ts` auto-detects old data, backs it up, and runs the migration chain. Migration failures preserve original data — never bricks the app.
 
-**5etools reference data** (`src/data/`): Static TypeScript files extracted from `../dnd/5etools-src/data/` via `scripts/extract-5etools.ts`. Contains conditions, weapons, armor, mastery properties, feats, barbarian progression, and subclass data. Re-extract with `npx tsx scripts/extract-5etools.ts` if the 5etools source changes.
+**5etools reference data** (`src/data/`): Static TypeScript files extracted from `../dnd/5etools-src/data/` via `scripts/extract-5etools.ts`. Contains conditions, weapons, armor, mastery properties, feats, barbarian progression, and subclass data — these 7 files are fully generated, committed to git as-is, and should not be hand-edited (re-extraction overwrites them). `src/data/mavok-default.ts` is the one hand-maintained exception — it's Mavok's specific starting character data, not generic 5etools reference data. Re-extract with `npx tsx scripts/extract-5etools.ts` if the 5etools source changes.
 
 **Theming**: Two themes (Dark Fantasy, D&D Classic) via CSS custom properties on `[data-theme]` attribute. Variables defined in `globals.css`, toggled via `useTheme()` hook. Tailwind classes reference them as `bg-background`, `text-accent`, `bg-card`, etc.
+
+**Service worker cache-busting** (`scripts/generate-sw.ts`): Runs automatically via the `prebuild` npm script before every `npm run build`. It stamps `public/sw.js`'s `STATIC_CACHE` constant with the current git commit hash. This means `public/sw.js` will show as modified after every build — that's expected, not a stray change, and should be committed alongside whatever code change triggered the rebuild.
 
 ## Key Constraints
 
@@ -52,6 +56,7 @@ Never include a "Co-authored-by" (or similar attribution) trailer in commit mess
 - D&D progression data (barbarian levels, subclass features, rage counts) is hardcoded in `src/data/barbarian-progression.ts` and `src/data/subclasses.ts` — not computed from rules. All 4 XPHB subclasses and 20 levels are covered.
 - `recalculate.ts` recomputes derived values (attack bonuses, AC, saves, mastery DCs) when attributes or proficiency change. Call it after any ASI/level-up that modifies ability scores.
 - Rage slots are tracked as `boolean[]` (`slots` field on `rpiRages`), not derived from `remaining`. Each slot toggles independently.
+- **Hooks must be called before any conditional early return** (e.g. `if (!character) return null;`), never after — every component in `src/components/tabs/` and several in `src/components/notes/` guard on `character` being non-null this way, and it's tempting to add a new `useState`/`useEffect`/custom hook (like `useLongPress`) further down near the code that uses it, after the guard. That violates React's Rules of Hooks and this project has hit real bugs from it. `npx tsc --noEmit` and `npm run build` do not catch this — only `npm run lint` does.
 
 ## Adding a New Data Model Field
 
@@ -59,4 +64,4 @@ Never include a "Co-authored-by" (or similar attribution) trailer in commit mess
 2. Increment `CURRENT_DATA_VERSION`
 3. Add a migration in `src/lib/migrations.ts` that backfills the field from old data
 4. Update `src/data/mavok-default.ts` with the field
-5. Verify: `npx tsc --noEmit && npm run build`
+5. Verify: `npx tsc --noEmit && npm run build && npm run lint`
