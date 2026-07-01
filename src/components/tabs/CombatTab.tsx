@@ -33,6 +33,10 @@ export function CombatTab() {
   const [standardActionsOpen, setStandardActionsOpen] = useState<"actions" | "bonus" | "reactions" | null>(null);
   const [stoneEnduranceEditing, setStoneEnduranceEditing] = useState(false);
   const [healerKitEditing, setHealerKitEditing] = useState(false);
+  const stoneEnduranceLongPress = useLongPress(() =>
+    setStoneEnduranceEditing(true)
+  );
+  const healerKitLongPress = useLongPress(() => setHealerKitEditing(true));
 
   if (!character) return null;
 
@@ -42,11 +46,6 @@ export function CombatTab() {
   const rageDamage =
     BARBARIAN_LEVELS.find((l) => l.level === meta.level)?.rageDamage ?? 2;
   const offhandAttack = attacks.find((a) => a.properties.includes("Light"));
-
-  const stoneEnduranceLongPress = useLongPress(() =>
-    setStoneEnduranceEditing(true)
-  );
-  const healerKitLongPress = useLongPress(() => setHealerKitEditing(true));
 
   const slots = resources.rpiRages.slots?.length === resources.rpiRages.total
     ? resources.rpiRages.slots
