@@ -13,8 +13,13 @@ import { DiceRoller } from "@/components/combat/DiceRoller";
 import { RageTracker } from "@/components/combat/RageTracker";
 import { StandardActionsModal } from "@/components/combat/StandardActionsModal";
 import { CONDITIONS } from "@/data/conditions";
+import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
 import { formatModifier } from "@/lib/utils";
 import { toast } from "sonner";
+
+function baseDice(damage: string): string {
+  return damage.replace(/\s*[+-]\s*\d+\s*$/, "").trim();
+}
 
 export function CombatTab() {
   const { character, updateCombat, updateResources, updateMeta } =
@@ -29,9 +34,11 @@ export function CombatTab() {
   if (!character) return null;
 
   const { combat, resources, meta, attacks } = character;
-  const { stoneEndurance } = resources;
+  const { stoneEndurance, healerKit } = resources;
   const rageActive = resources.rpiRages.active;
-  const rageDamage = 2;
+  const rageDamage =
+    BARBARIAN_LEVELS.find((l) => l.level === meta.level)?.rageDamage ?? 2;
+  const offhandAttack = attacks.find((a) => a.properties.includes("Light"));
 
   const slots = resources.rpiRages.slots?.length === resources.rpiRages.total
     ? resources.rpiRages.slots
@@ -43,6 +50,16 @@ export function CombatTab() {
     const newRemaining = newSlots.filter(Boolean).length;
     updateResources({
       rpiRages: { ...resources.rpiRages, remaining: newRemaining, slots: newSlots },
+    });
+  }
+
+  function spendHealerKit() {
+    if (resources.healerKit.remaining <= 0) return;
+    updateResources({
+      healerKit: {
+        ...resources.healerKit,
+        remaining: resources.healerKit.remaining - 1,
+      },
     });
   }
 
@@ -170,6 +187,32 @@ export function CombatTab() {
             rageDamage={rageDamage}
           />
         ))}
+        <div
+          className={`p-3 rounded-lg border mt-2 ${
+            healerKit.remaining > 0
+              ? "border-border bg-card"
+              : "border-border bg-card opacity-50"
+          }`}
+        >
+          <div className="flex items-center justify-between mb-1">
+            <span className="font-heading text-accent">Healer&apos;s Kit</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted font-heading">
+                {healerKit.remaining}/{healerKit.total}
+              </span>
+              <button
+                onClick={spendHealerKit}
+                disabled={healerKit.remaining <= 0}
+                className="text-xs px-2 py-0.5 border border-border rounded hover:border-accent hover:text-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Usar
+              </button>
+            </div>
+          </div>
+          <p className="text-xs text-muted">
+            Acción · estabiliza o cura 1d6+4 HP a una criatura · usos no se recuperan con descansos
+          </p>
+        </div>
         <button
           onClick={() => setStandardActionsOpen("actions")}
           className="w-full mt-2 p-2 rounded-lg border border-border/50 bg-card/50 text-left"
@@ -201,14 +244,17 @@ export function CombatTab() {
                 : `(${resources.rpiRages.remaining} usos restantes)`}
             </span>
           </button>
-          <div className="p-3 rounded-lg border border-border bg-card">
-            <span className="font-heading text-accent text-sm">
-              Offhand Attack
-            </span>
-            <span className="text-muted text-xs ml-2">
-              Handaxe · 1d6 slashing (sin mod STR)
-            </span>
-          </div>
+          {offhandAttack && (
+            <div className="p-3 rounded-lg border border-border bg-card">
+              <span className="font-heading text-accent text-sm">
+                Offhand Attack
+              </span>
+              <span className="text-muted text-xs ml-2">
+                {offhandAttack.name} · {baseDice(offhandAttack.damage)}{" "}
+                {offhandAttack.damageType} (sin mod de característica)
+              </span>
+            </div>
+          )}
           <button
             onClick={() => setStandardActionsOpen("bonus")}
             className="w-full mt-1 p-2 rounded-lg border border-border/50 bg-card/50 text-left"
