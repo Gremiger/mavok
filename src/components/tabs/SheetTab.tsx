@@ -24,6 +24,9 @@ export function SheetTab() {
     key: string;
     roll: DiceRoll;
   } | null>(null);
+  const [groupByAbility, setGroupByAbility] = useState(false);
+
+  const ABILITY_ORDER: AbilityScore[] = ["str", "dex", "con", "int", "wis", "cha"];
 
   const clearRoll = useCallback(() => setActiveRoll(null), []);
 
@@ -31,6 +34,10 @@ export function SheetTab() {
 
   const { meta, attributes, skills, savingThrows, proficiencies, features } =
     character;
+
+  const passivePerception = 10 + skillTotal(character, 'perception');
+  const passiveInsight = 10 + skillTotal(character, 'insight');
+  const passiveInvestigation = 10 + skillTotal(character, 'investigation');
 
   function rollAbility(ab: AbilityScore) {
     const mod = abilityModifier(attributes[ab]);
@@ -136,45 +143,96 @@ export function SheetTab() {
       </CollapsibleSection>
 
       {/* Habilidades */}
-      <CollapsibleSection title="Habilidades">
-        <div className="space-y-1">
-          {Object.entries(skills)
-            .sort(([a], [b]) => skillLabel(a).localeCompare(skillLabel(b)))
-            .map(([key, skill]) => (
-              <button
-                key={key}
-                onClick={() => rollSkill(key)}
-                className="w-full flex items-center justify-between py-1.5 px-1 text-sm rounded hover:bg-card/50 active:scale-[0.99] transition-transform cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`w-3 h-3 rounded-full border ${
-                      skill.proficient
-                        ? "bg-accent border-accent"
-                        : "border-muted"
-                    }`}
-                  />
-                  <span>{skillLabel(key)}</span>
-                  <span className="text-muted text-xs">
-                    ({abilityLabelShort(skill.attribute)})
-                  </span>
-                </div>
-                <span className="font-heading text-accent">
-                  {formatModifier(skillTotal(character, key))}
-                </span>
-              </button>
+      <div className="relative">
+        <button
+          onClick={() => setGroupByAbility(g => !g)}
+          className="absolute right-0 top-0 z-10 text-[0.6rem] text-muted border border-border rounded px-1.5 py-0.5 uppercase tracking-wider hover:border-accent hover:text-accent"
+          style={{ marginTop: '0.9rem' }}
+        >
+          {groupByAbility ? "A–Z" : "Grupo"}
+        </button>
+        <CollapsibleSection title="Habilidades">
+          <div className="flex gap-2 flex-wrap mb-3">
+            {[
+              { label: "Percepción Pasiva", value: passivePerception },
+              { label: "Perspicacia Pasiva", value: passiveInsight },
+              { label: "Investigación Pasiva", value: passiveInvestigation },
+            ].map(({ label, value }) => (
+              <div key={label} className="stone-card rounded-lg px-2 py-1 flex items-center gap-1.5">
+                <span className="text-muted text-[0.6rem] uppercase tracking-wider">{label}</span>
+                <span className="font-heading text-accent text-sm font-bold">{value}</span>
+              </div>
             ))}
-        </div>
-        {activeRoll?.key.startsWith("skill-") && (
-          <div className="mt-2">
-            <DiceResult
-              roll={activeRoll.roll}
-              label={skillLabel(activeRoll.key.replace("skill-", ""))}
-              onClear={clearRoll}
-            />
           </div>
-        )}
-      </CollapsibleSection>
+          <div className="space-y-1">
+            {groupByAbility
+              ? ABILITY_ORDER.map((ab) => {
+                  const group = Object.entries(skills).filter(([, s]) => s.attribute === ab);
+                  if (group.length === 0) return null;
+                  return (
+                    <div key={ab} className="mb-2">
+                      <div className="text-muted text-[0.6rem] uppercase tracking-widest px-1 mb-1">
+                        {abilityLabelShort(ab)}
+                      </div>
+                      {group
+                        .sort(([a], [b]) => skillLabel(a).localeCompare(skillLabel(b)))
+                        .map(([key, skill]) => (
+                          <button
+                            key={key}
+                            onClick={() => rollSkill(key)}
+                            className="w-full flex items-center justify-between py-1.5 px-1 text-sm rounded hover:bg-card/50 active:scale-[0.99] transition-transform cursor-pointer"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className={`w-3 h-3 rounded-full border ${skill.proficient ? "bg-accent border-accent" : "border-muted"}`} />
+                              <span>{skillLabel(key)}</span>
+                            </div>
+                            <span className="font-heading text-accent">
+                              {formatModifier(skillTotal(character, key))}
+                            </span>
+                          </button>
+                        ))}
+                    </div>
+                  );
+                })
+              : Object.entries(skills)
+                  .sort(([a], [b]) => skillLabel(a).localeCompare(skillLabel(b)))
+                  .map(([key, skill]) => (
+                    <button
+                      key={key}
+                      onClick={() => rollSkill(key)}
+                      className="w-full flex items-center justify-between py-1.5 px-1 text-sm rounded hover:bg-card/50 active:scale-[0.99] transition-transform cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-3 h-3 rounded-full border ${
+                            skill.proficient
+                              ? "bg-accent border-accent"
+                              : "border-muted"
+                          }`}
+                        />
+                        <span>{skillLabel(key)}</span>
+                        <span className="text-muted text-xs">
+                          ({abilityLabelShort(skill.attribute)})
+                        </span>
+                      </div>
+                      <span className="font-heading text-accent">
+                        {formatModifier(skillTotal(character, key))}
+                      </span>
+                    </button>
+                  ))
+            }
+          </div>
+          {activeRoll?.key.startsWith("skill-") && (
+            <div className="mt-2">
+              <DiceResult
+                roll={activeRoll.roll}
+                label={skillLabel(activeRoll.key.replace("skill-", ""))}
+                onClear={clearRoll}
+              />
+            </div>
+          )}
+        </CollapsibleSection>
+      </div>
 
       {/* Competencias */}
       <CollapsibleSection title="Competencias">
@@ -201,7 +259,9 @@ export function SheetTab() {
       {/* Rasgos y características */}
       <CollapsibleSection title="Rasgos y características">
         <div className="space-y-3">
-          {features.map((f, i) => (
+          {features
+            .filter(f => f.level <= meta.level)
+            .map((f, i) => (
             <div key={i} className="stone-card rounded-lg p-3">
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-heading text-accent text-base font-semibold">
