@@ -174,7 +174,19 @@ export function CombatTab() {
       {/* Conditions */}
       <div className="flex flex-wrap items-center gap-1.5">
         {combat.conditions.map((c) => (
-          <Tag key={c} label={c} onRemove={() => removeCondition(c)} />
+          <Tag
+            key={c}
+            label={c}
+            onRemove={() => {
+              removeCondition(c);
+              toast(`${c} eliminada`, {
+                action: {
+                  label: "Deshacer",
+                  onClick: () => addCondition(c),
+                },
+              });
+            }}
+          />
         ))}
         <button
           onClick={() => setConditionModalOpen(true)}
