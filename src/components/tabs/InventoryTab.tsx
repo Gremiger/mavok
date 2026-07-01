@@ -53,6 +53,12 @@ export function InventoryTab() {
     description: "",
   });
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "weight" | "equipped">("name");
+  const [hiddenCategories, setHiddenCategories] = useState<
+    Set<InventoryItem["category"]>
+  >(new Set());
+
   if (!character) return null;
 
   const { inventory, currency, attributes } = character;
@@ -63,10 +69,44 @@ export function InventoryTab() {
     0
   );
 
-  const grouped = CATEGORIES.map((cat) => ({
-    ...cat,
-    items: inventory.filter((i) => i.category === cat.value),
-  })).filter((g) => g.items.length > 0);
+  const filteredInventory = searchQuery
+    ? inventory.filter((i) =>
+        i.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : inventory;
+
+  function sortItems(items: InventoryItem[]): InventoryItem[] {
+    const sorted = [...items];
+    if (sortBy === "name") {
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === "weight") {
+      sorted.sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0));
+    } else {
+      sorted.sort((a, b) => {
+        if (a.equipped !== b.equipped) return a.equipped ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      });
+    }
+    return sorted;
+  }
+
+  function toggleCategory(cat: InventoryItem["category"]) {
+    setHiddenCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat);
+      else next.add(cat);
+      return next;
+    });
+  }
+
+  const grouped = CATEGORIES.filter((cat) => !hiddenCategories.has(cat.value))
+    .map((cat) => ({
+      ...cat,
+      items: sortItems(
+        filteredInventory.filter((i) => i.category === cat.value)
+      ),
+    }))
+    .filter((g) => g.items.length > 0);
 
   function handleAddItem() {
     if (!newItem.name.trim()) return;
@@ -139,6 +179,45 @@ export function InventoryTab() {
             <div className="text-muted text-xs">{label}</div>
           </div>
         ))}
+      </div>
+
+      {/* Search, Sort, Filter */}
+      <div className="space-y-2">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Buscar objeto..."
+          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+        />
+        <div className="flex gap-2 items-center flex-wrap">
+          <select
+            value={sortBy}
+            onChange={(e) =>
+              setSortBy(e.target.value as "name" | "weight" | "equipped")
+            }
+            className="bg-background border border-border rounded-lg px-2 py-1 text-xs text-foreground"
+          >
+            <option value="name">Nombre</option>
+            <option value="weight">Peso</option>
+            <option value="equipped">Equipado</option>
+          </select>
+          <div className="flex gap-1 flex-wrap">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => toggleCategory(cat.value)}
+                className={`px-2 py-1 rounded-full text-xs transition-colors ${
+                  hiddenCategories.has(cat.value)
+                    ? "bg-card border border-border text-muted opacity-50"
+                    : "bg-accent text-white"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Inventory List */}
@@ -239,6 +318,12 @@ export function InventoryTab() {
           </div>
         </div>
       ))}
+
+      {grouped.length === 0 && (
+        <p className="text-muted text-sm text-center py-8">
+          Sin objetos que coincidan. Ajusta la búsqueda o los filtros.
+        </p>
+      )}
 
       {/* Encumbrance Footer */}
       <div className="crack-divider" />
