@@ -11,6 +11,7 @@ import { DeathSaves } from "@/components/combat/DeathSaves";
 import { AttackRow } from "@/components/combat/AttackRow";
 import { DiceRoller } from "@/components/combat/DiceRoller";
 import { RageTracker } from "@/components/combat/RageTracker";
+import { StandardActionsModal } from "@/components/combat/StandardActionsModal";
 import { CONDITIONS } from "@/data/conditions";
 import { formatModifier } from "@/lib/utils";
 import { toast } from "sonner";
@@ -23,10 +24,12 @@ export function CombatTab() {
   const [tempHpInput, setTempHpInput] = useState(false);
   const [tempAcMod, setTempAcMod] = useState(0);
   const [acModalOpen, setAcModalOpen] = useState(false);
+  const [standardActionsOpen, setStandardActionsOpen] = useState<"actions" | "bonus" | "reactions" | null>(null);
 
   if (!character) return null;
 
   const { combat, resources, meta, attacks } = character;
+  const { stoneEndurance } = resources;
   const rageActive = resources.rpiRages.active;
   const rageDamage = 2;
 
@@ -40,6 +43,16 @@ export function CombatTab() {
     const newRemaining = newSlots.filter(Boolean).length;
     updateResources({
       rpiRages: { ...resources.rpiRages, remaining: newRemaining, slots: newSlots },
+    });
+  }
+
+  function spendStoneEndurance() {
+    if (resources.stoneEndurance.remaining <= 0) return;
+    updateResources({
+      stoneEndurance: {
+        ...resources.stoneEndurance,
+        remaining: resources.stoneEndurance.remaining - 1,
+      },
     });
   }
 
@@ -157,6 +170,15 @@ export function CombatTab() {
             rageDamage={rageDamage}
           />
         ))}
+        <button
+          onClick={() => setStandardActionsOpen("actions")}
+          className="w-full mt-2 p-2 rounded-lg border border-border/50 bg-card/50 text-left"
+        >
+          <span className="font-heading text-muted text-xs">Acciones estándar</span>
+          <p className="text-muted/60 text-[0.6rem] mt-0.5 leading-relaxed">
+            Attack (Grapple · Shove) · Dash · Disengage · Dodge · Help · Hide · Influence · Ready · Search · Study · Utilize
+          </p>
+        </button>
       </CollapsibleSection>
 
       {/* Bonus Actions */}
@@ -187,16 +209,63 @@ export function CombatTab() {
               Handaxe · 1d6 slashing (sin mod STR)
             </span>
           </div>
+          <button
+            onClick={() => setStandardActionsOpen("bonus")}
+            className="w-full mt-1 p-2 rounded-lg border border-border/50 bg-card/50 text-left"
+          >
+            <span className="font-heading text-muted text-xs">Bonus Actions estándar</span>
+            <span className="text-muted/60 text-[0.6rem] ml-2">Two-Weapon Fighting</span>
+          </button>
         </div>
       </CollapsibleSection>
 
       {/* Reactions */}
       <CollapsibleSection title="Reacciones">
-        <div className="p-3 rounded-lg border border-border bg-card text-sm">
-          <span className="font-heading text-accent">Opportunity Attack</span>
-          <span className="text-muted text-xs ml-2">
-            Mismas armas que Acciones
-          </span>
+        <div className="space-y-2 text-sm">
+          {/* Stone's Endurance */}
+          <div
+            className={`p-3 rounded-lg border ${
+              stoneEndurance.remaining > 0
+                ? "border-border bg-card"
+                : "border-border bg-card opacity-50"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-heading text-accent">Stone&apos;s Endurance</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted font-heading">
+                  {stoneEndurance.remaining}/{stoneEndurance.total}
+                </span>
+                <button
+                  onClick={spendStoneEndurance}
+                  disabled={stoneEndurance.remaining <= 0}
+                  className="text-xs px-2 py-0.5 border border-border rounded hover:border-accent hover:text-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Usar
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-muted">
+              Reacción · tira 1d12 + CON mod · reduce el daño entrante por ese total
+            </p>
+          </div>
+
+          {/* Opportunity Attack */}
+          <div className="p-3 rounded-lg border border-border bg-card">
+            <span className="font-heading text-accent">Opportunity Attack</span>
+            <span className="text-muted text-xs ml-2">
+              Mismas armas que Acciones
+            </span>
+          </div>
+
+          {/* Standard reactions compact card */}
+          <button
+            onClick={() => setStandardActionsOpen("reactions")}
+            className="w-full p-2 rounded-lg border border-border/50 bg-card/50 text-left"
+          >
+            <span className="font-heading text-muted text-xs">Reacciones estándar</span>
+            <span className="text-muted/60 text-[0.6rem] ml-2">Opportunity Attack</span>
+          </button>
         </div>
       </CollapsibleSection>
 
@@ -308,6 +377,12 @@ export function CombatTab() {
           </button>
         </div>
       </Modal>
+
+      <StandardActionsModal
+        open={standardActionsOpen !== null}
+        onClose={() => setStandardActionsOpen(null)}
+        filter={standardActionsOpen ?? "actions"}
+      />
     </div>
   );
 }
