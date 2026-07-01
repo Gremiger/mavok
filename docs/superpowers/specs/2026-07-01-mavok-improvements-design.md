@@ -37,11 +37,18 @@ description: "Reacción: cuando recibes daño, tira 1d12 y añade tu modificador
 
 This also requires adding a use tracker to `Resources` (see Section 1e).
 
-### 1e. Data model change — stoneEndurance tracker
+### 1e. Data model change — stoneEndurance tracker + feature patches in migration
 - Add `stoneEndurance: { total: number; remaining: number }` to the `Resources` interface in `src/lib/types.ts`
 - Increment `CURRENT_DATA_VERSION` from 2 → 3
-- Add migration v3 in `src/lib/migrations.ts`: `stoneEndurance = { total: character.meta.proficiencyBonus, remaining: character.meta.proficiencyBonus }`
 - Update `src/data/mavok-default.ts`: `stoneEndurance: { total: 2, remaining: 2 }`
+
+The v3 migration in `src/lib/migrations.ts` must do **all of the following** (features are stored in the character JSON in LocalStorage — changing `mavok-default.ts` only affects new characters):
+
+1. Add `resources.stoneEndurance = { total: meta.proficiencyBonus, remaining: meta.proficiencyBonus }`
+2. Fix Rage feature description to XPHB text (short rest recovery + duration/extension mechanic)
+3. Update Giant Ancestry: Stone Giant description to clarify Stone's Endurance boon and uses
+4. Add Stone's Endurance as a new feature entry (if not already present by name)
+5. Fix Large Form `level` field from 1 → 5
 
 ### 1f. Mountain Born — no action needed
 Mountain Born does not exist in XPHB. The Goliath species in XPHB has Giant Ancestry + Large Form + Powerful Build only. Nothing to add or remove.
