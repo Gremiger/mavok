@@ -248,6 +248,31 @@ export function RageTracker({
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Rage details when active */}
+        <AnimatePresence>
+          {active && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="overflow-hidden"
+            >
+              <div className="mt-2 px-1 space-y-0.5">
+                <p className="text-[0.65rem] text-orange-300/80 leading-relaxed">
+                  +2 daño · Resistencia Bludgeoning/Piercing/Slashing · Ventaja FUE checks/saves
+                </p>
+                <p className="text-[0.65rem] text-muted leading-relaxed">
+                  Extiende: ataca · fuerza salvación · Bonus Action
+                </p>
+                <p className="text-[0.65rem] text-muted leading-relaxed">
+                  No concentración · No hechizos
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );
