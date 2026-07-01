@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLongPress } from "@/hooks/useLongPress";
+import { motion } from "framer-motion";
 import { useCharacterContext } from "@/lib/context";
 import { StatBadge } from "@/components/ui/StatBadge";
 import { Tag } from "@/components/ui/Tag";
@@ -33,6 +34,9 @@ export function CombatTab() {
   const [standardActionsOpen, setStandardActionsOpen] = useState<"actions" | "bonus" | "reactions" | null>(null);
   const [stoneEnduranceEditing, setStoneEnduranceEditing] = useState(false);
   const [healerKitEditing, setHealerKitEditing] = useState(false);
+  const [ragePulseKey, setRagePulseKey] = useState(0);
+  const [stoneEndurancePulseKey, setStoneEndurancePulseKey] = useState(0);
+  const [healerKitPulseKey, setHealerKitPulseKey] = useState(0);
   const stoneEnduranceLongPress = useLongPress(() =>
     setStoneEnduranceEditing(true)
   );
@@ -68,6 +72,7 @@ export function CombatTab() {
         remaining: resources.healerKit.remaining - 1,
       },
     });
+    setHealerKitPulseKey((k) => k + 1);
   }
 
   function spendStoneEndurance() {
@@ -78,6 +83,7 @@ export function CombatTab() {
         remaining: resources.stoneEndurance.remaining - 1,
       },
     });
+    setStoneEndurancePulseKey((k) => k + 1);
   }
 
   function toggleRageActive() {
@@ -85,8 +91,12 @@ export function CombatTab() {
     updateResources({
       rpiRages: { ...resources.rpiRages, active: next },
     });
-    if (next) toast("Rage activado", { icon: "🔥" });
-    else toast("Rage desactivado", { icon: "💨" });
+    if (next) {
+      toast("Rage activado", { icon: "🔥" });
+      setRagePulseKey((k) => k + 1);
+    } else {
+      toast("Rage desactivado", { icon: "💨" });
+    }
   }
 
   function addCondition(name: string) {
@@ -206,7 +216,11 @@ export function CombatTab() {
             rageDamage={rageDamage}
           />
         ))}
-        <div
+        <motion.div
+          key={healerKitPulseKey}
+          initial={{ scale: 1.03 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.25 }}
           className={`p-3 rounded-lg border mt-2 ${
             healerKit.remaining > 0
               ? "border-border bg-card"
@@ -283,7 +297,7 @@ export function CombatTab() {
           <p className="text-xs text-muted">
             Acción · estabiliza o cura 1d6+4 HP a una criatura · usos no se recuperan con descansos
           </p>
-        </div>
+        </motion.div>
         <button
           onClick={() => setStandardActionsOpen("actions")}
           className="w-full mt-2 p-2 rounded-lg border border-border/50 bg-card/50 text-left"
@@ -298,7 +312,11 @@ export function CombatTab() {
       {/* Bonus Actions */}
       <CollapsibleSection title="Acciones adicionales">
         <div className="space-y-2 text-sm">
-          <button
+          <motion.button
+            key={ragePulseKey}
+            initial={{ scale: 1.06 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.25 }}
             onClick={toggleRageActive}
             className={`w-full p-3 rounded-lg border text-left ${
               rageActive
@@ -314,7 +332,7 @@ export function CombatTab() {
                 ? "(activo — tap para desactivar)"
                 : `(${resources.rpiRages.remaining} usos restantes)`}
             </span>
-          </button>
+          </motion.button>
           {offhandAttack && (
             <div className="p-3 rounded-lg border border-border bg-card">
               <span className="font-heading text-accent text-sm">
@@ -340,7 +358,11 @@ export function CombatTab() {
       <CollapsibleSection title="Reacciones">
         <div className="space-y-2 text-sm">
           {/* Stone's Endurance */}
-          <div
+          <motion.div
+            key={stoneEndurancePulseKey}
+            initial={{ scale: 1.03 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.25 }}
             className={`p-3 rounded-lg border ${
               stoneEndurance.remaining > 0
                 ? "border-border bg-card"
@@ -417,7 +439,7 @@ export function CombatTab() {
             <p className="text-xs text-muted">
               Reacción · tira 1d12 + CON mod · reduce el daño entrante por ese total
             </p>
-          </div>
+          </motion.div>
 
           {/* Opportunity Attack */}
           <div className="p-3 rounded-lg border border-border bg-card">
