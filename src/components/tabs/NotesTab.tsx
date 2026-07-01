@@ -110,7 +110,10 @@ export function NotesTab() {
           {SUB_TABS.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveSubTab(tab.id)}
+              onClick={() => {
+                setActiveSubTab(tab.id);
+                setPendingOpenId(undefined);
+              }}
               className={`px-3 py-2.5 text-xs whitespace-nowrap transition-colors border-b-2 ${
                 activeSubTab === tab.id
                   ? "text-accent border-accent"
