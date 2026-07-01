@@ -30,6 +30,7 @@ const SWIPE_THRESHOLD = 50;
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("ficha");
+  const [isPinching, setIsPinching] = useState(false);
   const charState = useCharacter();
   const themeState = useTheme();
   const dragX = useMotionValue(0);
@@ -86,12 +87,16 @@ export default function Home() {
         />
         <div className="flex flex-col min-h-dvh">
           <motion.main
-            className="flex-1 overflow-y-auto pb-safe-nav touch-pan-y"
-            style={{ x: dragX, opacity: dragOpacity }}
-            drag="x"
+            className="flex-1 overflow-y-auto pb-safe-nav"
+            style={{ x: dragX, opacity: dragOpacity, touchAction: 'pan-y pinch-zoom' }}
+            drag={isPinching ? false : "x"}
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
+            onTouchStart={(e) => {
+              if (e.touches.length > 1) setIsPinching(true);
+            }}
+            onTouchEnd={() => setIsPinching(false)}
           >
             {tabContent[activeTab]}
           </motion.main>
