@@ -1,6 +1,6 @@
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
-export const CURRENT_DATA_VERSION = 2;
+export const CURRENT_DATA_VERSION = 3;
 
 export interface Character {
   _version: number;
@@ -57,6 +57,7 @@ export interface CombatState {
 export interface Resources {
   rpiRages: { total: number; remaining: number; active: boolean; slots: boolean[] };
   healerKit: { total: number; remaining: number };
+  stoneEndurance: { total: number; remaining: number };
 }
 
 export interface Proficiencies {

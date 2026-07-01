@@ -23,8 +23,61 @@ const MIGRATIONS: Record<number, MigrationFn> = {
     return d;
   },
 
-  // Future migrations go here:
-  // 3: (data) => { ... return data; },
+  3: (data) => {
+    const d = data as Record<string, unknown>;
+    d._version = 3;
+
+    // Add stoneEndurance tracker
+    const meta = d.meta as Record<string, unknown> | undefined;
+    const profBonus = (meta?.proficiencyBonus as number) || 2;
+    const resources = d.resources as Record<string, unknown> | undefined;
+    if (resources && !resources.stoneEndurance) {
+      resources.stoneEndurance = { total: profBonus, remaining: profBonus };
+    }
+
+    // Patch features stored in LocalStorage
+    const features = d.features as Array<Record<string, unknown>> | undefined;
+    if (Array.isArray(features)) {
+      const rage = features.find(f => f.name === 'Rage');
+      if (rage) {
+        rage.description =
+          "Bonus Action para entrar en Rage (no puedes llevar Heavy Armor). " +
+          "2 usos — recuperas 1 uso tras descanso corto, todos tras descanso largo. " +
+          "Mientras activo: +2 daño en ataques de Fuerza (arma o Unarmed Strike), " +
+          "Resistencia a Bludgeoning/Piercing/Slashing, Ventaja en pruebas y salvaciones de FUE. " +
+          "No puedes concentrarte ni lanzar hechizos. " +
+          "La Rage termina al final de tu siguiente turno salvo que la extiendas atacando, " +
+          "forzando una salvación o gastando una Bonus Action. " +
+          "Máximo 10 minutos. Termina antes si equipas Heavy Armor o quedas Incapacitated.";
+      }
+
+      const giantAncestry = features.find(f => f.name === 'Giant Ancestry: Stone Giant');
+      if (giantAncestry) {
+        giantAncestry.description =
+          "Descendiente de Stone Giants. Boon elegido: Stone's Endurance. " +
+          "Usos iguales a tu Proficiency Bonus; se recuperan todos en un descanso largo.";
+      }
+
+      const largeForm = features.find(f => f.name === 'Large Form');
+      if (largeForm) {
+        largeForm.level = 5;
+      }
+
+      const hasStoneEndurance = features.some(f => f.name === "Stone's Endurance");
+      if (!hasStoneEndurance) {
+        features.push({
+          name: "Stone's Endurance",
+          source: "Goliath",
+          description:
+            `Reacción: cuando recibes daño, tira 1d12 y añade tu modificador de CON. ` +
+            `Reduce el daño entrante por ese total. Usos: ${profBonus} por descanso largo.`,
+          level: 1,
+        });
+      }
+    }
+
+    return d;
+  },
 };
 
 const BACKUP_PREFIX = "mavok_backup_pre_migration_";
