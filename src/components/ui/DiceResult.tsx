@@ -20,8 +20,9 @@ export function DiceResult({
     return () => clearTimeout(timer);
   }, [roll.timestamp, onClear, autoCloseMs]);
 
-  const isCrit = roll.rolls.length === 1 && roll.rolls[0] === 20;
-  const isFumble = roll.rolls.length === 1 && roll.rolls[0] === 1;
+  const isD20 = roll.expression.startsWith("1d20");
+  const isCrit = isD20 && roll.rolls.length === 1 && roll.rolls[0] === 20;
+  const isFumble = isD20 && roll.rolls.length === 1 && roll.rolls[0] === 1;
 
   return (
     <motion.div
