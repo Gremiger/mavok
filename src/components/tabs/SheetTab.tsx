@@ -77,7 +77,14 @@ export function SheetTab() {
       </div>
 
       {/* Atributos */}
-      <CollapsibleSection title="Atributos" defaultOpen>
+      <div className="relative">
+        <div
+          className="absolute right-0 top-0 z-10 text-[0.6rem] text-muted border border-border rounded px-1.5 py-0.5 uppercase tracking-wider"
+          style={{ marginTop: "0.9rem" }}
+        >
+          PB {formatModifier(meta.proficiencyBonus)}
+        </div>
+        <CollapsibleSection title="Atributos" defaultOpen>
         <div className="grid grid-cols-3 gap-2">
           {ABILITIES.map((ab) => (
             <button
@@ -105,6 +112,7 @@ export function SheetTab() {
           </div>
         )}
       </CollapsibleSection>
+      </div>
 
       {/* Tiradas de salvación */}
       <CollapsibleSection title="Tiradas de salvación">
@@ -260,7 +268,7 @@ export function SheetTab() {
       <CollapsibleSection title="Rasgos y características">
         <div className="space-y-3">
           {features
-            .filter(f => f.level <= meta.level)
+            .filter(f => f.source !== "Dote" && f.level <= meta.level)
             .map((f, i) => (
             <div key={i} className="stone-card rounded-lg p-3">
               <div className="flex items-center gap-2 mb-1">
@@ -274,6 +282,27 @@ export function SheetTab() {
               <p className="text-sm text-foreground/70 leading-relaxed">{f.description}</p>
             </div>
           ))}
+        </div>
+      </CollapsibleSection>
+
+      {/* Dotes */}
+      <CollapsibleSection title="Dotes">
+        <div className="space-y-3">
+          {features
+            .filter(f => f.source === "Dote" && f.level <= meta.level)
+            .map((f, i) => (
+              <div key={i} className="stone-card rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-heading text-accent text-base font-semibold">
+                    {f.name}
+                  </span>
+                </div>
+                <p className="text-sm text-foreground/70 leading-relaxed">{f.description}</p>
+              </div>
+            ))}
+          {features.filter(f => f.source === "Dote" && f.level <= meta.level).length === 0 && (
+            <p className="text-muted text-sm text-center py-4">Sin dotes todavía.</p>
+          )}
         </div>
       </CollapsibleSection>
 
