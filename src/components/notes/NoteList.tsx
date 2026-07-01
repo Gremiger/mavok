@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCharacterContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { Plus } from "lucide-react";
@@ -9,9 +9,11 @@ import type { NoteEntry } from "@/lib/types";
 export function NoteList({
   section,
   title,
+  initialOpenId,
 }: {
   section: "world" | "npcs";
   title: string;
+  initialOpenId?: string;
 }) {
   const { character, addNote, updateNote, removeNote } =
     useCharacterContext();
@@ -24,6 +26,13 @@ export function NoteList({
     fields: {} as Record<string, string>,
   });
   const [newFieldKey, setNewFieldKey] = useState("");
+
+  useEffect(() => {
+    if (!character || !initialOpenId) return;
+    const note = character.notes[section].find((n) => n.id === initialOpenId);
+    if (note) openEdit(note);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialOpenId]);
 
   if (!character) return null;
 

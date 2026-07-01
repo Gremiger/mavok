@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCharacterContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { Plus } from "lucide-react";
 import type { JournalEntry } from "@/lib/types";
 
-export function JournalList() {
+export function JournalList({
+  initialOpenId,
+}: {
+  initialOpenId?: string;
+} = {}) {
   const { character, addJournalEntry, removeJournalEntry } =
     useCharacterContext();
   const [formOpen, setFormOpen] = useState(false);
@@ -16,6 +20,10 @@ export function JournalList() {
     title: "",
     content: "",
   });
+
+  useEffect(() => {
+    if (initialOpenId) setViewingId(initialOpenId);
+  }, [initialOpenId]);
 
   if (!character) return null;
 

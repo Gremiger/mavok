@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCharacterContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { Tag } from "@/components/ui/Tag";
@@ -15,7 +15,11 @@ const STATUS_CONFIG = {
 
 type StatusFilter = "all" | QuestEntry["status"];
 
-export function QuestList() {
+export function QuestList({
+  initialOpenId,
+}: {
+  initialOpenId?: string;
+} = {}) {
   const { character, addQuest, updateQuest, removeQuest } =
     useCharacterContext();
   const [filter, setFilter] = useState<StatusFilter>("all");
@@ -27,6 +31,13 @@ export function QuestList() {
     givenBy: "",
     status: "active" as QuestEntry["status"],
   });
+
+  useEffect(() => {
+    if (!character || !initialOpenId) return;
+    const quest = character.notes.quests.find((q) => q.id === initialOpenId);
+    if (quest) openEdit(quest);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialOpenId]);
 
   if (!character) return null;
 
