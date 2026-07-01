@@ -203,6 +203,11 @@ export function SettingsTab() {
                     prev.meta.level -= 1;
                     const PROF_BY_LEVEL = [2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6];
                     prev.meta.proficiencyBonus = PROF_BY_LEVEL[prev.meta.level - 1];
+                    prev.resources.stoneEndurance.total = PROF_BY_LEVEL[prev.meta.level - 1];
+                    prev.resources.stoneEndurance.remaining = Math.min(
+                      prev.resources.stoneEndurance.remaining,
+                      PROF_BY_LEVEL[prev.meta.level - 1]
+                    );
                     const RAGES_BY_LEVEL = [2,2,3,3,3,4,4,4,4,4,4,5,5,5,5,5,6,6,6,6];
                     prev.resources.rpiRages.total = RAGES_BY_LEVEL[prev.meta.level - 1];
                     prev.resources.rpiRages.remaining = Math.min(prev.resources.rpiRages.remaining, prev.resources.rpiRages.total);

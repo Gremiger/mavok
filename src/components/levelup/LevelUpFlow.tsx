@@ -166,6 +166,11 @@ export function LevelUpFlow({
       // Proficiency bonus
       if (levelData.proficiencyBonus !== currentLevelData.proficiencyBonus) {
         updated.meta.proficiencyBonus = levelData.proficiencyBonus;
+        updated.resources.stoneEndurance.total = levelData.proficiencyBonus;
+        updated.resources.stoneEndurance.remaining = Math.min(
+          updated.resources.stoneEndurance.remaining,
+          levelData.proficiencyBonus
+        );
       }
 
       // Rages
