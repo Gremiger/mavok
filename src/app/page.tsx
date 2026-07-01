@@ -96,7 +96,12 @@ export default function Home() {
             onTouchStart={(e) => {
               if (e.touches.length > 1) setIsPinching(true);
             }}
-            onTouchEnd={() => setIsPinching(false)}
+            onTouchMove={(e) => {
+              if (e.touches.length > 1) setIsPinching(true);
+            }}
+            onTouchEnd={(e) => {
+              if (e.touches.length === 0) setIsPinching(false);
+            }}
           >
             {tabContent[activeTab]}
           </motion.main>
