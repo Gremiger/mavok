@@ -305,7 +305,15 @@ export function InventoryTab() {
                         </button>
                       </div>
                       <button
-                        onClick={() => removeInventoryItem(item.id)}
+                        onClick={() => {
+                          removeInventoryItem(item.id);
+                          toast(`${item.name} eliminado`, {
+                            action: {
+                              label: "Deshacer",
+                              onClick: () => addInventoryItem(item),
+                            },
+                          });
+                        }}
                         className="ml-auto px-3 py-1 text-xs text-danger border border-danger/30 rounded hover:bg-danger/10"
                       >
                         Eliminar
