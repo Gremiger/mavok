@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { motion } from "framer-motion";
 import type { DiceRoll } from "@/lib/dice";
 
 export function DiceResult({
@@ -23,7 +24,19 @@ export function DiceResult({
   const isFumble = roll.rolls.length === 1 && roll.rolls[0] === 1;
 
   return (
-    <div className="flex items-center gap-2 px-2 py-1 bg-accent/10 rounded text-sm animate-in fade-in">
+    <motion.div
+      key={roll.timestamp}
+      initial={
+        isCrit
+          ? { scale: 1.15, boxShadow: "0 0 0 4px rgba(234,179,8,0.5)" }
+          : isFumble
+            ? { scale: 1.15, boxShadow: "0 0 0 4px rgba(220,38,38,0.5)" }
+            : { scale: 1, boxShadow: "0 0 0 0 rgba(0,0,0,0)" }
+      }
+      animate={{ scale: 1, boxShadow: "0 0 0 0 rgba(0,0,0,0)" }}
+      transition={{ duration: 0.4 }}
+      className="flex items-center gap-2 px-2 py-1 bg-accent/10 rounded text-sm animate-in fade-in"
+    >
       {label && <span className="text-muted text-xs">{label}:</span>}
       <span className="text-foreground">
         [{roll.rolls.join(", ")}]
@@ -43,6 +56,6 @@ export function DiceResult({
       >
         ✕
       </button>
-    </div>
+    </motion.div>
   );
 }
