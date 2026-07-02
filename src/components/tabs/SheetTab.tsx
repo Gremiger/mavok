@@ -18,6 +18,13 @@ import {
 } from "@/lib/utils";
 
 const ABILITIES: AbilityScore[] = ["str", "dex", "con", "int", "wis", "cha"];
+const PRIMAL_KNOWLEDGE_SKILLS = [
+  "acrobatics",
+  "intimidation",
+  "perception",
+  "stealth",
+  "survival",
+];
 
 export function SheetTab() {
   const { character } = useCharacterContext();
@@ -33,10 +40,20 @@ export function SheetTab() {
 
   if (!character) return null;
 
-  const { meta, attributes, skills, savingThrows, proficiencies, features } =
-    character;
+  const {
+    meta,
+    attributes,
+    skills,
+    savingThrows,
+    proficiencies,
+    features,
+    resources,
+  } = character;
 
   const hasDangerSense = features.some((f) => f.name === "Danger Sense");
+  const primalKnowledgeActive =
+    resources.rpiRages.active &&
+    features.some((f) => f.name === "Primal Knowledge");
 
   const passivePerception = 10 + skillTotal(character, 'perception');
   const passiveInsight = 10 + skillTotal(character, 'insight');
@@ -61,6 +78,55 @@ export function SheetTab() {
     const total = skillTotal(character!, key);
     const result = rollD20(total);
     setActiveRoll({ key: `skill-${key}`, roll: result });
+  }
+
+  function rollSkillStr(key: string) {
+    const skill = skills[key];
+    const strMod = abilityModifier(attributes.str);
+    const total = strMod + (skill?.proficient ? meta.proficiencyBonus : 0);
+    const result = rollD20(total);
+    setActiveRoll({ key: `skill-str-${key}`, roll: result });
+  }
+
+  function renderSkillRow(
+    key: string,
+    skill: { attribute: AbilityScore; proficient: boolean },
+    showAbility: boolean
+  ) {
+    return (
+      <div key={key} className="flex items-center gap-1">
+        <button
+          onClick={() => rollSkill(key)}
+          className="flex-1 flex items-center justify-between py-1.5 px-1 text-sm rounded hover:bg-card/50 active:scale-[0.99] transition-transform cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <span
+              className={`w-3 h-3 rounded-full border ${
+                skill.proficient ? "bg-accent border-accent" : "border-muted"
+              }`}
+            />
+            <span>{skillLabel(key)}</span>
+            {showAbility && (
+              <span className="text-muted text-xs">
+                ({abilityLabelShort(skill.attribute)})
+              </span>
+            )}
+          </div>
+          <span className="font-heading text-accent">
+            {formatModifier(skillTotal(character!, key))}
+          </span>
+        </button>
+        {primalKnowledgeActive && PRIMAL_KNOWLEDGE_SKILLS.includes(key) && (
+          <button
+            onClick={() => rollSkillStr(key)}
+            title="Tirar con FUE (Primal Knowledge)"
+            className="px-1.5 py-1 text-[0.6rem] border border-accent/50 text-accent rounded shrink-0"
+          >
+            FUE
+          </button>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -209,57 +275,24 @@ export function SheetTab() {
                       </div>
                       {group
                         .sort(([a], [b]) => skillLabel(a).localeCompare(skillLabel(b)))
-                        .map(([key, skill]) => (
-                          <button
-                            key={key}
-                            onClick={() => rollSkill(key)}
-                            className="w-full flex items-center justify-between py-1.5 px-1 text-sm rounded hover:bg-card/50 active:scale-[0.99] transition-transform cursor-pointer"
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className={`w-3 h-3 rounded-full border ${skill.proficient ? "bg-accent border-accent" : "border-muted"}`} />
-                              <span>{skillLabel(key)}</span>
-                            </div>
-                            <span className="font-heading text-accent">
-                              {formatModifier(skillTotal(character, key))}
-                            </span>
-                          </button>
-                        ))}
+                        .map(([key, skill]) => renderSkillRow(key, skill, false))}
                     </div>
                   );
                 })
               : Object.entries(skills)
                   .sort(([a], [b]) => skillLabel(a).localeCompare(skillLabel(b)))
-                  .map(([key, skill]) => (
-                    <button
-                      key={key}
-                      onClick={() => rollSkill(key)}
-                      className="w-full flex items-center justify-between py-1.5 px-1 text-sm rounded hover:bg-card/50 active:scale-[0.99] transition-transform cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`w-3 h-3 rounded-full border ${
-                            skill.proficient
-                              ? "bg-accent border-accent"
-                              : "border-muted"
-                          }`}
-                        />
-                        <span>{skillLabel(key)}</span>
-                        <span className="text-muted text-xs">
-                          ({abilityLabelShort(skill.attribute)})
-                        </span>
-                      </div>
-                      <span className="font-heading text-accent">
-                        {formatModifier(skillTotal(character, key))}
-                      </span>
-                    </button>
-                  ))
+                  .map(([key, skill]) => renderSkillRow(key, skill, true))
             }
           </div>
           {activeRoll?.key.startsWith("skill-") && (
             <div className="mt-2">
               <DiceResult
                 roll={activeRoll.roll}
-                label={skillLabel(activeRoll.key.replace("skill-", ""))}
+                label={
+                  activeRoll.key.startsWith("skill-str-")
+                    ? `${skillLabel(activeRoll.key.replace("skill-str-", ""))} (FUE)`
+                    : skillLabel(activeRoll.key.replace("skill-", ""))
+                }
                 onClear={clearRoll}
               />
             </div>
