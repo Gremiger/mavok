@@ -21,7 +21,8 @@ import { getCharacterStorageKey } from "@/lib/storage";
 import { CURRENT_DATA_VERSION } from "@/lib/types";
 
 export function SettingsTab() {
-  const { character, update, updateCombat } = useCharacterContext();
+  const { character, update, updateCombat, updateMeta } =
+    useCharacterContext();
   const { theme, toggleTheme } = useThemeContext();
   const [shortRestOpen, setShortRestOpen] = useState(false);
   const [longRestOpen, setLongRestOpen] = useState(false);
@@ -34,6 +35,7 @@ export function SettingsTab() {
   const [levelUpOpen, setLevelUpOpen] = useState(false);
   const [levelUpDryRun, setLevelUpDryRun] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const portraitInputRef = useRef<HTMLInputElement>(null);
 
   if (!character) return null;
 
@@ -119,6 +121,31 @@ export function SettingsTab() {
     }
   }
 
+  async function handlePortraitUpload(file: File) {
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      img.src = objectUrl;
+      await img.decode();
+
+      const side = Math.min(img.naturalWidth, img.naturalHeight);
+      const sx = (img.naturalWidth - side) / 2;
+      const sy = (img.naturalHeight - side) / 2;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = 400;
+      canvas.height = 400;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(img, sx, sy, side, side, 0, 0, 400, 400);
+
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+      updateMeta({ portraitDataUrl: dataUrl });
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  }
+
   return (
     <div className="p-4 space-y-4">
       {/* Theme */}
@@ -132,6 +159,42 @@ export function SettingsTab() {
           </span>
           <span className="text-xs text-muted">Tap para cambiar</span>
         </button>
+      </CollapsibleSection>
+
+      {/* Portrait */}
+      <CollapsibleSection title="Retrato">
+        <div className="flex items-center gap-3">
+          {character.meta.portraitDataUrl ? (
+            <img
+              src={character.meta.portraitDataUrl}
+              alt="Retrato"
+              className="w-16 h-16 rounded-full object-cover border border-border"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-full border border-border bg-card flex items-center justify-center text-muted text-[0.6rem] text-center">
+              Sin foto
+            </div>
+          )}
+          <button
+            onClick={() => portraitInputRef.current?.click()}
+            className="flex-1 p-3 bg-card rounded-lg border border-border text-left text-sm"
+          >
+            {character.meta.portraitDataUrl
+              ? "Cambiar retrato"
+              : "Subir retrato"}
+          </button>
+        </div>
+        <input
+          ref={portraitInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handlePortraitUpload(file);
+            e.target.value = "";
+          }}
+        />
       </CollapsibleSection>
 
       {/* Rest */}

@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useCharacterContext } from "@/lib/context";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { DiceResult } from "@/components/ui/DiceResult";
+import { User } from "lucide-react";
 import type { AbilityScore } from "@/lib/types";
 import { rollD20, type DiceRoll } from "@/lib/dice";
 import {
@@ -61,7 +62,18 @@ export function SheetTab() {
     <div className="p-4 space-y-0">
       {/* Header */}
       <div className="mb-6 cord-line pl-4">
-        <div className="relative cord-knot">
+        <div className="relative cord-knot flex items-center gap-3">
+          {meta.portraitDataUrl ? (
+            <img
+              src={meta.portraitDataUrl}
+              alt={meta.name}
+              className="w-14 h-14 rounded-full object-cover border-2 border-accent shrink-0"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-full border-2 border-border bg-card flex items-center justify-center text-muted shrink-0">
+              <User size={24} />
+            </div>
+          )}
           <h1 className="font-heading text-3xl text-accent font-bold tracking-wide">
             {meta.name}
           </h1>
