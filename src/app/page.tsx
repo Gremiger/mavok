@@ -9,6 +9,7 @@ import { CombatTab } from "@/components/tabs/CombatTab";
 import { InventoryTab } from "@/components/tabs/InventoryTab";
 import { NotesTab } from "@/components/tabs/NotesTab";
 import { SettingsTab } from "@/components/tabs/SettingsTab";
+import { OfflineBadge } from "@/components/OfflineBadge";
 import { Toaster } from "sonner";
 import { Shield, Swords, Backpack, BookOpen, Settings } from "lucide-react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
@@ -85,6 +86,7 @@ export default function Home() {
             },
           }}
         />
+        <OfflineBadge />
         <div className="flex flex-col min-h-dvh">
           <motion.main
             className="flex-1 overflow-y-auto pb-safe-nav"
