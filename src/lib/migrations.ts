@@ -78,6 +78,22 @@ const MIGRATIONS: Record<number, MigrationFn> = {
 
     return d;
   },
+
+  4: (data) => {
+    const d = data as Record<string, unknown>;
+    d._version = 4;
+
+    const meta = d.meta as Record<string, unknown> | undefined;
+    if (meta && meta.portraitDataUrl === undefined) {
+      meta.portraitDataUrl = null;
+    }
+
+    if (d.levelUpHistory === undefined) {
+      d.levelUpHistory = [];
+    }
+
+    return d;
+  },
 };
 
 const BACKUP_PREFIX = "mavok_backup_pre_migration_";

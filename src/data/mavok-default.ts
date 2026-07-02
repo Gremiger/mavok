@@ -34,6 +34,7 @@ export const MAVOK_DEFAULT: Character = {
       "Comprender o silenciar los susurros bajo el suelo.",
       "Proteger a Taruq y a su nueva familia de camino.",
     ],
+    portraitDataUrl: null,
   },
   attributes: { str: 17, dex: 14, con: 14, int: 8, wis: 12, cha: 10 },
   combat: {
@@ -240,4 +241,5 @@ export const MAVOK_DEFAULT: Character = {
   ],
   currency: { cp: 0, sp: 0, ep: 0, gp: 30, pp: 0 },
   notes: { world: [], npcs: [], quests: [], journal: [], quick: [] },
+  levelUpHistory: [],
 };

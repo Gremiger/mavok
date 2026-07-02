@@ -1,6 +1,6 @@
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
-export const CURRENT_DATA_VERSION = 3;
+export const CURRENT_DATA_VERSION = 4;
 
 export interface Character {
   _version: number;
@@ -17,6 +17,14 @@ export interface Character {
   inventory: InventoryItem[];
   currency: Currency;
   notes: Notes;
+  levelUpHistory: LevelUpHistoryEntry[];
+}
+
+export interface LevelUpHistoryEntry {
+  level: number;
+  date: string;
+  asiChoice?: string;
+  featChosen?: string;
 }
 
 export interface CharacterMeta {
@@ -39,6 +47,7 @@ export interface CharacterMeta {
   flaw: string;
   backstory: string;
   goals: string[];
+  portraitDataUrl: string | null;
 }
 
 export interface CombatState {
