@@ -29,6 +29,7 @@ export function QuestList({
     title: "",
     content: "",
     givenBy: "",
+    tags: "",
     status: "active" as QuestEntry["status"],
   });
 
@@ -46,7 +47,7 @@ export function QuestList({
   );
 
   function openNew() {
-    setForm({ title: "", content: "", givenBy: "", status: "active" });
+    setForm({ title: "", content: "", givenBy: "", tags: "", status: "active" });
     setEditingId(null);
     setFormOpen(true);
   }
@@ -56,6 +57,7 @@ export function QuestList({
       title: quest.title,
       content: quest.content,
       givenBy: quest.givenBy,
+      tags: quest.tags.join(", "),
       status: quest.status,
     });
     setEditingId(quest.id);
@@ -65,12 +67,17 @@ export function QuestList({
   function handleSave() {
     if (!form.title.trim()) return;
     const now = new Date().toISOString();
+    const tags = form.tags
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
 
     if (editingId) {
       updateQuest(editingId, {
         title: form.title.trim(),
         content: form.content,
         givenBy: form.givenBy,
+        tags,
         status: form.status,
         updatedAt: now,
       });
@@ -79,7 +86,7 @@ export function QuestList({
         id: crypto.randomUUID(),
         title: form.title.trim(),
         content: form.content,
-        tags: [],
+        tags,
         givenBy: form.givenBy,
         status: form.status,
         createdAt: now,
@@ -149,6 +156,18 @@ export function QuestList({
               {quest.content}
             </p>
           )}
+          {quest.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {quest.tags.map((t) => (
+                <span
+                  key={t}
+                  className="text-[0.6rem] px-1.5 py-0.5 bg-background text-muted rounded"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       ))}
 
@@ -179,17 +198,29 @@ export function QuestList({
             autoFocus
           />
           <input
+            list="npc-names"
             value={form.givenBy}
             onChange={(e) => setForm({ ...form, givenBy: e.target.value })}
             placeholder="Dada por..."
             className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
           />
+          <datalist id="npc-names">
+            {character.notes.npcs.map((n) => (
+              <option key={n.id} value={n.title} />
+            ))}
+          </datalist>
           <textarea
             value={form.content}
             onChange={(e) => setForm({ ...form, content: e.target.value })}
             placeholder="Detalles"
             rows={4}
             className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"
+          />
+          <input
+            value={form.tags}
+            onChange={(e) => setForm({ ...form, tags: e.target.value })}
+            placeholder="Tags (separados por coma)"
+            className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
           />
           <select
             value={form.status}
