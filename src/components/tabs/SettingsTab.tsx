@@ -175,26 +175,30 @@ export function SettingsTab() {
             {character.meta.class}
             {character.meta.subclass && ` — ${character.meta.subclass}`}
           </div>
-          <div className="flex gap-2 justify-center mt-3">
-            <button
-              onClick={() => {
-                setLevelUpDryRun(false);
-                setLevelUpOpen(true);
-              }}
-              className="px-5 py-2 bg-accent text-white rounded-lg font-heading text-sm active:scale-95 transition-transform"
-            >
-              Subir de nivel
-            </button>
-            <button
-              onClick={() => {
-                setLevelUpDryRun(true);
-                setLevelUpOpen(true);
-              }}
-              className="px-5 py-2 border border-accent text-accent rounded-lg font-heading text-sm active:scale-95 transition-transform"
-            >
-              Dry Run ↑
-            </button>
-          </div>
+          {character.meta.level >= 20 ? (
+            <p className="mt-3 text-sm text-muted">Nivel máximo alcanzado</p>
+          ) : (
+            <div className="flex gap-2 justify-center mt-3">
+              <button
+                onClick={() => {
+                  setLevelUpDryRun(false);
+                  setLevelUpOpen(true);
+                }}
+                className="px-5 py-2 bg-accent text-white rounded-lg font-heading text-sm active:scale-95 transition-transform"
+              >
+                Subir de nivel
+              </button>
+              <button
+                onClick={() => {
+                  setLevelUpDryRun(true);
+                  setLevelUpOpen(true);
+                }}
+                className="px-5 py-2 border border-accent text-accent rounded-lg font-heading text-sm active:scale-95 transition-transform"
+              >
+                {"Dry Run ↑"}
+              </button>
+            </div>
+          )}
           {character.meta.level > 1 && (
             <button
               onClick={() => {
@@ -421,7 +425,7 @@ export function SettingsTab() {
               {character.resources.rpiRages.total}
             </li>
             <li>
-              Stone's Endurance → {character.resources.stoneEndurance.total}/{character.resources.stoneEndurance.total}
+              {"Stone's Endurance"} → {character.resources.stoneEndurance.total}/{character.resources.stoneEndurance.total}
             </li>
             <li>
               Dados de golpe: +
