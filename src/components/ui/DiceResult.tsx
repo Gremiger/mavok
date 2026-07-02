@@ -21,8 +21,9 @@ export function DiceResult({
   }, [roll.timestamp, onClear, autoCloseMs]);
 
   const isD20 = roll.expression.startsWith("1d20");
-  const isCrit = isD20 && roll.rolls.length === 1 && roll.rolls[0] === 20;
-  const isFumble = isD20 && roll.rolls.length === 1 && roll.rolls[0] === 1;
+  const isCrit = isD20 && roll.rolls.some((r) => r === 20);
+  const isFumble =
+    isD20 && roll.rolls.length > 0 && roll.rolls.every((r) => r === 1);
 
   return (
     <motion.div

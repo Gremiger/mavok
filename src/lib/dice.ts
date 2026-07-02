@@ -30,3 +30,15 @@ export function rollDice(expression: string): DiceRoll {
 export function rollD20(modifier: number = 0): DiceRoll {
   return rollDice(`1d20${modifier >= 0 ? "+" : ""}${modifier}`);
 }
+
+export function rollD20WithAdvantage(modifier: number = 0): DiceRoll {
+  const d1 = Math.floor(Math.random() * 20) + 1;
+  const d2 = Math.floor(Math.random() * 20) + 1;
+  return {
+    expression: `1d20adv${modifier >= 0 ? "+" : ""}${modifier}`,
+    rolls: [d1, d2],
+    modifier,
+    total: Math.max(d1, d2) + modifier,
+    timestamp: Date.now(),
+  };
+}
