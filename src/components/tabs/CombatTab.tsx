@@ -14,8 +14,10 @@ import { AttackRow } from "@/components/combat/AttackRow";
 import { DiceRoller } from "@/components/combat/DiceRoller";
 import { RageTracker } from "@/components/combat/RageTracker";
 import { StandardActionsModal } from "@/components/combat/StandardActionsModal";
+import { AttackFormModal } from "@/components/combat/AttackFormModal";
 import { CONDITIONS } from "@/data/conditions";
 import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
+import type { Attack } from "@/lib/types";
 import { formatModifier } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -24,8 +26,15 @@ function baseDice(damage: string): string {
 }
 
 export function CombatTab() {
-  const { character, updateCombat, updateResources, updateMeta } =
-    useCharacterContext();
+  const {
+    character,
+    updateCombat,
+    updateResources,
+    updateMeta,
+    addAttack,
+    updateAttack,
+    removeAttack,
+  } = useCharacterContext();
   const [hpModalOpen, setHpModalOpen] = useState(false);
   const [conditionModalOpen, setConditionModalOpen] = useState(false);
   const [tempHpInput, setTempHpInput] = useState(false);
@@ -34,6 +43,9 @@ export function CombatTab() {
   const [standardActionsOpen, setStandardActionsOpen] = useState<"actions" | "bonus" | "reactions" | null>(null);
   const [stoneEnduranceEditing, setStoneEnduranceEditing] = useState(false);
   const [healerKitEditing, setHealerKitEditing] = useState(false);
+  const [attackModalState, setAttackModalState] = useState<
+    "add" | Attack | null
+  >(null);
   const [ragePulseKey, setRagePulseKey] = useState(0);
   const [stoneEndurancePulseKey, setStoneEndurancePulseKey] = useState(0);
   const [healerKitPulseKey, setHealerKitPulseKey] = useState(0);
@@ -214,8 +226,26 @@ export function CombatTab() {
             attack={a}
             rageActive={rageActive}
             rageDamage={rageDamage}
+            onEdit={() => setAttackModalState(a)}
+            onDelete={() => {
+              removeAttack(a.id);
+              toast(`${a.name} eliminado`, {
+                action: {
+                  label: "Deshacer",
+                  onClick: () => addAttack(a),
+                },
+              });
+            }}
           />
         ))}
+        <button
+          onClick={() => setAttackModalState("add")}
+          className="w-full mt-2 p-2 rounded-lg border border-border/50 bg-card/50 text-left"
+        >
+          <span className="font-heading text-muted text-xs">
+            + Agregar ataque
+          </span>
+        </button>
         <motion.div
           key={healerKitPulseKey}
           initial={{ scale: 1.03 }}
@@ -573,6 +603,23 @@ export function CombatTab() {
         open={standardActionsOpen !== null}
         onClose={() => setStandardActionsOpen(null)}
         filter={standardActionsOpen ?? "actions"}
+      />
+
+      <AttackFormModal
+        open={attackModalState !== null}
+        onClose={() => setAttackModalState(null)}
+        onSave={(attack) => {
+          if (attackModalState && attackModalState !== "add") {
+            updateAttack(attack.id, attack);
+          } else {
+            addAttack(attack);
+          }
+        }}
+        existingAttack={
+          attackModalState && attackModalState !== "add"
+            ? attackModalState
+            : undefined
+        }
       />
     </div>
   );

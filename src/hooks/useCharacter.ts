@@ -7,6 +7,7 @@ import type {
   NoteEntry,
   QuestEntry,
   JournalEntry,
+  Attack,
 } from "@/lib/types";
 import { loadCharacter, saveCharacter } from "@/lib/storage";
 import { MAVOK_DEFAULT } from "@/data/mavok-default";
@@ -84,6 +85,32 @@ export function useCharacter(id: string = "mavok-1") {
         inventory: c.inventory.map((i) =>
           i.id === itemId ? { ...i, ...patch } : i
         ),
+      })),
+    [update]
+  );
+
+  const addAttack = useCallback(
+    (attack: Attack) =>
+      update((c) => ({ ...c, attacks: [...c.attacks, attack] })),
+    [update]
+  );
+
+  const updateAttack = useCallback(
+    (attackId: string, patch: Partial<Attack>) =>
+      update((c) => ({
+        ...c,
+        attacks: c.attacks.map((a) =>
+          a.id === attackId ? { ...a, ...patch } : a
+        ),
+      })),
+    [update]
+  );
+
+  const removeAttack = useCallback(
+    (attackId: string) =>
+      update((c) => ({
+        ...c,
+        attacks: c.attacks.filter((a) => a.id !== attackId),
       })),
     [update]
   );
@@ -235,6 +262,9 @@ export function useCharacter(id: string = "mavok-1") {
     addInventoryItem,
     removeInventoryItem,
     updateInventoryItem,
+    addAttack,
+    updateAttack,
+    removeAttack,
     addQuickNote,
     updateQuickNote,
     removeQuickNote,

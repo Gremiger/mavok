@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { Attack } from "@/lib/types";
 import { rollD20, rollDice, type DiceRoll } from "@/lib/dice";
 import { DiceResult } from "@/components/ui/DiceResult";
@@ -9,13 +9,31 @@ export function AttackRow({
   attack,
   rageActive,
   rageDamage,
+  onEdit,
+  onDelete,
 }: {
   attack: Attack;
   rageActive: boolean;
   rageDamage: number;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [lastRoll, setLastRoll] = useState<{ roll: DiceRoll; type: "hit" | "damage" } | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClickOutside(e: PointerEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("pointerdown", handleClickOutside);
+    return () =>
+      document.removeEventListener("pointerdown", handleClickOutside);
+  }, [menuOpen]);
 
   const isStrBased = !attack.properties.includes("Finesse");
   const rageBonus = rageActive && isStrBased && !attack.range.includes("/") ? rageDamage : 0;
@@ -76,7 +94,7 @@ export function AttackRow({
             +{attack.attackBonus} · {displayDamage()} {attack.damageType.slice(0, 4).toLowerCase()}. · {attack.range}
           </div>
         </div>
-        <div className="flex gap-1.5 ml-2">
+        <div className="flex gap-1.5 ml-2 items-center">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -95,6 +113,50 @@ export function AttackRow({
           >
             Dmg
           </button>
+          {(onEdit || onDelete) && (
+            <div
+              className="relative"
+              ref={menuOpen ? menuRef : undefined}
+            >
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuOpen((m) => !m);
+                }}
+                className="text-muted hover:text-foreground text-sm px-1"
+              >
+                ⋯
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-6 bg-card border border-border rounded-lg shadow-lg z-10 py-1 w-32">
+                  {onEdit && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMenuOpen(false);
+                        onEdit();
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs hover:bg-background"
+                    >
+                      Editar
+                    </button>
+                  )}
+                  {onDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMenuOpen(false);
+                        onDelete();
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs text-danger hover:bg-background"
+                    >
+                      Eliminar
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
