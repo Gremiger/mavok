@@ -47,6 +47,7 @@ export function CombatTab() {
     "add" | Attack | null
   >(null);
   const [ragePulseKey, setRagePulseKey] = useState(0);
+  const [recklessActive, setRecklessActive] = useState(false);
   const [stoneEndurancePulseKey, setStoneEndurancePulseKey] = useState(0);
   const [healerKitPulseKey, setHealerKitPulseKey] = useState(0);
   const stoneEnduranceLongPress = useLongPress(() =>
@@ -62,6 +63,9 @@ export function CombatTab() {
   const rageDamage =
     BARBARIAN_LEVELS.find((l) => l.level === meta.level)?.rageDamage ?? 2;
   const offhandAttack = attacks.find((a) => a.properties.includes("Light"));
+  const hasRecklessAttack = character.features.some(
+    (f) => f.name === "Reckless Attack"
+  );
 
   const slots = resources.rpiRages.slots?.length === resources.rpiRages.total
     ? resources.rpiRages.slots
@@ -226,6 +230,7 @@ export function CombatTab() {
             attack={a}
             rageActive={rageActive}
             rageDamage={rageDamage}
+            recklessActive={recklessActive}
             onEdit={() => setAttackModalState(a)}
             onDelete={() => {
               removeAttack(a.id);
@@ -363,6 +368,28 @@ export function CombatTab() {
                 : `(${resources.rpiRages.remaining} usos restantes)`}
             </span>
           </motion.button>
+          {hasRecklessAttack && (
+            <button
+              onClick={() => setRecklessActive((r) => !r)}
+              className={`w-full p-3 rounded-lg border text-left ${
+                recklessActive
+                  ? "border-danger bg-danger/10 text-danger"
+                  : "border-border bg-card text-foreground"
+              }`}
+            >
+              <span className="font-heading text-accent">
+                Reckless Attack
+              </span>
+              <span className="text-muted ml-2">
+                {recklessActive
+                  ? "(activo — tap para desactivar)"
+                  : "(tap para activar)"}
+              </span>
+              <p className="text-muted/60 text-[0.6rem] mt-0.5">
+                Atacantes contra ti tienen ventaja hasta tu próximo turno.
+              </p>
+            </button>
+          )}
           {offhandAttack && (
             <div className="p-3 rounded-lg border border-border bg-card">
               <span className="font-heading text-accent text-sm">

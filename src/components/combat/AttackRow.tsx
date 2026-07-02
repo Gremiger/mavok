@@ -2,19 +2,21 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import type { Attack } from "@/lib/types";
-import { rollD20, rollDice, type DiceRoll } from "@/lib/dice";
+import { rollD20, rollD20WithAdvantage, rollDice, type DiceRoll } from "@/lib/dice";
 import { DiceResult } from "@/components/ui/DiceResult";
 
 export function AttackRow({
   attack,
   rageActive,
   rageDamage,
+  recklessActive,
   onEdit,
   onDelete,
 }: {
   attack: Attack;
   rageActive: boolean;
   rageDamage: number;
+  recklessActive: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
 }) {
@@ -51,7 +53,10 @@ export function AttackRow({
   }
 
   function handleRollHit() {
-    const result = rollD20(attack.attackBonus);
+    const result =
+      recklessActive && isStrBased
+        ? rollD20WithAdvantage(attack.attackBonus)
+        : rollD20(attack.attackBonus);
     setLastRoll({ roll: result, type: "hit" });
   }
 
