@@ -27,7 +27,7 @@ npx tsc --noEmit     # Type check without emitting
 
 There are no tests. Verify changes by running `npx tsc --noEmit && npm run build && npm run lint`. **Always include lint** — `tsc`/`build` do not catch React Hooks ordering violations (see Key Constraints below); only `npm run lint`'s `react-hooks/rules-of-hooks` rule does. A change that skips lint can look clean and still ship a real bug.
 
-`npm run lint` currently reports 8 pre-existing errors across 5 files, unrelated to any one feature: `react-hooks/purity` (`Math.random()` called during render) x4 in `RageTracker.tsx`, `react-hooks/set-state-in-effect` x1 each in `JournalList.tsx`, `useCharacter.ts`, and `useTheme.ts`, and one `react/no-unescaped-entities` in `SettingsTab.tsx`. These are known/accepted debt — don't treat them as regressions caused by your own change; only investigate a lint failure that's new.
+`npm run lint` currently reports 7 pre-existing errors across 4 files, unrelated to any one feature: `react-hooks/purity` (`Math.random()` called during render) x4 in `RageTracker.tsx`, and `react-hooks/set-state-in-effect` x1 each in `JournalList.tsx`, `useCharacter.ts`, and `useTheme.ts`. These are known/accepted debt — don't treat them as regressions caused by your own change; only investigate a lint failure that's new.
 
 ## Commit Messages
 
