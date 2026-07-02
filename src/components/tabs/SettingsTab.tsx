@@ -16,6 +16,7 @@ import {
   importCharacterJSON,
 } from "@/lib/export";
 import { LevelUpFlow } from "@/components/levelup/LevelUpFlow";
+import { WeaponMasteryModal } from "@/components/settings/WeaponMasteryModal";
 import { getBackups, restoreBackup } from "@/lib/migrations";
 import { getCharacterStorageKey } from "@/lib/storage";
 import { CURRENT_DATA_VERSION } from "@/lib/types";
@@ -34,6 +35,7 @@ export function SettingsTab() {
   const [shortRestLog, setShortRestLog] = useState<string[]>([]);
   const [levelUpOpen, setLevelUpOpen] = useState(false);
   const [levelUpDryRun, setLevelUpDryRun] = useState(false);
+  const [weaponMasteryOpen, setWeaponMasteryOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const portraitInputRef = useRef<HTMLInputElement>(null);
 
@@ -223,6 +225,17 @@ export function SettingsTab() {
             </span>
             <span className="text-xs text-muted block mt-0.5">
               Recuperar HP, rage, dados de golpe
+            </span>
+          </button>
+          <button
+            onClick={() => setWeaponMasteryOpen(true)}
+            className="w-full p-3 bg-card rounded-lg border border-border text-left"
+          >
+            <span className="font-heading text-accent text-sm">
+              Practicar con armas
+            </span>
+            <span className="text-xs text-muted block mt-0.5">
+              Cambiar una maestría de arma (1 por descanso largo)
             </span>
           </button>
         </div>
@@ -550,6 +563,12 @@ export function SettingsTab() {
 
       {/* Level Up Flow */}
       <LevelUpFlow open={levelUpOpen} onClose={() => setLevelUpOpen(false)} dryRun={levelUpDryRun} />
+
+      {/* Weapon Mastery Swap */}
+      <WeaponMasteryModal
+        open={weaponMasteryOpen}
+        onClose={() => setWeaponMasteryOpen(false)}
+      />
 
       {/* Import Preview Modal */}
       <Modal
