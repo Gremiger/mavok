@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useCharacterContext } from "@/lib/context";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { DiceResult } from "@/components/ui/DiceResult";
+import { FeatsBrowserModal } from "@/components/sheet/FeatsBrowserModal";
 import { User } from "lucide-react";
 import type { AbilityScore } from "@/lib/types";
 import { rollD20, rollD20WithAdvantage, type DiceRoll } from "@/lib/dice";
@@ -33,6 +34,7 @@ export function SheetTab() {
     roll: DiceRoll;
   } | null>(null);
   const [groupByAbility, setGroupByAbility] = useState(false);
+  const [featsBrowserOpen, setFeatsBrowserOpen] = useState(false);
 
   const ABILITY_ORDER: AbilityScore[] = ["str", "dex", "con", "int", "wis", "cha"];
 
@@ -361,6 +363,14 @@ export function SheetTab() {
           {features.filter(f => f.source === "Dote" && f.level <= meta.level).length === 0 && (
             <p className="text-muted text-sm text-center py-4">Sin dotes todavía.</p>
           )}
+          <button
+            onClick={() => setFeatsBrowserOpen(true)}
+            className="w-full p-2 rounded-lg border border-border/50 bg-card/50 text-left"
+          >
+            <span className="font-heading text-muted text-xs">
+              Ver todas las dotes disponibles
+            </span>
+          </button>
         </div>
       </CollapsibleSection>
 
@@ -404,6 +414,12 @@ export function SheetTab() {
           ))}
         </ol>
       </CollapsibleSection>
+
+      <FeatsBrowserModal
+        open={featsBrowserOpen}
+        onClose={() => setFeatsBrowserOpen(false)}
+        character={character}
+      />
     </div>
   );
 }
