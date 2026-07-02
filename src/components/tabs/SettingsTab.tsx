@@ -322,7 +322,7 @@ export function SettingsTab() {
                     </span>
                   </div>
                   <span className="text-xs text-muted">
-                    {entry.asiChoice || entry.featChosen || "—"}
+                    {[entry.asiChoice, entry.featChosen].filter(Boolean).join(" · ") || "—"}
                   </span>
                 </div>
               ))}
