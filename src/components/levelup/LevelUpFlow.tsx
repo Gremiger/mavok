@@ -9,6 +9,7 @@ import {
   formatModifier,
   abilityLabel,
   abilityLabelShort,
+  skillLabel,
 } from "@/lib/utils";
 import { recalculateDerived } from "@/lib/recalculate";
 import {
@@ -23,6 +24,14 @@ import type { AbilityScore, Character, Feature } from "@/lib/types";
 const ABILITIES: AbilityScore[] = ["str", "dex", "con", "int", "wis", "cha"];
 const ASI_LEVELS = [4, 8, 12, 16, 19];
 const SUBCLASS_LEVEL = 3;
+const PRIMAL_KNOWLEDGE_SKILLS = [
+  "animalHandling",
+  "athletics",
+  "intimidation",
+  "nature",
+  "perception",
+  "survival",
+];
 
 interface PendingChanges {
   hpIncrease: number;
@@ -30,6 +39,7 @@ interface PendingChanges {
   subclass: string | null;
   abilityIncreases: Partial<Record<AbilityScore, number>>;
   feat: { name: string; description: string } | null;
+  primalKnowledgeSkill: string | null;
   newProfBonus: number | null;
   newRages: number | null;
   newRageDamage: number | null;
@@ -37,7 +47,14 @@ interface PendingChanges {
   newSpeed: number | null;
 }
 
-type Step = "confirm" | "hp" | "subclass" | "asi" | "features" | "summary";
+type Step =
+  | "confirm"
+  | "hp"
+  | "subclass"
+  | "primalKnowledge"
+  | "asi"
+  | "features"
+  | "summary";
 
 export function LevelUpFlow({
   open,
@@ -64,6 +81,9 @@ export function LevelUpFlow({
 
   const needsSubclass = newLevel === SUBCLASS_LEVEL && !character.meta.subclass;
   const needsASI = ASI_LEVELS.includes(newLevel);
+  const needsPrimalKnowledge =
+    newLevel === 3 &&
+    !character.features.some((f) => f.name === "Primal Knowledge");
 
   const newFeatures = BARBARIAN_FEATURES.filter(
     (f) => f.level === newLevel && !f.isSubclassSlot
@@ -76,6 +96,7 @@ export function LevelUpFlow({
   function buildSteps(): Step[] {
     const steps: Step[] = ["confirm", "hp"];
     if (needsSubclass) steps.push("subclass");
+    if (needsPrimalKnowledge) steps.push("primalKnowledge");
     if (needsASI) steps.push("asi");
     if (newFeatures.length > 0 || subclassFeatures.length > 0)
       steps.push("features");
@@ -119,6 +140,11 @@ export function LevelUpFlow({
       subclass: name,
       newFeatures: [...prev.newFeatures, ...subFeatures],
     }));
+    nextStep();
+  }
+
+  function selectPrimalKnowledgeSkill(skillKey: string) {
+    setChanges((prev) => ({ ...prev, primalKnowledgeSkill: skillKey }));
     nextStep();
   }
 
@@ -202,6 +228,15 @@ export function LevelUpFlow({
           20,
           updated.attributes[key] + (inc || 0)
         );
+      }
+
+      // Primal Knowledge skill choice
+      if (changes.primalKnowledgeSkill) {
+        const skillKey = changes.primalKnowledgeSkill;
+        updated.skills[skillKey] = {
+          ...updated.skills[skillKey],
+          proficient: true,
+        };
       }
 
       // Features
@@ -353,6 +388,35 @@ export function LevelUpFlow({
         </div>
       )}
 
+      {/* Primal Knowledge skill choice */}
+      {step === "primalKnowledge" && (
+        <div className="space-y-3">
+          <p className="text-sm">
+            Primal Knowledge: elige una competencia adicional de la lista de
+            habilidades de Bárbaro.
+          </p>
+          <div className="space-y-1">
+            {PRIMAL_KNOWLEDGE_SKILLS.map((key) => (
+              <button
+                key={key}
+                onClick={() => selectPrimalKnowledgeSkill(key)}
+                disabled={character.skills[key]?.proficient}
+                className="w-full p-3 bg-card border border-border rounded-lg text-left active:scale-[0.99] transition-transform disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <span className="font-heading text-accent text-sm">
+                  {skillLabel(key)}
+                </span>
+                {character.skills[key]?.proficient && (
+                  <span className="text-xs text-muted ml-2">
+                    (ya competente)
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ASI / Feat */}
       {step === "asi" && (
         <ASIStep
@@ -448,6 +512,12 @@ export function LevelUpFlow({
                 {character.attributes[ab as AbilityScore] + (inc || 0)})
               </li>
             ))}
+            {changes.primalKnowledgeSkill && (
+              <li>
+                Primal Knowledge: competencia en{" "}
+                {skillLabel(changes.primalKnowledgeSkill)}
+              </li>
+            )}
             {changes.feat && <li>Dote: {changes.feat.name}</li>}
             {newFeatures.map((f) => (
               <li key={f.name}>Nuevo: {f.name}</li>
@@ -777,6 +847,7 @@ function emptyChanges(): PendingChanges {
     subclass: null,
     abilityIncreases: {},
     feat: null,
+    primalKnowledgeSkill: null,
     newProfBonus: null,
     newRages: null,
     newRageDamage: null,
