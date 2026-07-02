@@ -6,7 +6,7 @@ import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { User } from "lucide-react";
 import type { AbilityScore } from "@/lib/types";
-import { rollD20, type DiceRoll } from "@/lib/dice";
+import { rollD20, rollD20WithAdvantage, type DiceRoll } from "@/lib/dice";
 import {
   abilityModifier,
   formatModifier,
@@ -36,6 +36,8 @@ export function SheetTab() {
   const { meta, attributes, skills, savingThrows, proficiencies, features } =
     character;
 
+  const hasDangerSense = features.some((f) => f.name === "Danger Sense");
+
   const passivePerception = 10 + skillTotal(character, 'perception');
   const passiveInsight = 10 + skillTotal(character, 'insight');
   const passiveInvestigation = 10 + skillTotal(character, 'investigation');
@@ -48,7 +50,10 @@ export function SheetTab() {
 
   function rollSave(ab: AbilityScore) {
     const total = saveTotal(character!, ab);
-    const result = rollD20(total);
+    const result =
+      ab === "dex" && hasDangerSense
+        ? rollD20WithAdvantage(total)
+        : rollD20(total);
     setActiveRoll({ key: `save-${ab}`, roll: result });
   }
 
@@ -144,6 +149,14 @@ export function SheetTab() {
                   }`}
                 />
                 <span>{abilityLabel(ab)}</span>
+                {ab === "dex" && hasDangerSense && (
+                  <span
+                    className="text-[0.6rem]"
+                    title="Ventaja automática (Danger Sense)"
+                  >
+                    ⚡
+                  </span>
+                )}
               </div>
               <span className="font-heading text-accent">
                 {formatModifier(saveTotal(character, ab))}
