@@ -284,6 +284,7 @@ export function SettingsTab() {
                     prev.combat.hitDice.remaining = Math.min(prev.combat.hitDice.remaining, prev.combat.hitDice.total);
                     prev.features = prev.features.filter(f => f.level <= prev.meta.level);
                     if (prev.meta.level < 3) prev.meta.subclass = null;
+                    prev.levelUpHistory = prev.levelUpHistory.slice(0, -1);
                     return prev;
                   });
                 }
@@ -294,6 +295,39 @@ export function SettingsTab() {
             </button>
           )}
         </div>
+      </CollapsibleSection>
+
+      {/* Level-up History */}
+      <CollapsibleSection title="Historial de niveles">
+        {character.levelUpHistory.length === 0 ? (
+          <p className="text-xs text-muted text-center py-2">
+            Sin historial todavía. Se registra cada vez que subes de nivel.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {character.levelUpHistory
+              .slice()
+              .reverse()
+              .map((entry, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-2 bg-card rounded-lg border border-border"
+                >
+                  <div>
+                    <span className="text-sm font-heading text-accent">
+                      Nivel {entry.level}
+                    </span>
+                    <span className="text-xs text-muted ml-2">
+                      {new Date(entry.date).toLocaleDateString("es")}
+                    </span>
+                  </div>
+                  <span className="text-xs text-muted">
+                    {entry.asiChoice || entry.featChosen || "—"}
+                  </span>
+                </div>
+              ))}
+          </div>
+        )}
       </CollapsibleSection>
 
       {/* Import / Export */}

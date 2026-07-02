@@ -4,7 +4,12 @@ import { useState } from "react";
 import { useCharacterContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { rollDice } from "@/lib/dice";
-import { abilityModifier, formatModifier, abilityLabel } from "@/lib/utils";
+import {
+  abilityModifier,
+  formatModifier,
+  abilityLabel,
+  abilityLabelShort,
+} from "@/lib/utils";
 import { recalculateDerived } from "@/lib/recalculate";
 import {
   BARBARIAN_LEVELS,
@@ -236,6 +241,27 @@ export function LevelUpFlow({
 
       // Recalculate derived values
       updated = recalculateDerived(updated);
+
+      // Level-up history log
+      const abilityIncreaseEntries = Object.entries(changes.abilityIncreases);
+      const asiChoice =
+        abilityIncreaseEntries.length > 0
+          ? abilityIncreaseEntries
+              .map(
+                ([ab, inc]) =>
+                  `${abilityLabelShort(ab as AbilityScore)} +${inc}`
+              )
+              .join(", ")
+          : undefined;
+      updated.levelUpHistory = [
+        ...updated.levelUpHistory,
+        {
+          level: newLevel,
+          date: new Date().toISOString(),
+          asiChoice,
+          featChosen: changes.feat?.name,
+        },
+      ];
 
       return updated;
     });
