@@ -18,6 +18,7 @@ import {
 } from "@/data/barbarian-progression";
 import { SUBCLASSES } from "@/data/subclasses";
 import { FEATS, type FeatData } from "@/data/feats";
+import { meetsAbilityPrereqs } from "@/lib/feats";
 import { toast } from "sonner";
 import type { AbilityScore, Character, Feature } from "@/lib/types";
 
@@ -317,15 +318,7 @@ export function LevelUpFlow({
       if (f.category === "Fighting Style") return false;
       if (f.levelRequired && f.levelRequired > newLevel) return false;
       if (f.requiresSpellcasting) return false;
-      if (f.abilityPrereqs) {
-        const meetsAny = f.abilityPrereqs.some((prereq) =>
-          Object.entries(prereq).every(
-            ([ab, min]) =>
-              (character!.attributes[ab as AbilityScore] || 0) >= min
-          )
-        );
-        if (!meetsAny) return false;
-      }
+      if (!meetsAbilityPrereqs(f, character!.attributes)) return false;
       return true;
     });
   }
