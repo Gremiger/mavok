@@ -11,10 +11,16 @@ export function JournalList({
 }: {
   initialOpenId?: string;
 } = {}) {
-  const { character, addJournalEntry, removeJournalEntry } =
+  const { character, addJournalEntry, updateJournalEntry, removeJournalEntry } =
     useCharacterContext();
   const [formOpen, setFormOpen] = useState(false);
   const [viewingId, setViewingId] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    session: 1,
+    title: "",
+    content: "",
+  });
   const [form, setForm] = useState({
     session: 1,
     title: "",
@@ -54,6 +60,26 @@ export function JournalList({
     };
     addJournalEntry(entry);
     setFormOpen(false);
+  }
+
+  function startEdit() {
+    if (!viewingEntry) return;
+    setEditForm({
+      session: viewingEntry.session,
+      title: viewingEntry.title,
+      content: viewingEntry.content,
+    });
+    setEditing(true);
+  }
+
+  function saveEdit() {
+    if (!viewingEntry || !editForm.title.trim()) return;
+    updateJournalEntry(viewingEntry.id, {
+      session: editForm.session,
+      title: editForm.title.trim(),
+      content: editForm.content,
+    });
+    setEditing(false);
   }
 
   return (
@@ -151,30 +177,95 @@ export function JournalList({
         </div>
       </Modal>
 
-      {/* View Entry */}
+      {/* View/Edit Entry */}
       <Modal
         open={!!viewingEntry}
-        onClose={() => setViewingId(null)}
+        onClose={() => {
+          setViewingId(null);
+          setEditing(false);
+        }}
         title={viewingEntry ? `Sesión ${viewingEntry.session}` : ""}
       >
-        {viewingEntry && (
-          <div className="space-y-3">
-            <h3 className="font-heading text-accent">{viewingEntry.title}</h3>
-            <p className="text-xs text-muted">{viewingEntry.date}</p>
-            <p className="text-sm whitespace-pre-line">
-              {viewingEntry.content}
-            </p>
-            <button
-              onClick={() => {
-                removeJournalEntry(viewingEntry.id);
-                setViewingId(null);
-              }}
-              className="text-xs text-danger hover:underline"
-            >
-              Eliminar entrada
-            </button>
-          </div>
-        )}
+        {viewingEntry &&
+          (editing ? (
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <div className="w-1/3">
+                  <label className="text-xs text-muted">Sesión</label>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    value={editForm.session}
+                    onChange={(e) =>
+                      setEditForm({
+                        ...editForm,
+                        session: parseInt(e.target.value) || 1,
+                      })
+                    }
+                    className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground mt-1"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs text-muted">Título</label>
+                  <input
+                    value={editForm.title}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, title: e.target.value })
+                    }
+                    className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground mt-1"
+                    autoFocus
+                  />
+                </div>
+              </div>
+              <textarea
+                value={editForm.content}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, content: e.target.value })
+                }
+                rows={6}
+                className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setEditing(false)}
+                  className="flex-1 py-2 text-sm border border-border rounded-lg text-muted"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={saveEdit}
+                  className="flex-1 py-2 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+                >
+                  Guardar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <h3 className="font-heading text-accent">{viewingEntry.title}</h3>
+              <p className="text-xs text-muted">{viewingEntry.date}</p>
+              <p className="text-sm whitespace-pre-line">
+                {viewingEntry.content}
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={startEdit}
+                  className="text-xs text-accent hover:underline"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => {
+                    removeJournalEntry(viewingEntry.id);
+                    setViewingId(null);
+                  }}
+                  className="text-xs text-danger hover:underline"
+                >
+                  Eliminar entrada
+                </button>
+              </div>
+            </div>
+          ))}
       </Modal>
     </div>
   );

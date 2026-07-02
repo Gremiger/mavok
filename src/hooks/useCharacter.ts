@@ -239,6 +239,20 @@ export function useCharacter(id: string = "mavok-1") {
     [update]
   );
 
+  const updateJournalEntry = useCallback(
+    (entryId: string, patch: Partial<JournalEntry>) =>
+      update((c) => ({
+        ...c,
+        notes: {
+          ...c.notes,
+          journal: c.notes.journal.map((j) =>
+            j.id === entryId ? { ...j, ...patch } : j
+          ),
+        },
+      })),
+    [update]
+  );
+
   const removeJournalEntry = useCallback(
     (entryId: string) =>
       update((c) => ({
@@ -275,6 +289,7 @@ export function useCharacter(id: string = "mavok-1") {
     updateQuest,
     removeQuest,
     addJournalEntry,
+    updateJournalEntry,
     removeJournalEntry,
   };
 }
