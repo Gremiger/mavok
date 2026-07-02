@@ -38,17 +38,38 @@ function computeSearchResults(notes: Notes, query: string): SearchResult[] {
   const results: SearchResult[] = [];
 
   for (const n of notes.world) {
-    if (n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q)) {
+    const fieldsMatch = Object.values(n.fields ?? {}).some((v) =>
+      v.toLowerCase().includes(q)
+    );
+    if (
+      n.title.toLowerCase().includes(q) ||
+      n.content.toLowerCase().includes(q) ||
+      fieldsMatch
+    ) {
       results.push({ id: n.id, section: "world", typeLabel: TYPE_LABELS.world, title: n.title });
     }
   }
   for (const n of notes.npcs) {
-    if (n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q)) {
+    const fieldsMatch = Object.values(n.fields ?? {}).some((v) =>
+      v.toLowerCase().includes(q)
+    );
+    if (
+      n.title.toLowerCase().includes(q) ||
+      n.content.toLowerCase().includes(q) ||
+      fieldsMatch
+    ) {
       results.push({ id: n.id, section: "npcs", typeLabel: TYPE_LABELS.npcs, title: n.title });
     }
   }
   for (const quest of notes.quests) {
-    if (quest.title.toLowerCase().includes(q) || quest.content.toLowerCase().includes(q)) {
+    const tagsMatch = quest.tags.join(" ").toLowerCase().includes(q);
+    const givenByMatch = quest.givenBy.toLowerCase().includes(q);
+    if (
+      quest.title.toLowerCase().includes(q) ||
+      quest.content.toLowerCase().includes(q) ||
+      tagsMatch ||
+      givenByMatch
+    ) {
       results.push({ id: quest.id, section: "quests", typeLabel: TYPE_LABELS.quests, title: quest.title });
     }
   }
