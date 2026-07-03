@@ -194,6 +194,182 @@ export const GEAR: GearData[] = ${JSON.stringify(gear, null, 2)};
   console.log(`Gear: ${gear.length}`);
 }
 
+// --- Actions ---
+function extractActions() {
+  const raw = JSON.parse(
+    fs.readFileSync(path.join(TOOLS_DIR, "actions.json"), "utf-8")
+  );
+  const actions = raw.action
+    .filter((a: Record<string, unknown>) => a.source === "XPHB")
+    .map((a: Record<string, unknown>) => ({
+      name: a.name as string,
+      description: flattenEntries(a.entries as unknown[]),
+    }));
+
+  const ts = `export interface ActionData {
+  name: string;
+  description: string;
+}
+
+export const ACTIONS: ActionData[] = ${JSON.stringify(actions, null, 2)};
+`;
+  fs.writeFileSync(path.join(OUT_DIR, "actions.ts"), ts);
+  console.log(`Actions: ${actions.length}`);
+}
+
+// --- Skills ---
+function extractSkills() {
+  const raw = JSON.parse(
+    fs.readFileSync(path.join(TOOLS_DIR, "skills.json"), "utf-8")
+  );
+  const skills = raw.skill
+    .filter((s: Record<string, unknown>) => s.source === "XPHB")
+    .map((s: Record<string, unknown>) => ({
+      name: s.name as string,
+      ability: s.ability as string,
+      description: flattenEntries(s.entries as unknown[]),
+    }));
+
+  const ts = `export interface SkillData {
+  name: string;
+  ability: string;
+  description: string;
+}
+
+export const SKILLS_REFERENCE: SkillData[] = ${JSON.stringify(skills, null, 2)};
+`;
+  fs.writeFileSync(path.join(OUT_DIR, "skills-reference.ts"), ts);
+  console.log(`Skills: ${skills.length}`);
+}
+
+// --- Spells ---
+function extractSpells() {
+  const raw = JSON.parse(
+    fs.readFileSync(path.join(TOOLS_DIR, "spells/spells-xphb.json"), "utf-8")
+  );
+  const schoolMap: Record<string, string> = {
+    A: "Abjuration", C: "Conjuration", D: "Divination", E: "Enchantment",
+    V: "Evocation", I: "Illusion", N: "Necromancy", T: "Transmutation",
+  };
+
+  function formatCastingTime(time: Record<string, unknown>[]): string {
+    const t = time[0] as { number: number; unit: string; condition?: string };
+    const unitLabels: Record<string, string> = {
+      action: "Action", bonus: "Bonus Action", reaction: "Reaction",
+      minute: "Minute", hour: "Hour",
+    };
+    const label = unitLabels[t.unit] || t.unit;
+    const plural =
+      t.number > 1 && (t.unit === "minute" || t.unit === "hour") ? "s" : "";
+    const base = `${t.number} ${label}${plural}`;
+    return t.condition ? `${base}, ${t.condition}` : base;
+  }
+
+  function formatRange(range: Record<string, unknown>): string {
+    const type = range.type as string;
+    const distance = range.distance as
+      | { type: string; amount?: number }
+      | undefined;
+    if (type === "point") {
+      if (!distance) return "Self";
+      switch (distance.type) {
+        case "touch":
+          return "Touch";
+        case "self":
+          return "Self";
+        case "sight":
+          return "Sight";
+        case "unlimited":
+          return "Unlimited";
+        case "feet":
+          return `${distance.amount} feet`;
+        case "miles":
+          return `${distance.amount} miles`;
+        default:
+          return distance.type;
+      }
+    }
+    const shapeLabels: Record<string, string> = {
+      cone: "Cone", sphere: "Sphere", cube: "Cube", line: "Line",
+      emanation: "Emanation",
+    };
+    const unit = distance?.type === "miles" ? "mile" : "foot";
+    return `Self (${distance?.amount}-${unit} ${shapeLabels[type] || type})`;
+  }
+
+  function formatDuration(duration: Record<string, unknown>[]): string {
+    const d = duration[0] as {
+      type: string;
+      duration?: { amount: number; type: string };
+    };
+    if (d.type === "instant") return "Instantaneous";
+    if (d.type === "permanent") return "Until dispelled";
+    if (d.type === "special") return "Special";
+    if (d.type === "timed" && d.duration) {
+      const amt = d.duration.amount;
+      const unit = d.duration.type;
+      const plural = amt > 1 ? "s" : "";
+      return `${amt} ${unit.charAt(0).toUpperCase()}${unit.slice(1)}${plural}`;
+    }
+    return d.type;
+  }
+
+  function formatComponents(components: Record<string, unknown>): string {
+    const parts: string[] = [];
+    if (components.v) parts.push("V");
+    if (components.s) parts.push("S");
+    if (components.m) {
+      const m = components.m;
+      const text = typeof m === "string" ? m : (m as { text?: string }).text;
+      parts.push(text ? `M (${text})` : "M");
+    }
+    return parts.join(", ");
+  }
+
+  const spells = raw.spell
+    .filter((s: Record<string, unknown>) => s.source === "XPHB")
+    .map((s: Record<string, unknown>) => {
+      const duration = s.duration as Record<string, unknown>[];
+      const higherLevel = s.entriesHigherLevel
+        ? flattenEntries(s.entriesHigherLevel as unknown[])
+        : "";
+      const baseDescription = flattenEntries(s.entries as unknown[]);
+      return {
+        name: s.name as string,
+        level: s.level as number,
+        school: schoolMap[s.school as string] || (s.school as string),
+        castingTime: formatCastingTime(s.time as Record<string, unknown>[]),
+        range: formatRange(s.range as Record<string, unknown>),
+        components: formatComponents(s.components as Record<string, unknown>),
+        duration: formatDuration(duration),
+        concentration: !!(duration[0] as Record<string, unknown>)
+          ?.concentration,
+        ritual: !!(s.meta as Record<string, unknown> | undefined)?.ritual,
+        description: higherLevel
+          ? `${baseDescription} ${higherLevel}`
+          : baseDescription,
+      };
+    });
+
+  const ts = `export interface SpellData {
+  name: string;
+  level: number;
+  school: string;
+  castingTime: string;
+  range: string;
+  components: string;
+  duration: string;
+  concentration: boolean;
+  ritual: boolean;
+  description: string;
+}
+
+export const SPELLS: SpellData[] = ${JSON.stringify(spells, null, 2)};
+`;
+  fs.writeFileSync(path.join(OUT_DIR, "spells.ts"), ts);
+  console.log(`Spells: ${spells.length}`);
+}
+
 // --- Weapon Mastery Properties ---
 function extractMastery() {
   const raw = JSON.parse(
@@ -454,6 +630,9 @@ extractConditions();
 extractWeapons();
 extractArmor();
 extractGear();
+extractActions();
+extractSkills();
+extractSpells();
 extractMastery();
 extractFeats();
 extractBarbarianProgression();
