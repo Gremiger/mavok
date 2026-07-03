@@ -8,22 +8,24 @@ import { SheetTab } from "@/components/tabs/SheetTab";
 import { CombatTab } from "@/components/tabs/CombatTab";
 import { InventoryTab } from "@/components/tabs/InventoryTab";
 import { NotesTab } from "@/components/tabs/NotesTab";
+import { EncyclopediaTab } from "@/components/tabs/EncyclopediaTab";
 import { SettingsTab } from "@/components/tabs/SettingsTab";
 import { OfflineBadge } from "@/components/OfflineBadge";
 import { Toaster } from "sonner";
-import { Shield, Swords, Backpack, BookOpen, Settings } from "lucide-react";
+import { Shield, Swords, Backpack, BookOpen, Library, Settings } from "lucide-react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import type { ReactNode } from "react";
 
-type Tab = "ficha" | "combate" | "inventario" | "notas" | "ajustes";
+type Tab = "ficha" | "combate" | "inventario" | "notas" | "enciclopedia" | "ajustes";
 
-const TAB_ORDER: Tab[] = ["ficha", "combate", "inventario", "notas", "ajustes"];
+const TAB_ORDER: Tab[] = ["ficha", "combate", "inventario", "notas", "enciclopedia", "ajustes"];
 
 const TAB_META: { id: Tab; label: string; icon: ReactNode }[] = [
   { id: "ficha", label: "Ficha", icon: <Shield size={20} /> },
   { id: "combate", label: "Combate", icon: <Swords size={20} /> },
   { id: "inventario", label: "Inventario", icon: <Backpack size={20} /> },
   { id: "notas", label: "Notas", icon: <BookOpen size={20} /> },
+  { id: "enciclopedia", label: "Enciclopedia", icon: <Library size={20} /> },
   { id: "ajustes", label: "Ajustes", icon: <Settings size={20} /> },
 ];
 
@@ -69,6 +71,7 @@ export default function Home() {
     combate: <CombatTab />,
     inventario: <InventoryTab />,
     notas: <NotesTab />,
+    enciclopedia: <EncyclopediaTab />,
     ajustes: <SettingsTab />,
   };
 
