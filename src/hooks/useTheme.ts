@@ -9,6 +9,7 @@ export function useTheme() {
 
   useEffect(() => {
     const settings = loadSettings();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- deliberate: localStorage is unavailable during the static-export build's prerender pass, so this read must be deferred to after client mount.
     setTheme(settings.theme);
     document.documentElement.setAttribute("data-theme", settings.theme);
   }, []);

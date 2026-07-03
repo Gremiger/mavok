@@ -37,6 +37,74 @@
 
 - [ ] **Step 1: Fix `RageTracker.tsx`'s impure random values**
 
+**Correction found during execution:** the `useMemo`-wrapped version below still fails `react-hooks/purity` — the rule flags `Math.random()` anywhere its initializer callback runs during render, `useMemo` included, since React can invoke that callback more than once (e.g. under Strict Mode). The actual fix uses a deterministic seeded pseudo-random function of the `Ember`'s index instead — pure and idempotent (same index always produces the same output), so no hook is needed at all. Visually indistinguishable for decorative particles. Use this replacement instead of the "Replace with" block shown below:
+
+```typescript
+"use client";
+
+import { motion, AnimatePresence } from "framer-motion";
+
+interface RageTrackerProps {
+  slots: boolean[];
+  active: boolean;
+  onToggleSlot: (index: number) => void;
+  onToggleActive: () => void;
+}
+
+// Deterministic pseudo-random in [0, 1) from a seed — pure and idempotent,
+// unlike Math.random(), so it satisfies react-hooks/purity when called
+// during render. Visually indistinguishable for decorative particles.
+function seeded(seed: number): number {
+  const x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+function Ember({ delay, index }: { delay: number; index: number }) {
+  const xMid = (seeded(index * 2 + 1) - 0.5) * 30;
+  const xEnd = (seeded(index * 2 + 2) - 0.5) * 40;
+  const repeatDelay = seeded(index * 3 + 1) * 2;
+  const left = 30 + seeded(index * 5 + 1) * 40;
+  return (
+    <motion.div
+      className="absolute w-1 h-1 rounded-full bg-orange-400"
+      initial={{ opacity: 0, y: 0, x: 0, scale: 0 }}
+      animate={{
+        opacity: [0, 1, 1, 0],
+        y: [0, -20, -40, -55],
+        x: [0, xMid, xEnd],
+        scale: [0, 1.5, 1, 0],
+      }}
+      transition={{
+        duration: 1.8,
+        delay,
+        repeat: Infinity,
+        repeatDelay,
+        ease: "easeOut",
+      }}
+      style={{
+        left: `${left}%`,
+        bottom: "10%",
+        filter: "blur(0.5px)",
+      }}
+    />
+  );
+}
+```
+
+Also find, further down in the same file:
+
+```tsx
+              <Ember key={i} delay={i * 0.25} />
+```
+
+Replace with:
+
+```tsx
+              <Ember key={i} delay={i * 0.25} index={i} />
+```
+
+The `useMemo`-based version below is kept for reference only — do not use it; use the seeded-pseudo-random version above instead.
+
 Find:
 
 ```typescript

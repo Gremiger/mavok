@@ -27,7 +27,7 @@ npx tsc --noEmit     # Type check without emitting
 
 There are no tests. Verify changes by running `npx tsc --noEmit && npm run build && npm run lint`. **Always include lint** — `tsc`/`build` do not catch React Hooks ordering violations (see Key Constraints below); only `npm run lint`'s `react-hooks/rules-of-hooks` rule does. A change that skips lint can look clean and still ship a real bug.
 
-`npm run lint` currently reports 7 pre-existing errors across 4 files, unrelated to any one feature: `react-hooks/purity` (`Math.random()` called during render) x4 in `RageTracker.tsx`, and `react-hooks/set-state-in-effect` x1 each in `JournalList.tsx`, `useCharacter.ts`, and `useTheme.ts`. These are known/accepted debt — don't treat them as regressions caused by your own change; only investigate a lint failure that's new.
+`npm run lint` should report 0 errors. Two lines (in `useCharacter.ts` and `useTheme.ts`, both reading `localStorage` on mount) carry a scoped `eslint-disable-next-line react-hooks/set-state-in-effect` with an inline justification — that's deliberate (localStorage is unavailable during this static-export app's build-time prerender pass), not new debt. Don't remove those comments, and don't add a similar suppression elsewhere without the same SSR/localStorage justification.
 
 ## Commit Messages
 

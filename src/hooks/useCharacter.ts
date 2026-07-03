@@ -18,6 +18,7 @@ export function useCharacter(id: string = "mavok-1") {
 
   useEffect(() => {
     const data = loadCharacter(id);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- deliberate: localStorage is unavailable during the static-export build's prerender pass (see storage.ts's `typeof window === "undefined"` guards), so this read must be deferred to after client mount, not computed during render.
     setCharacter(data ?? MAVOK_DEFAULT);
     setReady(true);
   }, [id]);

@@ -9,7 +9,19 @@ interface RageTrackerProps {
   onToggleActive: () => void;
 }
 
-function Ember({ delay }: { delay: number }) {
+// Deterministic pseudo-random in [0, 1) from a seed — pure and idempotent,
+// unlike Math.random(), so it satisfies react-hooks/purity when called
+// during render. Visually indistinguishable for decorative particles.
+function seeded(seed: number): number {
+  const x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+function Ember({ delay, index }: { delay: number; index: number }) {
+  const xMid = (seeded(index * 2 + 1) - 0.5) * 30;
+  const xEnd = (seeded(index * 2 + 2) - 0.5) * 40;
+  const repeatDelay = seeded(index * 3 + 1) * 2;
+  const left = 30 + seeded(index * 5 + 1) * 40;
   return (
     <motion.div
       className="absolute w-1 h-1 rounded-full bg-orange-400"
@@ -17,18 +29,18 @@ function Ember({ delay }: { delay: number }) {
       animate={{
         opacity: [0, 1, 1, 0],
         y: [0, -20, -40, -55],
-        x: [0, (Math.random() - 0.5) * 30, (Math.random() - 0.5) * 40],
+        x: [0, xMid, xEnd],
         scale: [0, 1.5, 1, 0],
       }}
       transition={{
         duration: 1.8,
         delay,
         repeat: Infinity,
-        repeatDelay: Math.random() * 2,
+        repeatDelay,
         ease: "easeOut",
       }}
       style={{
-        left: `${30 + Math.random() * 40}%`,
+        left: `${left}%`,
         bottom: "10%",
         filter: "blur(0.5px)",
       }}
@@ -52,7 +64,7 @@ export function RageTracker({
         {active && (
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             {Array.from({ length: 8 }).map((_, i) => (
-              <Ember key={i} delay={i * 0.25} />
+              <Ember key={i} delay={i * 0.25} index={i} />
             ))}
           </div>
         )}
