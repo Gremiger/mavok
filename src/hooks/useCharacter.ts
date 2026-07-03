@@ -116,6 +116,20 @@ export function useCharacter(id: string = "mavok-1") {
     [update]
   );
 
+  const moveAttack = useCallback(
+    (attackId: string, direction: "up" | "down") =>
+      update((c) => {
+        const index = c.attacks.findIndex((a) => a.id === attackId);
+        if (index === -1) return c;
+        const swapWith = direction === "up" ? index - 1 : index + 1;
+        if (swapWith < 0 || swapWith >= c.attacks.length) return c;
+        const attacks = [...c.attacks];
+        [attacks[index], attacks[swapWith]] = [attacks[swapWith], attacks[index]];
+        return { ...c, attacks };
+      }),
+    [update]
+  );
+
   const addQuickNote = useCallback(
     (text: string) =>
       update((c) => ({
@@ -280,6 +294,7 @@ export function useCharacter(id: string = "mavok-1") {
     addAttack,
     updateAttack,
     removeAttack,
+    moveAttack,
     addQuickNote,
     updateQuickNote,
     removeQuickNote,

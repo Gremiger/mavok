@@ -19,6 +19,8 @@ export function AttackRow({
   recklessActive,
   onEdit,
   onDelete,
+  onMoveUp,
+  onMoveDown,
 }: {
   attack: Attack;
   rageActive: boolean;
@@ -26,6 +28,8 @@ export function AttackRow({
   recklessActive: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [lastRoll, setLastRoll] = useState<{ roll: DiceRoll; type: "hit" | "damage" } | null>(null);
@@ -129,6 +133,32 @@ export function AttackRow({
           >
             Dmg
           </button>
+          {(onMoveUp || onMoveDown) && (
+            <div className="flex flex-col gap-0.5">
+              {onMoveUp && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMoveUp();
+                  }}
+                  className="text-muted hover:text-accent text-xs leading-none px-1"
+                >
+                  ▲
+                </button>
+              )}
+              {onMoveDown && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMoveDown();
+                  }}
+                  className="text-muted hover:text-accent text-xs leading-none px-1"
+                >
+                  ▼
+                </button>
+              )}
+            </div>
+          )}
           {(onEdit || onDelete) && (
             <div
               className="relative"

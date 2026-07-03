@@ -35,6 +35,7 @@ export function CombatTab() {
     addAttack,
     updateAttack,
     removeAttack,
+    moveAttack,
   } = useCharacterContext();
   const [hpModalOpen, setHpModalOpen] = useState(false);
   const [conditionModalOpen, setConditionModalOpen] = useState(false);
@@ -225,7 +226,7 @@ export function CombatTab() {
 
       {/* Actions */}
       <CollapsibleSection title="Acciones" defaultOpen>
-        {attacks.map((a) => (
+        {attacks.map((a, i) => (
           <AttackRow
             key={a.id}
             attack={a}
@@ -248,6 +249,10 @@ export function CombatTab() {
                 },
               });
             }}
+            onMoveUp={i > 0 ? () => moveAttack(a.id, "up") : undefined}
+            onMoveDown={
+              i < attacks.length - 1 ? () => moveAttack(a.id, "down") : undefined
+            }
           />
         ))}
         <button
