@@ -94,7 +94,7 @@ export default function Home() {
           <motion.main
             className="flex-1 overflow-y-auto pb-safe-nav"
             style={{ x: dragX, opacity: dragOpacity, touchAction: 'pan-y pinch-zoom' }}
-            drag={isPinching ? false : "x"}
+            drag={isPinching || activeTab === "enciclopedia" ? false : "x"}
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
