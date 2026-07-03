@@ -154,4 +154,5 @@ export interface QuickNote {
 export interface AppSettings {
   theme: "piedra-viva" | "dark-fantasy";
   lastCharacterId: string;
+  density: "compact" | "spacious";
 }

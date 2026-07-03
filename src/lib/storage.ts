@@ -41,15 +41,17 @@ export function getCharacterStorageKey(id: string): string {
 }
 
 export function loadSettings(): AppSettings {
-  if (typeof window === "undefined")
-    return { theme: "piedra-viva", lastCharacterId: "mavok-1" };
+  const defaults: AppSettings = {
+    theme: "piedra-viva",
+    lastCharacterId: "mavok-1",
+    density: "spacious",
+  };
+  if (typeof window === "undefined") return defaults;
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    return raw
-      ? JSON.parse(raw)
-      : { theme: "piedra-viva", lastCharacterId: "mavok-1" };
+    return raw ? { ...defaults, ...JSON.parse(raw) } : defaults;
   } catch {
-    return { theme: "piedra-viva", lastCharacterId: "mavok-1" };
+    return defaults;
   }
 }
 

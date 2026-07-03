@@ -6,11 +6,13 @@ import type { AppSettings } from "@/lib/types";
 
 export function useTheme() {
   const [theme, setTheme] = useState<AppSettings["theme"]>("piedra-viva");
+  const [density, setDensity] = useState<AppSettings["density"]>("spacious");
 
   useEffect(() => {
     const settings = loadSettings();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- deliberate: localStorage is unavailable during the static-export build's prerender pass, so this read must be deferred to after client mount.
     setTheme(settings.theme);
+    setDensity(settings.density);
     document.documentElement.setAttribute("data-theme", settings.theme);
   }, []);
 
@@ -25,5 +27,14 @@ export function useTheme() {
     });
   }, []);
 
-  return { theme, toggleTheme };
+  const toggleDensity = useCallback(() => {
+    setDensity((prev) => {
+      const next = prev === "spacious" ? "compact" : "spacious";
+      const settings = loadSettings();
+      saveSettings({ ...settings, density: next });
+      return next;
+    });
+  }, []);
+
+  return { theme, toggleTheme, density, toggleDensity };
 }

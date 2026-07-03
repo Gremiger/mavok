@@ -1301,10 +1301,14 @@ export function useTheme() {
     const settings = loadSettings();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- deliberate: localStorage is unavailable during the static-export build's prerender pass, so this read must be deferred to after client mount.
     setTheme(settings.theme);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- see above
     setDensity(settings.density);
     document.documentElement.setAttribute("data-theme", settings.theme);
   }, []);
+```
+
+**Correction found during execution:** a second `eslint-disable-next-line` on the `setDensity` line is flagged by ESLint as an *unused* disable directive — this rule apparently only fires once per effect body, not once per `setState` call within it. Don't add the second disable comment; the code above (without it) is correct and lint-clean.
+
+```typescript
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {

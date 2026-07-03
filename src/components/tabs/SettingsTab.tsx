@@ -25,7 +25,7 @@ import { CHANGELOG } from "@/data/changelog";
 export function SettingsTab() {
   const { character, update, updateCombat, updateMeta } =
     useCharacterContext();
-  const { theme, toggleTheme } = useThemeContext();
+  const { theme, toggleTheme, density, toggleDensity } = useThemeContext();
   const [shortRestOpen, setShortRestOpen] = useState(false);
   const [longRestOpen, setLongRestOpen] = useState(false);
   const [importPreview, setImportPreview] = useState<{
@@ -160,15 +160,26 @@ export function SettingsTab() {
     <div className="p-4 space-y-4">
       {/* Theme */}
       <CollapsibleSection title="Tema" defaultOpen>
-        <button
-          onClick={toggleTheme}
-          className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border"
-        >
-          <span className="text-sm">
-            {theme === "piedra-viva" ? "Piedra Viva" : "Dark Fantasy"}
-          </span>
-          <span className="text-xs text-muted">Tap para cambiar</span>
-        </button>
+        <div className="space-y-2">
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border"
+          >
+            <span className="text-sm">
+              {theme === "piedra-viva" ? "Piedra Viva" : "Dark Fantasy"}
+            </span>
+            <span className="text-xs text-muted">Tap para cambiar</span>
+          </button>
+          <button
+            onClick={toggleDensity}
+            className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border"
+          >
+            <span className="text-sm">
+              {density === "compact" ? "Compacto" : "Espacioso"}
+            </span>
+            <span className="text-xs text-muted">Tap para cambiar</span>
+          </button>
+        </div>
       </CollapsibleSection>
 
       {/* Portrait */}
