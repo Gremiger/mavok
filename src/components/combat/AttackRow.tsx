@@ -4,6 +4,13 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import type { Attack } from "@/lib/types";
 import { rollD20, rollD20WithAdvantage, rollDice, type DiceRoll } from "@/lib/dice";
 import { DiceResult } from "@/components/ui/DiceResult";
+import { Sword, Target, Hammer } from "lucide-react";
+
+const DAMAGE_TYPE_ICONS: Record<string, typeof Sword> = {
+  Slashing: Sword,
+  Piercing: Target,
+  Bludgeoning: Hammer,
+};
 
 export function AttackRow({
   attack,
@@ -39,6 +46,7 @@ export function AttackRow({
 
   const isStrBased = !attack.properties.includes("Finesse");
   const rageBonus = rageActive && isStrBased ? rageDamage : 0;
+  const DamageIcon = DAMAGE_TYPE_ICONS[attack.damageType];
 
   function displayDamage() {
     if (rageBonus > 0) {
@@ -96,6 +104,9 @@ export function AttackRow({
             )}
           </div>
           <div className="text-xs text-muted mt-0.5">
+            {DamageIcon && (
+              <DamageIcon size={11} className="inline-block mb-0.5 mr-1" />
+            )}
             +{attack.attackBonus} · {displayDamage()} {attack.damageType.slice(0, 4).toLowerCase()}. · {attack.range}
           </div>
         </div>
