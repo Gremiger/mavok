@@ -20,6 +20,7 @@ import { WeaponMasteryModal } from "@/components/settings/WeaponMasteryModal";
 import { getBackups, restoreBackup } from "@/lib/migrations";
 import { getCharacterStorageKey } from "@/lib/storage";
 import { CURRENT_DATA_VERSION } from "@/lib/types";
+import { CHANGELOG } from "@/data/changelog";
 
 export function SettingsTab() {
   const { character, update, updateCombat, updateMeta } =
@@ -36,6 +37,9 @@ export function SettingsTab() {
   const [levelUpOpen, setLevelUpOpen] = useState(false);
   const [levelUpDryRun, setLevelUpDryRun] = useState(false);
   const [weaponMasteryOpen, setWeaponMasteryOpen] = useState(false);
+  const [expandedChangelogEntry, setExpandedChangelogEntry] = useState<
+    string | null
+  >(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const portraitInputRef = useRef<HTMLInputElement>(null);
 
@@ -428,6 +432,49 @@ export function SettingsTab() {
               </div>
             ))
           )}
+        </div>
+      </CollapsibleSection>
+
+      {/* Changelog */}
+      <CollapsibleSection title="Historial de versiones">
+        <div className="space-y-2">
+          {CHANGELOG.map((entry) => {
+            const [year, month, day] = entry.date.split("-");
+            const displayDate = `${day}/${month}/${year}`;
+            const isExpanded = expandedChangelogEntry === entry.version;
+            return (
+              <div
+                key={entry.version}
+                className="stone-card rounded-lg overflow-hidden"
+              >
+                <button
+                  onClick={() =>
+                    setExpandedChangelogEntry(
+                      isExpanded ? null : entry.version
+                    )
+                  }
+                  className="w-full flex items-center justify-between p-3 text-left"
+                >
+                  <div>
+                    <span className="font-heading text-accent text-sm">
+                      {entry.version}
+                    </span>
+                    <span className="text-sm ml-2">{entry.title}</span>
+                  </div>
+                  <span className="text-xs text-muted">{displayDate}</span>
+                </button>
+                {isExpanded && (
+                  <div className="px-3 pb-3 border-t border-border pt-2">
+                    <ul className="list-disc list-inside space-y-1 text-xs text-foreground/80">
+                      {entry.summary.map((line, i) => (
+                        <li key={i}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </CollapsibleSection>
 
