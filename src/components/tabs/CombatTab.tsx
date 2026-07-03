@@ -28,6 +28,7 @@ function baseDice(damage: string): string {
 export function CombatTab() {
   const {
     character,
+    update,
     updateCombat,
     updateResources,
     updateMeta,
@@ -233,11 +234,17 @@ export function CombatTab() {
             recklessActive={recklessActive}
             onEdit={() => setAttackModalState(a)}
             onDelete={() => {
+              const index = attacks.findIndex((x) => x.id === a.id);
               removeAttack(a.id);
               toast(`${a.name} eliminado`, {
                 action: {
                   label: "Deshacer",
-                  onClick: () => addAttack(a),
+                  onClick: () =>
+                    update((c) => {
+                      const next = [...c.attacks];
+                      next.splice(index, 0, a);
+                      return { ...c, attacks: next };
+                    }),
                 },
               });
             }}

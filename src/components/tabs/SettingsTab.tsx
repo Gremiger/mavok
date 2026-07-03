@@ -143,10 +143,14 @@ export function SettingsTab() {
       canvas.height = 400;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, 400, 400);
       ctx.drawImage(img, sx, sy, side, side, 0, 0, 400, 400);
 
       const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
       updateMeta({ portraitDataUrl: dataUrl });
+    } catch {
+      toast.error("No se pudo procesar la imagen");
     } finally {
       URL.revokeObjectURL(objectUrl);
     }
@@ -325,9 +329,9 @@ export function SettingsTab() {
             {character.levelUpHistory
               .slice()
               .reverse()
-              .map((entry, i) => (
+              .map((entry) => (
                 <div
-                  key={i}
+                  key={`${entry.level}-${entry.date}`}
                   className="flex items-center justify-between p-2 bg-card rounded-lg border border-border"
                 >
                   <div>
