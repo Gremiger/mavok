@@ -24,6 +24,18 @@ export function QuestList({
     useCharacterContext();
   const { density } = useThemeContext();
   const [filter, setFilter] = useState<StatusFilter>("all");
+  const [expandedPreviews, setExpandedPreviews] = useState<Set<string>>(
+    new Set()
+  );
+
+  function togglePreview(id: string) {
+    setExpandedPreviews((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -153,9 +165,22 @@ export function QuestList({
             <p className="text-xs text-muted mt-1">De: {quest.givenBy}</p>
           )}
           {quest.content && (
-            <p className="text-xs text-foreground/80 mt-1 line-clamp-2">
-              {quest.content}
-            </p>
+            <>
+              <p
+                className={`text-xs text-foreground/80 mt-1 ${expandedPreviews.has(quest.id) ? "" : "line-clamp-2"}`}
+              >
+                {quest.content}
+              </p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePreview(quest.id);
+                }}
+                className="text-[0.65rem] text-accent mt-0.5"
+              >
+                {expandedPreviews.has(quest.id) ? "ver menos" : "ver más"}
+              </button>
+            </>
           )}
           {quest.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">

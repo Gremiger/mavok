@@ -27,6 +27,19 @@ export function JournalList({
     title: "",
     content: "",
   });
+  const [expandedPreviews, setExpandedPreviews] = useState<Set<string>>(
+    new Set()
+  );
+
+  function togglePreview(id: string) {
+    setExpandedPreviews((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
   const [prevInitialOpenId, setPrevInitialOpenId] = useState(initialOpenId);
   if (initialOpenId !== prevInitialOpenId) {
     setPrevInitialOpenId(initialOpenId);
@@ -105,9 +118,22 @@ export function JournalList({
               <span className="text-xs text-muted">{entry.date}</span>
             </div>
             {entry.content && (
-              <p className="text-xs text-foreground/80 mt-2 line-clamp-3">
-                {entry.content}
-              </p>
+              <>
+                <p
+                  className={`text-xs text-foreground/80 mt-2 ${expandedPreviews.has(entry.id) ? "" : "line-clamp-3"}`}
+                >
+                  {entry.content}
+                </p>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    togglePreview(entry.id);
+                  }}
+                  className="text-[0.65rem] text-accent mt-0.5"
+                >
+                  {expandedPreviews.has(entry.id) ? "ver menos" : "ver más"}
+                </button>
+              </>
             )}
           </div>
         ))}

@@ -27,6 +27,18 @@ export function NoteList({
     fields: {} as Record<string, string>,
   });
   const [newFieldKey, setNewFieldKey] = useState("");
+  const [expandedPreviews, setExpandedPreviews] = useState<Set<string>>(
+    new Set()
+  );
+
+  function togglePreview(id: string) {
+    setExpandedPreviews((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   useEffect(() => {
     if (!character || !initialOpenId) return;
@@ -113,9 +125,22 @@ export function NoteList({
         >
           <h4 className="font-heading text-accent text-sm">{note.title}</h4>
           {note.content && (
-            <p className="text-xs text-foreground/80 mt-1 line-clamp-2">
-              {note.content}
-            </p>
+            <>
+              <p
+                className={`text-xs text-foreground/80 mt-1 ${expandedPreviews.has(note.id) ? "" : "line-clamp-2"}`}
+              >
+                {note.content}
+              </p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePreview(note.id);
+                }}
+                className="text-[0.65rem] text-accent mt-0.5"
+              >
+                {expandedPreviews.has(note.id) ? "ver menos" : "ver más"}
+              </button>
+            </>
           )}
           {note.fields &&
             Object.entries(note.fields).some(([, v]) => v) && (
