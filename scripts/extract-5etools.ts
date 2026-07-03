@@ -94,6 +94,7 @@ function extractWeapons() {
         properties: props,
         mastery: masteries[0] || null,
         range,
+        value: typeof i.value === "number" ? i.value / 100 : null,
       };
     });
 
@@ -107,6 +108,7 @@ function extractWeapons() {
   properties: string[];
   mastery: string | null;
   range: string | null;
+  value: number | null;
 }
 
 export const WEAPONS: WeaponData[] = ${JSON.stringify(weapons, null, 2)};
@@ -142,6 +144,7 @@ function extractArmor() {
         weight: (i.weight as number) || 0,
         stealthDisadvantage: !!(i.stealth as boolean),
         strengthRequirement: i.strength ? parseInt(String(i.strength)) : null,
+        value: typeof i.value === "number" ? i.value / 100 : null,
       };
     });
 
@@ -152,12 +155,43 @@ function extractArmor() {
   weight: number;
   stealthDisadvantage: boolean;
   strengthRequirement: number | null;
+  value: number | null;
 }
 
 export const ARMOR: ArmorData[] = ${JSON.stringify(armor, null, 2)};
 `;
   fs.writeFileSync(path.join(OUT_DIR, "armor.ts"), ts);
   console.log(`Armor: ${armor.length}`);
+}
+
+// --- General Adventuring Gear ---
+function extractGear() {
+  const raw = JSON.parse(
+    fs.readFileSync(path.join(TOOLS_DIR, "items.json"), "utf-8")
+  );
+  const gear = raw.item
+    .filter(
+      (i: Record<string, unknown>) =>
+        i.source === "XPHB" && i.type === "G|XPHB"
+    )
+    .map((i: Record<string, unknown>) => ({
+      name: i.name as string,
+      weight: typeof i.weight === "number" ? i.weight : null,
+      value: typeof i.value === "number" ? i.value / 100 : null,
+      description: flattenEntries((i.entries as unknown[]) || []),
+    }));
+
+  const ts = `export interface GearData {
+  name: string;
+  weight: number | null;
+  value: number | null;
+  description: string;
+}
+
+export const GEAR: GearData[] = ${JSON.stringify(gear, null, 2)};
+`;
+  fs.writeFileSync(path.join(OUT_DIR, "gear.ts"), ts);
+  console.log(`Gear: ${gear.length}`);
 }
 
 // --- Weapon Mastery Properties ---
@@ -419,6 +453,7 @@ console.log("Extracting 5etools data...\n");
 extractConditions();
 extractWeapons();
 extractArmor();
+extractGear();
 extractMastery();
 extractFeats();
 extractBarbarianProgression();

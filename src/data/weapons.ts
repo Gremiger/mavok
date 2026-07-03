@@ -8,6 +8,7 @@ export interface WeaponData {
   properties: string[];
   mastery: string | null;
   range: string | null;
+  value: number | null;
 }
 
 export const WEAPONS: WeaponData[] = [
@@ -22,7 +23,8 @@ export const WEAPONS: WeaponData[] = [
       "Versatile"
     ],
     "mastery": "Topple",
-    "range": null
+    "range": null,
+    "value": 10
   },
   {
     "name": "Blowgun",
@@ -36,7 +38,8 @@ export const WEAPONS: WeaponData[] = [
       "Loading"
     ],
     "mastery": "Vex",
-    "range": "25/100 ft"
+    "range": "25/100 ft",
+    "value": 10
   },
   {
     "name": "Club",
@@ -49,7 +52,8 @@ export const WEAPONS: WeaponData[] = [
       "Light"
     ],
     "mastery": "Slow",
-    "range": null
+    "range": null,
+    "value": 0.1
   },
   {
     "name": "Dagger",
@@ -64,7 +68,8 @@ export const WEAPONS: WeaponData[] = [
       "Thrown"
     ],
     "mastery": "Nick",
-    "range": "20/60 ft"
+    "range": "20/60 ft",
+    "value": 2
   },
   {
     "name": "Dart",
@@ -78,7 +83,8 @@ export const WEAPONS: WeaponData[] = [
       "Thrown"
     ],
     "mastery": "Vex",
-    "range": "20/60 ft"
+    "range": "20/60 ft",
+    "value": 0.05
   },
   {
     "name": "Flail",
@@ -89,7 +95,8 @@ export const WEAPONS: WeaponData[] = [
     "weight": 2,
     "properties": [],
     "mastery": "Sap",
-    "range": null
+    "range": null,
+    "value": 10
   },
   {
     "name": "Glaive",
@@ -104,7 +111,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Graze",
-    "range": null
+    "range": null,
+    "value": 20
   },
   {
     "name": "Greataxe",
@@ -118,7 +126,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Cleave",
-    "range": null
+    "range": null,
+    "value": 30
   },
   {
     "name": "Greatclub",
@@ -131,7 +140,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Push",
-    "range": null
+    "range": null,
+    "value": 0.2
   },
   {
     "name": "Greatsword",
@@ -145,7 +155,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Graze",
-    "range": null
+    "range": null,
+    "value": 50
   },
   {
     "name": "Halberd",
@@ -160,7 +171,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Cleave",
-    "range": null
+    "range": null,
+    "value": 20
   },
   {
     "name": "Hand Crossbow",
@@ -175,7 +187,8 @@ export const WEAPONS: WeaponData[] = [
       "Loading"
     ],
     "mastery": "Vex",
-    "range": "30/120 ft"
+    "range": "30/120 ft",
+    "value": 75
   },
   {
     "name": "Handaxe",
@@ -189,7 +202,8 @@ export const WEAPONS: WeaponData[] = [
       "Thrown"
     ],
     "mastery": "Vex",
-    "range": "20/60 ft"
+    "range": "20/60 ft",
+    "value": 5
   },
   {
     "name": "Heavy Crossbow",
@@ -205,7 +219,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Push",
-    "range": "100/400 ft"
+    "range": "100/400 ft",
+    "value": 50
   },
   {
     "name": "Javelin",
@@ -218,7 +233,8 @@ export const WEAPONS: WeaponData[] = [
       "Thrown"
     ],
     "mastery": "Slow",
-    "range": "30/120 ft"
+    "range": "30/120 ft",
+    "value": 0.5
   },
   {
     "name": "Lance",
@@ -233,7 +249,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Topple",
-    "range": null
+    "range": null,
+    "value": 10
   },
   {
     "name": "Light Crossbow",
@@ -248,7 +265,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Slow",
-    "range": "80/320 ft"
+    "range": "80/320 ft",
+    "value": 25
   },
   {
     "name": "Light Hammer",
@@ -262,7 +280,8 @@ export const WEAPONS: WeaponData[] = [
       "Thrown"
     ],
     "mastery": "Nick",
-    "range": "20/60 ft"
+    "range": "20/60 ft",
+    "value": 2
   },
   {
     "name": "Longbow",
@@ -277,7 +296,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Slow",
-    "range": "150/600 ft"
+    "range": "150/600 ft",
+    "value": 50
   },
   {
     "name": "Longsword",
@@ -290,7 +310,8 @@ export const WEAPONS: WeaponData[] = [
       "Versatile"
     ],
     "mastery": "Sap",
-    "range": null
+    "range": null,
+    "value": 15
   },
   {
     "name": "Mace",
@@ -301,7 +322,8 @@ export const WEAPONS: WeaponData[] = [
     "weight": 4,
     "properties": [],
     "mastery": "Sap",
-    "range": null
+    "range": null,
+    "value": 5
   },
   {
     "name": "Maul",
@@ -315,7 +337,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Topple",
-    "range": null
+    "range": null,
+    "value": 10
   },
   {
     "name": "Morningstar",
@@ -326,7 +349,8 @@ export const WEAPONS: WeaponData[] = [
     "weight": 4,
     "properties": [],
     "mastery": "Sap",
-    "range": null
+    "range": null,
+    "value": 15
   },
   {
     "name": "Musket",
@@ -341,7 +365,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Slow",
-    "range": "40/120 ft"
+    "range": "40/120 ft",
+    "value": 500
   },
   {
     "name": "Pike",
@@ -356,7 +381,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Push",
-    "range": null
+    "range": null,
+    "value": 5
   },
   {
     "name": "Pistol",
@@ -370,7 +396,8 @@ export const WEAPONS: WeaponData[] = [
       "Loading"
     ],
     "mastery": "Vex",
-    "range": "30/90 ft"
+    "range": "30/90 ft",
+    "value": 250
   },
   {
     "name": "Quarterstaff",
@@ -383,7 +410,8 @@ export const WEAPONS: WeaponData[] = [
       "Versatile"
     ],
     "mastery": "Topple",
-    "range": null
+    "range": null,
+    "value": 0.2
   },
   {
     "name": "Rapier",
@@ -396,7 +424,8 @@ export const WEAPONS: WeaponData[] = [
       "Finesse"
     ],
     "mastery": "Vex",
-    "range": null
+    "range": null,
+    "value": 25
   },
   {
     "name": "Scimitar",
@@ -410,7 +439,8 @@ export const WEAPONS: WeaponData[] = [
       "Light"
     ],
     "mastery": "Nick",
-    "range": null
+    "range": null,
+    "value": 25
   },
   {
     "name": "Shortbow",
@@ -424,7 +454,8 @@ export const WEAPONS: WeaponData[] = [
       "Two-Handed"
     ],
     "mastery": "Vex",
-    "range": "80/320 ft"
+    "range": "80/320 ft",
+    "value": 25
   },
   {
     "name": "Shortsword",
@@ -438,7 +469,8 @@ export const WEAPONS: WeaponData[] = [
       "Light"
     ],
     "mastery": "Vex",
-    "range": null
+    "range": null,
+    "value": 10
   },
   {
     "name": "Sickle",
@@ -451,7 +483,8 @@ export const WEAPONS: WeaponData[] = [
       "Light"
     ],
     "mastery": "Nick",
-    "range": null
+    "range": null,
+    "value": 1
   },
   {
     "name": "Sling",
@@ -464,7 +497,8 @@ export const WEAPONS: WeaponData[] = [
       "Ammunition"
     ],
     "mastery": "Slow",
-    "range": "30/120 ft"
+    "range": "30/120 ft",
+    "value": 0.1
   },
   {
     "name": "Spear",
@@ -478,7 +512,8 @@ export const WEAPONS: WeaponData[] = [
       "Versatile"
     ],
     "mastery": "Sap",
-    "range": "20/60 ft"
+    "range": "20/60 ft",
+    "value": 1
   },
   {
     "name": "Trident",
@@ -492,7 +527,8 @@ export const WEAPONS: WeaponData[] = [
       "Versatile"
     ],
     "mastery": "Topple",
-    "range": "20/60 ft"
+    "range": "20/60 ft",
+    "value": 5
   },
   {
     "name": "War Pick",
@@ -505,7 +541,8 @@ export const WEAPONS: WeaponData[] = [
       "Versatile"
     ],
     "mastery": "Sap",
-    "range": null
+    "range": null,
+    "value": 5
   },
   {
     "name": "Warhammer",
@@ -518,7 +555,8 @@ export const WEAPONS: WeaponData[] = [
       "Versatile"
     ],
     "mastery": "Push",
-    "range": null
+    "range": null,
+    "value": 15
   },
   {
     "name": "Whip",
@@ -532,6 +570,7 @@ export const WEAPONS: WeaponData[] = [
       "Reach"
     ],
     "mastery": "Slow",
-    "range": null
+    "range": null,
+    "value": 2
   }
 ];

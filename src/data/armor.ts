@@ -5,6 +5,7 @@ export interface ArmorData {
   weight: number;
   stealthDisadvantage: boolean;
   strengthRequirement: number | null;
+  value: number | null;
 }
 
 export const ARMOR: ArmorData[] = [
@@ -14,7 +15,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 14,
     "weight": 20,
     "stealthDisadvantage": false,
-    "strengthRequirement": null
+    "strengthRequirement": null,
+    "value": 400
   },
   {
     "name": "Chain Mail",
@@ -22,7 +24,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 16,
     "weight": 55,
     "stealthDisadvantage": true,
-    "strengthRequirement": 13
+    "strengthRequirement": 13,
+    "value": 75
   },
   {
     "name": "Chain Shirt",
@@ -30,7 +33,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 13,
     "weight": 20,
     "stealthDisadvantage": false,
-    "strengthRequirement": null
+    "strengthRequirement": null,
+    "value": 50
   },
   {
     "name": "Half Plate Armor",
@@ -38,7 +42,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 15,
     "weight": 40,
     "stealthDisadvantage": true,
-    "strengthRequirement": null
+    "strengthRequirement": null,
+    "value": 750
   },
   {
     "name": "Hide Armor",
@@ -46,7 +51,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 12,
     "weight": 12,
     "stealthDisadvantage": false,
-    "strengthRequirement": null
+    "strengthRequirement": null,
+    "value": 10
   },
   {
     "name": "Leather Armor",
@@ -54,7 +60,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 11,
     "weight": 10,
     "stealthDisadvantage": false,
-    "strengthRequirement": null
+    "strengthRequirement": null,
+    "value": 10
   },
   {
     "name": "Padded Armor",
@@ -62,7 +69,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 11,
     "weight": 8,
     "stealthDisadvantage": true,
-    "strengthRequirement": null
+    "strengthRequirement": null,
+    "value": 5
   },
   {
     "name": "Plate Armor",
@@ -70,7 +78,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 18,
     "weight": 65,
     "stealthDisadvantage": true,
-    "strengthRequirement": 15
+    "strengthRequirement": 15,
+    "value": 1500
   },
   {
     "name": "Ring Mail",
@@ -78,7 +87,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 14,
     "weight": 40,
     "stealthDisadvantage": true,
-    "strengthRequirement": null
+    "strengthRequirement": null,
+    "value": 30
   },
   {
     "name": "Scale Mail",
@@ -86,7 +96,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 14,
     "weight": 45,
     "stealthDisadvantage": true,
-    "strengthRequirement": null
+    "strengthRequirement": null,
+    "value": 50
   },
   {
     "name": "Shield",
@@ -94,7 +105,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 2,
     "weight": 6,
     "stealthDisadvantage": false,
-    "strengthRequirement": null
+    "strengthRequirement": null,
+    "value": 10
   },
   {
     "name": "Splint Armor",
@@ -102,7 +114,8 @@ export const ARMOR: ArmorData[] = [
     "ac": 17,
     "weight": 60,
     "stealthDisadvantage": true,
-    "strengthRequirement": 15
+    "strengthRequirement": 15,
+    "value": 200
   },
   {
     "name": "Studded Leather Armor",
@@ -110,6 +123,7 @@ export const ARMOR: ArmorData[] = [
     "ac": 12,
     "weight": 13,
     "stealthDisadvantage": false,
-    "strengthRequirement": null
+    "strengthRequirement": null,
+    "value": 45
   }
 ];
