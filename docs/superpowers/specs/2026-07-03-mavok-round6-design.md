@@ -354,24 +354,24 @@ function togglePreview(id: string) {
   });
 }
 ```
-In the render, replace the bare `<p className="... line-clamp-2">{content}</p>` with:
+**The three files use different iteration variable names for the same `.content: string` field** (all three entry types — `NoteEntry`, `QuestEntry`, `JournalEntry` — share `content` via `NoteEntry`, but the loop variable itself differs per file): `NoteList.tsx` maps `.map((note) => ...)`, `QuestList.tsx` maps `.map((quest) => ...)`, `JournalList.tsx` maps `.map((entry) => ...)`. Apply the same shape in each, substituting that file's actual variable name for the placeholder `x` used below — do not introduce a variable literally named `item` or `x`, since neither exists in any of these three files today:
 ```tsx
-<p className={`text-xs text-foreground/80 mt-1 ${expandedPreviews.has(item.id) ? "" : "line-clamp-2"}`}>
-  {item.content}
+<p className={`text-xs text-foreground/80 mt-1 ${expandedPreviews.has(x.id) ? "" : "line-clamp-2"}`}>
+  {x.content}
 </p>
-{item.content && (
+{x.content && (
   <button
     onClick={(e) => {
       e.stopPropagation();
-      togglePreview(item.id);
+      togglePreview(x.id);
     }}
     className="text-[0.65rem] text-accent mt-0.5"
   >
-    {expandedPreviews.has(item.id) ? "ver menos" : "ver más"}
+    {expandedPreviews.has(x.id) ? "ver menos" : "ver más"}
   </button>
 )}
 ```
-(`e.stopPropagation()` prevents the tap from also triggering the card's outer `onClick={() => openEdit(item)}`.)
+(`e.stopPropagation()` prevents the tap from also triggering the card's outer click handler, which already exists in all three files but under different names: `NoteList.tsx` and `QuestList.tsx` both call `onClick={() => openEdit(note)}` / `onClick={() => openEdit(quest)}`; `JournalList.tsx` instead calls `onClick={() => setViewingId(entry.id)}` directly, with no `openEdit` function of its own.)
 
 **Deliberate simplification:** the "ver más" link shows for any entry with non-empty content, regardless of whether it actually overflows two lines — detecting real overflow would need a `ResizeObserver` or DOM measurement, which is more complexity than this feature is worth. Worst case, a short note shows a "ver más" that reveals... the same short text. Harmless, and simpler.
 
@@ -469,12 +469,12 @@ No new route — both modes share the same `/print` page and the same `useCharac
 | File | Change |
 |------|--------|
 | `src/components/combat/RageTracker.tsx` | Memoize `Ember`'s random offsets |
-| `src/components/notes/JournalList.tsx` | Replace prop-mirroring effect with render-time comparison; add read-more toggle |
+| `src/components/notes/JournalList.tsx` | Replace prop-mirroring effect with render-time comparison; add read-more toggle; density-aware padding |
 | `src/hooks/useCharacter.ts` | Scoped lint suppression with justification |
 | `src/hooks/useTheme.ts` | Scoped lint suppression; add `density`/`toggleDensity` |
 | `scripts/extract-5etools.ts` | Fix object-shaped weapon property extraction |
 | `src/data/weapons.ts` | Regenerated — only Lance's `properties` should change |
-| `src/components/combat/AttackRow.tsx` | Remove `rageBonus` range exclusion; damage-type icons; move-up/down props |
+| `src/components/combat/AttackRow.tsx` | Remove `rageBonus` range exclusion; damage-type icons; move-up/down props; density-aware padding |
 | `src/data/mavok-default.ts` | No change — its static "Weapon Mastery" description field remains in storage, but `SheetTab.tsx` unconditionally overrides the *displayed* text for that one feature with the live-computed version |
 | `src/lib/weaponMatch.ts` | New file — `baseWeaponName`, `describeWeaponMastery` |
 | `src/components/settings/WeaponMasteryModal.tsx` | Import `baseWeaponName` instead of local copy |
