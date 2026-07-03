@@ -1,6 +1,6 @@
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
-export const CURRENT_DATA_VERSION = 4;
+export const CURRENT_DATA_VERSION = 5;
 
 export interface Character {
   _version: number;
@@ -101,6 +101,7 @@ export interface InventoryItem {
   name: string;
   quantity: number;
   weight: number | null;
+  value: number | null;
   category: "weapon" | "armor" | "gear" | "consumable" | "personal";
   equipped: boolean;
   description: string;
