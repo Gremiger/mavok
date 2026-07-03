@@ -7,14 +7,8 @@ import { WEAPONS } from "@/data/weapons";
 import { MASTERY_PROPERTIES } from "@/data/mastery";
 import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
 import { computeMasterySaveDC } from "@/lib/masteryDC";
+import { baseWeaponName } from "@/lib/weaponMatch";
 import { toast } from "sonner";
-
-function baseWeaponName(attackName: string): string | null {
-  const match = WEAPONS.find(
-    (w) => attackName === w.name || attackName.startsWith(`${w.name} (`)
-  );
-  return match ? match.name : null;
-}
 
 export function WeaponMasteryModal({
   open,

@@ -8,6 +8,7 @@ import { FeatsBrowserModal } from "@/components/sheet/FeatsBrowserModal";
 import { User } from "lucide-react";
 import type { AbilityScore } from "@/lib/types";
 import { rollD20, rollD20WithAdvantage, type DiceRoll } from "@/lib/dice";
+import { describeWeaponMastery } from "@/lib/weaponMatch";
 import {
   abilityModifier,
   formatModifier,
@@ -50,6 +51,7 @@ export function SheetTab() {
     proficiencies,
     features,
     resources,
+    attacks,
   } = character;
 
   const hasDangerSense = features.some((f) => f.name === "Danger Sense");
@@ -339,7 +341,9 @@ export function SheetTab() {
                   {f.source}
                 </span>
               </div>
-              <p className="text-sm text-foreground/70 leading-relaxed">{f.description}</p>
+              <p className="text-sm text-foreground/70 leading-relaxed">
+                {f.name === "Weapon Mastery" ? describeWeaponMastery(attacks) : f.description}
+              </p>
             </div>
           ))}
         </div>
