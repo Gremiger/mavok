@@ -38,7 +38,7 @@ export function AttackRow({
   }, [menuOpen]);
 
   const isStrBased = !attack.properties.includes("Finesse");
-  const rageBonus = rageActive && isStrBased && !attack.range.includes("/") ? rageDamage : 0;
+  const rageBonus = rageActive && isStrBased ? rageDamage : 0;
 
   function displayDamage() {
     if (rageBonus > 0) {
