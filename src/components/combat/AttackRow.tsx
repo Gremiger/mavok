@@ -93,7 +93,7 @@ export function AttackRow({
   const clearRoll = useCallback(() => setLastRoll(null), []);
 
   return (
-    <div className="stone-card rounded-lg overflow-hidden mb-2">
+    <div className="stone-card rounded-lg mb-2">
       <div
         className={`flex items-center justify-between cursor-pointer ${density === "compact" ? "p-2" : "p-3"}`}
         onClick={() => setExpanded(!expanded)}
@@ -135,33 +135,7 @@ export function AttackRow({
           >
             Dmg
           </button>
-          {(onMoveUp || onMoveDown) && (
-            <div className="flex flex-col gap-0.5">
-              {onMoveUp && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onMoveUp();
-                  }}
-                  className="text-muted hover:text-accent text-xs leading-none px-1"
-                >
-                  ▲
-                </button>
-              )}
-              {onMoveDown && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onMoveDown();
-                  }}
-                  className="text-muted hover:text-accent text-xs leading-none px-1"
-                >
-                  ▼
-                </button>
-              )}
-            </div>
-          )}
-          {(onEdit || onDelete) && (
+          {(onEdit || onDelete || onMoveUp || onMoveDown) && (
             <div
               className="relative"
               ref={menuOpen ? menuRef : undefined}
@@ -176,7 +150,7 @@ export function AttackRow({
                 ⋯
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-6 bg-card border border-border rounded-lg shadow-lg z-10 py-1 w-32">
+                <div className="absolute right-0 top-6 bg-card border border-border rounded-lg shadow-lg z-10 py-1 w-36">
                   {onEdit && (
                     <button
                       onClick={(e) => {
@@ -187,6 +161,30 @@ export function AttackRow({
                       className="w-full text-left px-3 py-2 text-xs hover:bg-background"
                     >
                       Editar
+                    </button>
+                  )}
+                  {onMoveUp && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMenuOpen(false);
+                        onMoveUp();
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs hover:bg-background"
+                    >
+                      Mover arriba
+                    </button>
+                  )}
+                  {onMoveDown && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMenuOpen(false);
+                        onMoveDown();
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs hover:bg-background"
+                    >
+                      Mover abajo
                     </button>
                   )}
                   {onDelete && (
