@@ -9,6 +9,8 @@ import { Sword, Shield, Wrench, FlaskConical, Heart, Plus } from "lucide-react";
 import type { InventoryItem } from "@/lib/types";
 import type { ReactNode } from "react";
 import { WEAPONS } from "@/data/weapons";
+import { ARMOR } from "@/data/armor";
+import { GEAR } from "@/data/gear";
 
 const CURRENCY_LABELS = [
   { key: "cp" as const, label: "CP" },
@@ -50,6 +52,7 @@ export function InventoryTab() {
     name: "",
     quantity: 1,
     weight: "",
+    value: "",
     category: "gear" as InventoryItem["category"],
     description: "",
   });
@@ -116,6 +119,7 @@ export function InventoryTab() {
       name: newItem.name.trim(),
       quantity: newItem.quantity,
       weight: newItem.weight ? parseFloat(newItem.weight) : null,
+      value: newItem.value ? parseFloat(newItem.value) : null,
       category: newItem.category,
       equipped: false,
       description: newItem.description,
@@ -126,6 +130,7 @@ export function InventoryTab() {
       name: "",
       quantity: 1,
       weight: "",
+      value: "",
       category: "gear",
       description: "",
     });
@@ -139,8 +144,37 @@ export function InventoryTab() {
         ...newItem,
         name: w.name,
         weight: String(w.weight),
+        value: w.value !== null ? String(w.value) : "",
         category: "weapon",
         description: `${w.damage} ${w.damageType} · ${w.properties.join(", ")}${w.mastery ? ` · Mastery: ${w.mastery}` : ""}`,
+      });
+    }
+  }
+
+  function prefillFromArmor(armorName: string) {
+    const a = ARMOR.find((ar) => ar.name === armorName);
+    if (a) {
+      setNewItem({
+        ...newItem,
+        name: a.name,
+        weight: String(a.weight),
+        value: a.value !== null ? String(a.value) : "",
+        category: "armor",
+        description: `AC ${a.ac}${a.stealthDisadvantage ? " · Desventaja en Sigilo" : ""}${a.strengthRequirement ? ` · Requiere FUE ${a.strengthRequirement}` : ""}`,
+      });
+    }
+  }
+
+  function prefillFromGear(gearName: string) {
+    const g = GEAR.find((ge) => ge.name === gearName);
+    if (g) {
+      setNewItem({
+        ...newItem,
+        name: g.name,
+        weight: g.weight !== null ? String(g.weight) : "",
+        value: g.value !== null ? String(g.value) : "",
+        category: "gear",
+        description: g.description,
       });
     }
   }
@@ -265,9 +299,13 @@ export function InventoryTab() {
                       </span>
                     )}
                   </div>
-                  {item.weight !== null && (
+                  {(item.weight !== null || item.value !== null) && (
                     <span className="text-muted text-xs">
-                      {item.weight * item.quantity} lb
+                      {item.weight !== null
+                        ? `${item.weight * item.quantity} lb`
+                        : ""}
+                      {item.weight !== null && item.value !== null ? " · " : ""}
+                      {item.value !== null ? `${item.value} gp` : ""}
                     </span>
                   )}
                 </div>
@@ -382,6 +420,44 @@ export function InventoryTab() {
             </select>
           </div>
 
+          <div>
+            <label className="text-xs text-muted">Armadura rápida</label>
+            <select
+              onChange={(e) => {
+                if (e.target.value) prefillFromArmor(e.target.value);
+                e.target.value = "";
+              }}
+              className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground mt-1"
+              defaultValue=""
+            >
+              <option value="">Elegir armadura...</option>
+              {ARMOR.map((a) => (
+                <option key={a.name} value={a.name}>
+                  {a.name} (AC {a.ac})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="text-xs text-muted">Equipo rápido</label>
+            <select
+              onChange={(e) => {
+                if (e.target.value) prefillFromGear(e.target.value);
+                e.target.value = "";
+              }}
+              className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground mt-1"
+              defaultValue=""
+            >
+              <option value="">Elegir equipo...</option>
+              {GEAR.map((g) => (
+                <option key={g.name} value={g.name}>
+                  {g.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <input
             value={newItem.name}
             onChange={(e) =>
@@ -413,23 +489,32 @@ export function InventoryTab() {
               placeholder="Peso (lb)"
               className="w-1/3 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
             />
-            <select
-              value={newItem.category}
+            <input
+              value={newItem.value}
               onChange={(e) =>
-                setNewItem({
-                  ...newItem,
-                  category: e.target.value as InventoryItem["category"],
-                })
+                setNewItem({ ...newItem, value: e.target.value })
               }
+              placeholder="Valor (gp)"
               className="w-1/3 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
+            />
           </div>
+
+          <select
+            value={newItem.category}
+            onChange={(e) =>
+              setNewItem({
+                ...newItem,
+                category: e.target.value as InventoryItem["category"],
+              })
+            }
+            className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+          >
+            {CATEGORIES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </select>
 
           <textarea
             value={newItem.description}
