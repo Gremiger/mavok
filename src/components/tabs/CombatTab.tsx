@@ -39,6 +39,9 @@ export function CombatTab() {
   } = useCharacterContext();
   const [hpModalOpen, setHpModalOpen] = useState(false);
   const [conditionModalOpen, setConditionModalOpen] = useState(false);
+  const [viewingCondition, setViewingCondition] = useState<string | null>(
+    null
+  );
   const [tempHpInput, setTempHpInput] = useState(false);
   const [tempAcMod, setTempAcMod] = useState(0);
   const [acModalOpen, setAcModalOpen] = useState(false);
@@ -205,6 +208,7 @@ export function CombatTab() {
           <Tag
             key={c}
             label={c}
+            onClick={() => setViewingCondition(c)}
             onRemove={() => {
               removeCondition(c);
               toast(`${c} eliminada`, {
@@ -545,6 +549,17 @@ export function CombatTab() {
           updateCombat({ currentHp: hp, tempHp: temp })
         }
       />
+
+      {/* Condition Detail Modal */}
+      <Modal
+        open={viewingCondition !== null}
+        onClose={() => setViewingCondition(null)}
+        title={viewingCondition ?? ""}
+      >
+        <p className="text-sm text-foreground/80 leading-relaxed">
+          {CONDITIONS.find((c) => c.name === viewingCondition)?.description}
+        </p>
+      </Modal>
 
       {/* Condition Selection Modal */}
       <Modal

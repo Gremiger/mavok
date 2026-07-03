@@ -3,10 +3,12 @@
 export function Tag({
   label,
   onRemove,
+  onClick,
   variant = "default",
 }: {
   label: string;
   onRemove?: () => void;
+  onClick?: () => void;
   variant?: "default" | "success" | "danger";
 }) {
   const colors = {
@@ -19,7 +21,9 @@ export function Tag({
     <span
       className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded ${colors[variant]}`}
     >
-      {label}
+      <span onClick={onClick} className={onClick ? "cursor-pointer" : undefined}>
+        {label}
+      </span>
       {onRemove && (
         <button
           onClick={onRemove}
