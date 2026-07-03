@@ -69,9 +69,10 @@ function extractWeapons() {
         T: "Thrown", V: "Versatile", A: "Ammunition", R: "Reach",
         LD: "Loading",
       };
-      const rawProps = (i.property as string[]) || [];
-      const props = rawProps.map((p: string) => {
-        const abbr = typeof p === "string" ? p.split("|")[0] : String(p);
+      const rawProps = (i.property as (string | { uid: string })[]) || [];
+      const props = rawProps.map((p) => {
+        const raw = typeof p === "string" ? p : p.uid;
+        const abbr = raw.split("|")[0];
         return propAbbrevMap[abbr] || abbr;
       });
       const rawMasteries = (i.mastery as string[]) || [];

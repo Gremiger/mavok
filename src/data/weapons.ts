@@ -230,7 +230,7 @@ export const WEAPONS: WeaponData[] = [
     "properties": [
       "Heavy",
       "Reach",
-      "[object Object]"
+      "Two-Handed"
     ],
     "mastery": "Topple",
     "range": null
