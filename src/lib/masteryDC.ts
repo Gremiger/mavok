@@ -1,7 +1,7 @@
 import type { AbilityScore } from "./types";
 import { abilityModifier } from "./utils";
 
-const DC_MASTERIES = new Set(["Topple", "Push"]);
+const DC_MASTERIES = new Set(["Topple"]);
 
 export function computeMasterySaveDC(
   masteryName: string,

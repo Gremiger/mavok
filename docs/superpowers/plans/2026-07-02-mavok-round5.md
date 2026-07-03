@@ -32,7 +32,7 @@
 - **No data model changes in this round.** `CURRENT_DATA_VERSION` stays at 4, no migration is added. Every change in this plan is either pure UI/logic, or mutates existing `Attack`/`skills` fields via functions that already exist (`updateAttack`, and direct `skills[key].proficient` writes inside `LevelUpFlow.applyAll()`, matching how ability-score increases are already applied there).
 - **Advantage-roll crit/fumble asymmetry is load-bearing, not stylistic.** `rollD20WithAdvantage` (Task 1) returns `rolls: [d1, d2]` — both dice, not just the winner. Crit detection is `rolls.some(r => r === 20)` (symmetric — correct, since 20 is the max value). Fumble detection is `rolls.every(r => r === 1)` (asymmetric — required, since with advantage you keep the *higher* die: `[1, 15]` is not a fumble). Any code that reads `DiceRoll.rolls` for crit/fumble purposes elsewhere must follow the same asymmetric rule.
 - **Weapon Mastery swap is 1-for-1, not a free re-pick.** XPHB: "Whenever you finish a Long Rest, you can practice weapon drills and change one of those weapon choices." Task 7's picker must always deactivate exactly one weapon type and activate exactly one weapon type — never allow picking multiple activations per deactivation.
-- **Only `Topple` and `Push` weapon masteries require a save DC.** `computeMasterySaveDC` (Task 6) returns `null` for the other six XPHB mastery properties (`Vex`, `Nick`, `Slow`, `Cleave`, `Graze`, `Sap`).
+- **Only `Topple` weapon mastery requires a save DC.** `computeMasterySaveDC` (Task 6) returns `null` for the other seven XPHB mastery properties (`Push`, `Vex`, `Nick`, `Slow`, `Cleave`, `Graze`, `Sap`).
 
 ---
 
@@ -1185,7 +1185,7 @@ git commit -m "feat: add Primal Knowledge STR-substitution rolls while raging"
 - Consumes: `AbilityScore` from `@/lib/types`, `abilityModifier` from `@/lib/utils`.
 - Produces: `computeMasterySaveDC(masteryName: string, weaponProperties: string[], proficiencyBonus: number, attributes: Record<AbilityScore, number>): number | null`, consumed by Task 7.
 
-**Context:** Among all 8 XPHB weapon mastery properties (`src/data/mastery.ts`), only `Topple` (forces a CON save) and `Push` (implicitly a STR-based shove, per XPHB's DC formula convention) require a save DC — the other six (`Vex`, `Nick`, `Slow`, `Cleave`, `Graze`, `Sap`) don't call for a saving throw at all. The DC formula is the standard XPHB weapon attack DC: `8 + proficiency + (STR modifier, or the higher of STR/DEX if the weapon has the Finesse property)`.
+**Context:** Among all 8 XPHB weapon mastery properties (`src/data/mastery.ts`), only `Topple` (forces a CON save) requires a save DC — `Push` pushes the target automatically on a hit, with no saving throw at all (XPHB p.214), and the other six (`Vex`, `Nick`, `Slow`, `Cleave`, `Graze`, `Sap`) don't call for a saving throw either. The DC formula is the standard XPHB weapon attack DC: `8 + proficiency + (STR modifier, or the higher of STR/DEX if the weapon has the Finesse property)`.
 
 - [ ] **Step 1: Create the helper**
 
@@ -1195,7 +1195,7 @@ Create `src/lib/masteryDC.ts`:
 import type { AbilityScore } from "./types";
 import { abilityModifier } from "./utils";
 
-const DC_MASTERIES = new Set(["Topple", "Push"]);
+const DC_MASTERIES = new Set(["Topple"]);
 
 export function computeMasterySaveDC(
   masteryName: string,

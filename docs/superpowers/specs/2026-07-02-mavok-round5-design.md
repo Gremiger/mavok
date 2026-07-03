@@ -60,7 +60,7 @@ No data model changes in this round — everything here is either pure UI/logic 
 - **Deactivating**: `updateAttack(id, { mastery: null, masteryEffect: null, masterySaveDC: null })`.
 - **`masterySaveDC` computation — not always STR, and not every mastery needs one.** New small helper file `src/lib/masteryDC.ts`:
   ```typescript
-  const DC_MASTERIES = new Set(["Topple", "Push"]);
+  const DC_MASTERIES = new Set(["Topple"]);
 
   export function computeMasterySaveDC(
     masteryName: string,
@@ -76,7 +76,7 @@ No data model changes in this round — everything here is either pure UI/logic 
     return 8 + proficiencyBonus + abilityMod;
   }
   ```
-  Only `Topple` (CON save) and `Push` (STR save) require a DC among all XPHB mastery properties — the rest (`Vex`, `Nick`, `Slow`, `Cleave`, `Graze`, `Sap`) don't. None of Mavok's current 4 weapon types use Push, but this must be correct generally, not hardcoded for Topple only, since the player can add new weapons via Round 4's custom-attack-management feature and might add a Push-mastery weapon later. The DC formula itself (`8 + proficiency + STR-or-Finesse-choice-of-DEX`) is the standard XPHB weapon mastery DC formula, not specific to any one property.
+  Only `Topple` requires a DC among all XPHB mastery properties — the rest (`Push`, `Vex`, `Nick`, `Slow`, `Cleave`, `Graze`, `Sap`) don't. (Push pushes the target automatically on a hit, with no saving throw — XPHB p.214.) None of Mavok's current 4 weapon types use Push, but this must be correct generally, not hardcoded, since the player can add new weapons via Round 4's custom-attack-management feature and might add a Push-mastery weapon later. The DC formula itself (`8 + proficiency + STR-or-Finesse-choice-of-DEX`) is the standard XPHB weapon mastery DC formula, not specific to any one property.
 
 ## Section 6 — Feats reference browser
 
