@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useCharacterContext } from "@/lib/context";
+import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { exportInventoryCSV } from "@/lib/export";
 import { toast } from "sonner";
@@ -42,6 +42,7 @@ export function InventoryTab() {
     removeInventoryItem,
     updateInventoryItem,
   } = useCharacterContext();
+  const { density } = useThemeContext();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editingCurrency, setEditingCurrency] = useState<string | null>(null);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
@@ -234,7 +235,7 @@ export function InventoryTab() {
                 className="stone-card rounded-lg overflow-hidden"
               >
                 <div
-                  className="flex items-center gap-3 p-3 cursor-pointer"
+                  className={`flex items-center cursor-pointer ${density === "compact" ? "gap-2 p-1.5" : "gap-3 p-3"}`}
                   onClick={() =>
                     setExpandedItem(
                       expandedItem === item.id ? null : item.id

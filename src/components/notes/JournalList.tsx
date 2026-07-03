@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useCharacterContext } from "@/lib/context";
+import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { Plus } from "lucide-react";
 import type { JournalEntry } from "@/lib/types";
@@ -13,6 +13,7 @@ export function JournalList({
 } = {}) {
   const { character, addJournalEntry, updateJournalEntry, removeJournalEntry } =
     useCharacterContext();
+  const { density } = useThemeContext();
   const [formOpen, setFormOpen] = useState(false);
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
@@ -92,7 +93,7 @@ export function JournalList({
           <div
             key={entry.id}
             onClick={() => setViewingId(entry.id)}
-            className="stone-card rounded-lg p-3 cursor-pointer active:scale-[0.99] transition-transform"
+            className={`stone-card rounded-lg cursor-pointer active:scale-[0.99] transition-transform ${density === "compact" ? "p-2" : "p-3"}`}
           >
             <div className="flex items-center gap-2">
               <span className="text-xs px-2 py-0.5 bg-accent/20 text-accent rounded font-heading">

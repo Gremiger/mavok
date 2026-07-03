@@ -5,6 +5,7 @@ import type { Attack } from "@/lib/types";
 import { rollD20, rollD20WithAdvantage, rollDice, type DiceRoll } from "@/lib/dice";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { Sword, Target, Hammer } from "lucide-react";
+import { useThemeContext } from "@/lib/context";
 
 const DAMAGE_TYPE_ICONS: Record<string, typeof Sword> = {
   Slashing: Sword,
@@ -31,6 +32,7 @@ export function AttackRow({
   onMoveUp?: () => void;
   onMoveDown?: () => void;
 }) {
+  const { density } = useThemeContext();
   const [expanded, setExpanded] = useState(false);
   const [lastRoll, setLastRoll] = useState<{ roll: DiceRoll; type: "hit" | "damage" } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -93,7 +95,7 @@ export function AttackRow({
   return (
     <div className="stone-card rounded-lg overflow-hidden mb-2">
       <div
-        className="flex items-center justify-between p-3 cursor-pointer"
+        className={`flex items-center justify-between cursor-pointer ${density === "compact" ? "p-2" : "p-3"}`}
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex-1 min-w-0">

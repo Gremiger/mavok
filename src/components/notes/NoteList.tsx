@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useCharacterContext } from "@/lib/context";
+import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { Plus } from "lucide-react";
 import type { NoteEntry } from "@/lib/types";
@@ -17,6 +17,7 @@ export function NoteList({
 }) {
   const { character, addNote, updateNote, removeNote } =
     useCharacterContext();
+  const { density } = useThemeContext();
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -108,7 +109,7 @@ export function NoteList({
         <div
           key={note.id}
           onClick={() => openEdit(note)}
-          className="stone-card rounded-lg p-3 cursor-pointer active:scale-[0.99] transition-transform"
+          className={`stone-card rounded-lg cursor-pointer active:scale-[0.99] transition-transform ${density === "compact" ? "p-2" : "p-3"}`}
         >
           <h4 className="font-heading text-accent text-sm">{note.title}</h4>
           {note.content && (

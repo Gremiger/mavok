@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useCharacterContext } from "@/lib/context";
+import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { Tag } from "@/components/ui/Tag";
 import { Plus } from "lucide-react";
@@ -22,6 +22,7 @@ export function QuestList({
 } = {}) {
   const { character, addQuest, updateQuest, removeQuest } =
     useCharacterContext();
+  const { density } = useThemeContext();
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -130,7 +131,7 @@ export function QuestList({
         <div
           key={quest.id}
           onClick={() => openEdit(quest)}
-          className="stone-card rounded-lg p-3 cursor-pointer active:scale-[0.99] transition-transform"
+          className={`stone-card rounded-lg cursor-pointer active:scale-[0.99] transition-transform ${density === "compact" ? "p-2" : "p-3"}`}
         >
           <div className="flex items-center gap-2">
             <h4 className="font-heading text-accent text-sm flex-1">
