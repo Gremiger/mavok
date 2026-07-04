@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useCharacter } from "@/hooks/useCharacter";
 import { useTheme } from "@/hooks/useTheme";
 import { CharacterContext, ThemeContext } from "@/lib/context";
@@ -13,7 +13,8 @@ import { SettingsTab } from "@/components/tabs/SettingsTab";
 import { OfflineBadge } from "@/components/OfflineBadge";
 import { Toaster } from "sonner";
 import { Shield, Swords, Backpack, BookOpen, Library, Settings } from "lucide-react";
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { motion } from "framer-motion";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import type { ReactNode } from "react";
 
 type Tab = "ficha" | "combate" | "inventario" | "notas" | "enciclopedia" | "ajustes";
@@ -29,31 +30,15 @@ const TAB_META: { id: Tab; label: string; icon: ReactNode }[] = [
   { id: "ajustes", label: "Ajustes", icon: <Settings size={20} /> },
 ];
 
-const SWIPE_THRESHOLD = 50;
-
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("ficha");
   const [isPinching, setIsPinching] = useState(false);
   const charState = useCharacter();
   const themeState = useTheme();
-  const dragX = useMotionValue(0);
-  const dragOpacity = useTransform(dragX, [-150, 0, 150], [0.5, 1, 0.5]);
-
-  const handleDragEnd = useCallback(
-    (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
-      const idx = TAB_ORDER.indexOf(activeTab);
-      const swipe =
-        Math.abs(info.offset.x) > SWIPE_THRESHOLD ||
-        Math.abs(info.velocity.x) > 300;
-
-      if (swipe && info.offset.x < 0 && idx < TAB_ORDER.length - 1) {
-        setActiveTab(TAB_ORDER[idx + 1]);
-      } else if (swipe && info.offset.x > 0 && idx > 0) {
-        setActiveTab(TAB_ORDER[idx - 1]);
-      }
-      animate(dragX, 0, { type: "spring", stiffness: 300, damping: 30 });
-    },
-    [activeTab, dragX]
+  const { dragX, dragOpacity, handleDragEnd } = useSwipeNavigation(
+    TAB_ORDER,
+    activeTab,
+    setActiveTab
   );
 
   if (!charState.character) {
@@ -94,7 +79,13 @@ export default function Home() {
           <motion.main
             className="flex-1 overflow-y-auto pb-safe-nav"
             style={{ x: dragX, opacity: dragOpacity, touchAction: 'pan-y pinch-zoom' }}
-            drag={isPinching || activeTab === "enciclopedia" ? false : "x"}
+            drag={
+              isPinching ||
+              activeTab === "enciclopedia" ||
+              activeTab === "notas"
+                ? false
+                : "x"
+            }
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
