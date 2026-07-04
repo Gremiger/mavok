@@ -153,7 +153,7 @@ export interface QuickNote {
 }
 
 export interface AppSettings {
-  theme: "piedra-viva" | "dark-fantasy";
+  theme: "piedra-viva" | "dark-fantasy" | "pergamino" | "furia-de-sangre";
   lastCharacterId: string;
   density: "compact" | "spacious";
   encyclopediaFavorites: string[];

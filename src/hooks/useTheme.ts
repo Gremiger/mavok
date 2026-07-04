@@ -4,8 +4,21 @@ import { useState, useEffect, useCallback } from "react";
 import { loadSettings, saveSettings } from "@/lib/storage";
 import type { AppSettings } from "@/lib/types";
 
+export const THEME_META: {
+  id: AppSettings["theme"];
+  label: string;
+  swatch: string;
+}[] = [
+  { id: "piedra-viva", label: "Piedra Viva", swatch: "#b87333" },
+  { id: "dark-fantasy", label: "Dark Fantasy", swatch: "#8b6d2d" },
+  { id: "pergamino", label: "Pergamino", swatch: "#9c2b2b" },
+  { id: "furia-de-sangre", label: "Furia de Sangre", swatch: "#c23b2b" },
+];
+
 export function useTheme() {
-  const [theme, setTheme] = useState<AppSettings["theme"]>("piedra-viva");
+  const [theme, setThemeState] = useState<AppSettings["theme"]>(
+    "piedra-viva"
+  );
   const [density, setDensity] = useState<AppSettings["density"]>("spacious");
   const [encyclopediaFavorites, setEncyclopediaFavorites] = useState<
     string[]
@@ -17,22 +30,18 @@ export function useTheme() {
   useEffect(() => {
     const settings = loadSettings();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- deliberate: localStorage is unavailable during the static-export build's prerender pass, so this read must be deferred to after client mount.
-    setTheme(settings.theme);
+    setThemeState(settings.theme);
     setDensity(settings.density);
     setEncyclopediaFavorites(settings.encyclopediaFavorites);
     setEncyclopediaLanguageState(settings.encyclopediaLanguage);
     document.documentElement.setAttribute("data-theme", settings.theme);
   }, []);
 
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      const next =
-        prev === "piedra-viva" ? "dark-fantasy" : "piedra-viva";
-      document.documentElement.setAttribute("data-theme", next);
-      const settings = loadSettings();
-      saveSettings({ ...settings, theme: next });
-      return next;
-    });
+  const setTheme = useCallback((next: AppSettings["theme"]) => {
+    setThemeState(next);
+    document.documentElement.setAttribute("data-theme", next);
+    const settings = loadSettings();
+    saveSettings({ ...settings, theme: next });
   }, []);
 
   const toggleDensity = useCallback(() => {
@@ -66,7 +75,7 @@ export function useTheme() {
 
   return {
     theme,
-    toggleTheme,
+    setTheme,
     density,
     toggleDensity,
     encyclopediaFavorites,
