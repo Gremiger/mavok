@@ -21,11 +21,12 @@ import { getBackups, restoreBackup } from "@/lib/migrations";
 import { getCharacterStorageKey } from "@/lib/storage";
 import { CURRENT_DATA_VERSION } from "@/lib/types";
 import { CHANGELOG } from "@/data/changelog";
+import { THEME_META } from "@/hooks/useTheme";
 
 export function SettingsTab() {
   const { character, update, updateCombat, updateMeta } =
     useCharacterContext();
-  const { theme, toggleTheme, density, toggleDensity } = useThemeContext();
+  const { theme, setTheme, density, toggleDensity } = useThemeContext();
   const [shortRestOpen, setShortRestOpen] = useState(false);
   const [longRestOpen, setLongRestOpen] = useState(false);
   const [importPreview, setImportPreview] = useState<{
@@ -161,15 +162,26 @@ export function SettingsTab() {
       {/* Theme */}
       <CollapsibleSection title="Tema" defaultOpen>
         <div className="space-y-2">
-          <button
-            onClick={toggleTheme}
-            className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border"
-          >
-            <span className="text-sm">
-              {theme === "piedra-viva" ? "Piedra Viva" : "Dark Fantasy"}
-            </span>
-            <span className="text-xs text-muted">Tap para cambiar</span>
-          </button>
+          {THEME_META.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTheme(t.id)}
+              className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border"
+            >
+              <span className="flex items-center gap-2 text-sm">
+                <span
+                  className="w-3 h-3 rounded-full border border-border/60 shrink-0"
+                  style={{ backgroundColor: t.swatch }}
+                />
+                {t.label}
+              </span>
+              {theme === t.id ? (
+                <span className="text-xs text-accent">Activo</span>
+              ) : (
+                <span className="text-xs text-muted">Tap para cambiar</span>
+              )}
+            </button>
+          ))}
           <button
             onClick={toggleDensity}
             className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border"
