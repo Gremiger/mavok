@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useThemeContext } from "@/lib/context";
 import { CONDITIONS } from "@/data/conditions";
 import { ACTIONS } from "@/data/actions";
@@ -42,6 +44,8 @@ const PILLS: { id: Category | typeof FAVORITES_ID; label: string }[] = [
   { id: FAVORITES_ID, label: "Favoritos" },
   ...CATEGORIES,
 ];
+
+const PILL_IDS = PILLS.map((p) => p.id);
 
 const TRANSLATIONS: Partial<Record<Category, Record<string, string>>> = {
   conditions: CONDITIONS_ES,
@@ -226,6 +230,11 @@ export function EncyclopediaTab() {
   >("conditions");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewingItem, setViewingItem] = useState<EncyclopediaItem | null>(null);
+  const { dragX, dragOpacity, handleDragEnd } = useSwipeNavigation(
+    PILL_IDS,
+    activeCategory,
+    setActiveCategory
+  );
 
   const allItems = useMemo(
     () => CATEGORIES.flatMap((c) => CATEGORY_ITEMS[c.id]()),
@@ -331,7 +340,14 @@ export function EncyclopediaTab() {
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto p-4">
+      <motion.div
+        className="flex-1 overflow-y-auto p-4"
+        style={{ x: dragX, opacity: dragOpacity, touchAction: "pan-y pinch-zoom" }}
+        drag={searchQuery ? false : "x"}
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={handleDragEnd}
+      >
         {searchQuery ? (
           searchResults.length > 0 ? (
             <div className="space-y-2">
@@ -358,7 +374,7 @@ export function EncyclopediaTab() {
             {categoryItems.map((item) => renderRow(item, false))}
           </div>
         )}
-      </div>
+      </motion.div>
 
       <Modal
         open={viewingItem !== null}
