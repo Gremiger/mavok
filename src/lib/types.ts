@@ -156,4 +156,6 @@ export interface AppSettings {
   theme: "piedra-viva" | "dark-fantasy";
   lastCharacterId: string;
   density: "compact" | "spacious";
+  encyclopediaFavorites: string[];
+  encyclopediaLanguage: "en" | "es";
 }

@@ -45,6 +45,8 @@ export function loadSettings(): AppSettings {
     theme: "piedra-viva",
     lastCharacterId: "mavok-1",
     density: "spacious",
+    encyclopediaFavorites: [],
+    encyclopediaLanguage: "en",
   };
   if (typeof window === "undefined") return defaults;
   try {

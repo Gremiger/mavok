@@ -7,12 +7,20 @@ import type { AppSettings } from "@/lib/types";
 export function useTheme() {
   const [theme, setTheme] = useState<AppSettings["theme"]>("piedra-viva");
   const [density, setDensity] = useState<AppSettings["density"]>("spacious");
+  const [encyclopediaFavorites, setEncyclopediaFavorites] = useState<
+    string[]
+  >([]);
+  const [encyclopediaLanguage, setEncyclopediaLanguageState] = useState<
+    AppSettings["encyclopediaLanguage"]
+  >("en");
 
   useEffect(() => {
     const settings = loadSettings();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- deliberate: localStorage is unavailable during the static-export build's prerender pass, so this read must be deferred to after client mount.
     setTheme(settings.theme);
     setDensity(settings.density);
+    setEncyclopediaFavorites(settings.encyclopediaFavorites);
+    setEncyclopediaLanguageState(settings.encyclopediaLanguage);
     document.documentElement.setAttribute("data-theme", settings.theme);
   }, []);
 
@@ -36,5 +44,34 @@ export function useTheme() {
     });
   }, []);
 
-  return { theme, toggleTheme, density, toggleDensity };
+  const toggleFavorite = useCallback((id: string) => {
+    setEncyclopediaFavorites((prev) => {
+      const next = prev.includes(id)
+        ? prev.filter((f) => f !== id)
+        : [...prev, id];
+      const settings = loadSettings();
+      saveSettings({ ...settings, encyclopediaFavorites: next });
+      return next;
+    });
+  }, []);
+
+  const setEncyclopediaLanguage = useCallback(
+    (lang: AppSettings["encyclopediaLanguage"]) => {
+      setEncyclopediaLanguageState(lang);
+      const settings = loadSettings();
+      saveSettings({ ...settings, encyclopediaLanguage: lang });
+    },
+    []
+  );
+
+  return {
+    theme,
+    toggleTheme,
+    density,
+    toggleDensity,
+    encyclopediaFavorites,
+    toggleFavorite,
+    encyclopediaLanguage,
+    setEncyclopediaLanguage,
+  };
 }
