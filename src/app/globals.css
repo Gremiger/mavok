@@ -37,6 +37,26 @@
   --border-color: #2a2a4a;
 }
 
+[data-theme="pergamino"] {
+  --bg: #d9c9a3;
+  --card: #f0e6cc;
+  --accent: #9c2b2b;
+  --cord: #5c3a1f;
+  --fg: #2e2417;
+  --muted: #8a7554;
+  --border-color: #c4b28e;
+}
+
+[data-theme="furia-de-sangre"] {
+  --bg: #160b0b;
+  --card: #241010;
+  --accent: #c23b2b;
+  --cord: #6e1414;
+  --fg: #e8d8ce;
+  --muted: #6b4444;
+  --border-color: #3a1414;
+}
+
 /* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
 input, textarea, select {
   font-size: max(16px, 1rem);
@@ -49,35 +69,90 @@ body {
     linear-gradient(
       157deg,
       transparent 22%,
-      rgba(184,115,51,0.06) 22.1%,
-      rgba(184,115,51,0.04) 22.3%,
+      color-mix(in srgb, var(--accent) 6%, transparent) 22.1%,
+      color-mix(in srgb, var(--accent) 4%, transparent) 22.3%,
       transparent 22.4%,
       transparent 58%,
-      rgba(184,115,51,0.05) 58.1%,
-      rgba(184,115,51,0.03) 58.2%,
+      color-mix(in srgb, var(--accent) 5%, transparent) 58.1%,
+      color-mix(in srgb, var(--accent) 3%, transparent) 58.2%,
       transparent 58.3%
     ),
     /* crack 2 — branching */
     linear-gradient(
       203deg,
       transparent 35%,
-      rgba(184,115,51,0.05) 35.1%,
-      rgba(184,115,51,0.03) 35.2%,
+      color-mix(in srgb, var(--accent) 5%, transparent) 35.1%,
+      color-mix(in srgb, var(--accent) 3%, transparent) 35.2%,
       transparent 35.3%,
       transparent 71%,
-      rgba(184,115,51,0.04) 71.1%,
-      rgba(184,115,51,0.02) 71.3%,
+      color-mix(in srgb, var(--accent) 4%, transparent) 71.1%,
+      color-mix(in srgb, var(--accent) 2%, transparent) 71.3%,
       transparent 71.4%
     ),
     /* crack 3 — horizontal stress line */
     linear-gradient(
       93deg,
       transparent 40%,
-      rgba(184,115,51,0.04) 40.1%,
-      rgba(184,115,51,0.02) 40.2%,
+      color-mix(in srgb, var(--accent) 4%, transparent) 40.1%,
+      color-mix(in srgb, var(--accent) 2%, transparent) 40.2%,
       transparent 40.3%,
       transparent 78%,
-      rgba(184,115,51,0.03) 78.1%,
+      color-mix(in srgb, var(--accent) 3%, transparent) 78.1%,
+      transparent 78.2%
+    ),
+    /* stone grain — fine noise */
+    repeating-conic-gradient(
+      rgba(255,255,255,0.01) 0%,
+      transparent 0.5%,
+      transparent 1%,
+      rgba(0,0,0,0.015) 1.5%,
+      transparent 2%
+    ),
+    /* base color */
+    var(--bg);
+  background-attachment: fixed;
+}
+
+[data-theme="pergamino"] body {
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 60%,
+      rgba(0, 0, 0, 0.08) 100%
+    ),
+    /* crack 1 — long diagonal */
+    linear-gradient(
+      157deg,
+      transparent 22%,
+      color-mix(in srgb, var(--accent) 6%, transparent) 22.1%,
+      color-mix(in srgb, var(--accent) 4%, transparent) 22.3%,
+      transparent 22.4%,
+      transparent 58%,
+      color-mix(in srgb, var(--accent) 5%, transparent) 58.1%,
+      color-mix(in srgb, var(--accent) 3%, transparent) 58.2%,
+      transparent 58.3%
+    ),
+    /* crack 2 — branching */
+    linear-gradient(
+      203deg,
+      transparent 35%,
+      color-mix(in srgb, var(--accent) 5%, transparent) 35.1%,
+      color-mix(in srgb, var(--accent) 3%, transparent) 35.2%,
+      transparent 35.3%,
+      transparent 71%,
+      color-mix(in srgb, var(--accent) 4%, transparent) 71.1%,
+      color-mix(in srgb, var(--accent) 2%, transparent) 71.3%,
+      transparent 71.4%
+    ),
+    /* crack 3 — horizontal stress line */
+    linear-gradient(
+      93deg,
+      transparent 40%,
+      color-mix(in srgb, var(--accent) 4%, transparent) 40.1%,
+      color-mix(in srgb, var(--accent) 2%, transparent) 40.2%,
+      transparent 40.3%,
+      transparent 78%,
+      color-mix(in srgb, var(--accent) 3%, transparent) 78.1%,
       transparent 78.2%
     ),
     /* stone grain — fine noise */
