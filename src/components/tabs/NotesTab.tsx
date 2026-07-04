@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useCharacterContext } from "@/lib/context";
 import { QuickNotes } from "@/components/notes/QuickNotes";
 import { NoteList } from "@/components/notes/NoteList";
@@ -17,6 +19,8 @@ const SUB_TABS = [
 ] as const;
 
 type SubTab = (typeof SUB_TABS)[number]["id"];
+
+const SUB_TAB_IDS = SUB_TABS.map((t) => t.id);
 
 interface SearchResult {
   id: string;
@@ -98,6 +102,11 @@ export function NotesTab() {
   const [pendingOpenId, setPendingOpenId] = useState<string | undefined>(
     undefined
   );
+  const { dragX, dragOpacity, handleDragEnd } = useSwipeNavigation(
+    SUB_TAB_IDS,
+    activeSubTab,
+    setActiveSubTab
+  );
   const charCtx = useCharacterContext();
 
   if (!charCtx.character) return null;
@@ -147,7 +156,14 @@ export function NotesTab() {
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto p-4">
+      <motion.div
+        className="flex-1 overflow-y-auto p-4"
+        style={{ x: dragX, opacity: dragOpacity, touchAction: "pan-y pinch-zoom" }}
+        drag={searchQuery ? false : "x"}
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={handleDragEnd}
+      >
         {searchQuery ? (
           results.length > 0 ? (
             <div className="space-y-2">
@@ -186,7 +202,7 @@ export function NotesTab() {
             )}
           </>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }
