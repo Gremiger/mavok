@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Star } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
+import { useThemeContext } from "@/lib/context";
 import { CONDITIONS } from "@/data/conditions";
 import { ACTIONS } from "@/data/actions";
 import { SKILLS_REFERENCE } from "@/data/skills-reference";
@@ -11,6 +13,12 @@ import { GEAR } from "@/data/gear";
 import { MASTERY_PROPERTIES } from "@/data/mastery";
 import { FEATS } from "@/data/feats";
 import { SPELLS } from "@/data/spells";
+import {
+  CONDITIONS_ES,
+  ACTIONS_ES,
+  SKILLS_ES,
+  SPELLS_ES,
+} from "@/data/translations-es";
 import { abilityLabel } from "@/lib/utils";
 import type { AbilityScore } from "@/lib/types";
 
@@ -28,12 +36,42 @@ const CATEGORIES = [
 
 type Category = (typeof CATEGORIES)[number]["id"];
 
+const FAVORITES_ID = "favorites" as const;
+
+const PILLS: { id: Category | typeof FAVORITES_ID; label: string }[] = [
+  { id: FAVORITES_ID, label: "Favoritos" },
+  ...CATEGORIES,
+];
+
+const TRANSLATIONS: Partial<Record<Category, Record<string, string>>> = {
+  conditions: CONDITIONS_ES,
+  actions: ACTIONS_ES,
+  skills: SKILLS_ES,
+  spells: SPELLS_ES,
+};
+
+const TRANSLATION_DISCLAIMER =
+  "Traducción no oficial — verifica en inglés si hay dudas.";
+
 interface EncyclopediaItem {
   id: string;
   category: Category;
   name: string;
   hint: string;
-  detail: string;
+  header: string;
+  description: string;
+}
+
+function resolveDetail(
+  item: EncyclopediaItem,
+  language: "en" | "es"
+): string {
+  const translations = TRANSLATIONS[item.category];
+  const translated = language === "es" ? translations?.[item.name] : undefined;
+  const body = translated
+    ? `${TRANSLATION_DISCLAIMER}\n\n${translated}`
+    : item.description;
+  return [item.header, body].filter(Boolean).join("\n\n");
 }
 
 function buildConditionItems(): EncyclopediaItem[] {
@@ -42,7 +80,8 @@ function buildConditionItems(): EncyclopediaItem[] {
     category: "conditions",
     name: c.name,
     hint: "",
-    detail: c.description,
+    header: "",
+    description: c.description,
   }));
 }
 
@@ -52,7 +91,8 @@ function buildActionItems(): EncyclopediaItem[] {
     category: "actions",
     name: a.name,
     hint: "",
-    detail: a.description,
+    header: "",
+    description: a.description,
   }));
 }
 
@@ -62,7 +102,8 @@ function buildSkillItems(): EncyclopediaItem[] {
     category: "skills",
     name: s.name,
     hint: abilityLabel(s.ability as AbilityScore),
-    detail: s.description,
+    header: "",
+    description: s.description,
   }));
 }
 
@@ -72,7 +113,7 @@ function buildWeaponItems(): EncyclopediaItem[] {
     category: "weapons",
     name: w.name,
     hint: `${w.damage} ${w.damageType}`,
-    detail: [
+    header: [
       `${w.type === "melee" ? "Cuerpo a cuerpo" : "A distancia"} · ${w.category}`,
       `Daño: ${w.damage} ${w.damageType}`,
       w.range ? `Alcance: ${w.range}` : null,
@@ -82,6 +123,7 @@ function buildWeaponItems(): EncyclopediaItem[] {
     ]
       .filter(Boolean)
       .join("\n"),
+    description: "",
   }));
 }
 
@@ -91,7 +133,7 @@ function buildArmorItems(): EncyclopediaItem[] {
     category: "armor",
     name: a.name,
     hint: `AC ${a.ac}`,
-    detail: [
+    header: [
       `Tipo: ${a.type}`,
       `CA: ${a.ac}`,
       `Peso: ${a.weight} lb${a.value !== null ? ` · Valor: ${a.value} gp` : ""}`,
@@ -100,6 +142,7 @@ function buildArmorItems(): EncyclopediaItem[] {
     ]
       .filter(Boolean)
       .join("\n"),
+    description: "",
   }));
 }
 
@@ -109,7 +152,8 @@ function buildGearItems(): EncyclopediaItem[] {
     category: "gear",
     name: g.name,
     hint: g.value !== null ? `${g.value} gp` : "",
-    detail: g.description,
+    header: "",
+    description: g.description,
   }));
 }
 
@@ -119,7 +163,8 @@ function buildMasteryItems(): EncyclopediaItem[] {
     category: "mastery",
     name: m.name,
     hint: "",
-    detail: m.description,
+    header: "",
+    description: m.description,
   }));
 }
 
@@ -129,17 +174,14 @@ function buildFeatItems(): EncyclopediaItem[] {
     category: "feats",
     name: f.name,
     hint: f.category,
-    detail: [
-      [
-        f.category,
-        f.levelRequired ? `Nivel ${f.levelRequired}` : null,
-        f.repeatable ? "Repetible" : null,
-      ]
-        .filter(Boolean)
-        .join(" · "),
-      "",
-      f.description,
-    ].join("\n"),
+    header: [
+      f.category,
+      f.levelRequired ? `Nivel ${f.levelRequired}` : null,
+      f.repeatable ? "Repetible" : null,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    description: f.description,
   }));
 }
 
@@ -149,15 +191,14 @@ function buildSpellItems(): EncyclopediaItem[] {
     category: "spells",
     name: s.name,
     hint: `${s.level === 0 ? "Cantrip" : `Nv. ${s.level}`} · ${s.school}`,
-    detail: [
+    header: [
       `${s.level === 0 ? "Cantrip" : `Nivel ${s.level}`} · ${s.school}${s.ritual ? " (Ritual)" : ""}`,
       `Tiempo de lanzamiento: ${s.castingTime}`,
       `Alcance: ${s.range}`,
       `Componentes: ${s.components}`,
       `Duración: ${s.duration}${s.concentration ? " (Concentración)" : ""}`,
-      "",
-      s.description,
     ].join("\n"),
+    description: s.description,
   }));
 }
 
@@ -174,7 +215,15 @@ const CATEGORY_ITEMS: Record<Category, () => EncyclopediaItem[]> = {
 };
 
 export function EncyclopediaTab() {
-  const [activeCategory, setActiveCategory] = useState<Category>("conditions");
+  const {
+    encyclopediaFavorites,
+    toggleFavorite,
+    encyclopediaLanguage,
+    setEncyclopediaLanguage,
+  } = useThemeContext();
+  const [activeCategory, setActiveCategory] = useState<
+    Category | typeof FAVORITES_ID
+  >("conditions");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewingItem, setViewingItem] = useState<EncyclopediaItem | null>(null);
 
@@ -183,8 +232,13 @@ export function EncyclopediaTab() {
     []
   );
   const categoryItems = useMemo(
-    () => CATEGORY_ITEMS[activeCategory](),
+    () =>
+      activeCategory === FAVORITES_ID ? [] : CATEGORY_ITEMS[activeCategory](),
     [activeCategory]
+  );
+  const favoriteItems = useMemo(
+    () => allItems.filter((item) => encyclopediaFavorites.includes(item.id)),
+    [allItems, encyclopediaFavorites]
   );
 
   const searchResults = searchQuery
@@ -194,6 +248,7 @@ export function EncyclopediaTab() {
     : [];
 
   function renderRow(item: EncyclopediaItem, showCategoryBadge: boolean) {
+    const isFavorite = encyclopediaFavorites.includes(item.id);
     return (
       <div
         key={item.id}
@@ -209,37 +264,68 @@ export function EncyclopediaTab() {
         {item.hint && (
           <span className="text-muted text-xs shrink-0">{item.hint}</span>
         )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleFavorite(item.id);
+          }}
+          className="shrink-0 text-accent"
+        >
+          <Star size={14} fill={isFavorite ? "currentColor" : "none"} />
+        </button>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col h-full">
-      {/* Search bar */}
-      <div className="p-2 border-b border-border bg-card shrink-0">
+      {/* Search bar + language toggle */}
+      <div className="p-2 border-b border-border bg-card shrink-0 flex gap-2 items-center">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar en la enciclopedia..."
-          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+          className="flex-1 bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground"
         />
+        <div className="flex rounded-lg border border-border overflow-hidden shrink-0">
+          <button
+            onClick={() => setEncyclopediaLanguage("en")}
+            className={`px-2 py-2 text-xs font-heading ${
+              encyclopediaLanguage === "en"
+                ? "bg-accent text-white"
+                : "text-muted"
+            }`}
+          >
+            EN
+          </button>
+          <button
+            onClick={() => setEncyclopediaLanguage("es")}
+            className={`px-2 py-2 text-xs font-heading ${
+              encyclopediaLanguage === "es"
+                ? "bg-accent text-white"
+                : "text-muted"
+            }`}
+          >
+            ES
+          </button>
+        </div>
       </div>
 
       {/* Category navigation (hidden while searching) */}
       {!searchQuery && (
         <div className="flex overflow-x-auto border-b border-border bg-card px-2 gap-1 shrink-0">
-          {CATEGORIES.map((cat) => (
+          {PILLS.map((tab) => (
             <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
+              key={tab.id}
+              onClick={() => setActiveCategory(tab.id)}
               className={`px-3 py-2.5 text-xs whitespace-nowrap transition-colors border-b-2 ${
-                activeCategory === cat.id
+                activeCategory === tab.id
                   ? "text-accent border-accent"
                   : "text-muted border-transparent"
               }`}
             >
-              {cat.label}
+              {tab.label}
             </button>
           ))}
         </div>
@@ -256,6 +342,17 @@ export function EncyclopediaTab() {
               Sin resultados para &quot;{searchQuery}&quot;.
             </p>
           )
+        ) : activeCategory === FAVORITES_ID ? (
+          favoriteItems.length > 0 ? (
+            <div className="space-y-2">
+              {favoriteItems.map((item) => renderRow(item, true))}
+            </div>
+          ) : (
+            <p className="text-muted text-sm text-center py-8">
+              Aún no tienes favoritos — toca la estrella en cualquier
+              entrada.
+            </p>
+          )
         ) : (
           <div className="space-y-2">
             {categoryItems.map((item) => renderRow(item, false))}
@@ -268,9 +365,29 @@ export function EncyclopediaTab() {
         onClose={() => setViewingItem(null)}
         title={viewingItem?.name ?? ""}
       >
-        <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
-          {viewingItem?.detail}
-        </p>
+        {viewingItem && (
+          <>
+            <button
+              onClick={() => toggleFavorite(viewingItem.id)}
+              className="flex items-center gap-1.5 text-xs text-accent mb-3"
+            >
+              <Star
+                size={16}
+                fill={
+                  encyclopediaFavorites.includes(viewingItem.id)
+                    ? "currentColor"
+                    : "none"
+                }
+              />
+              {encyclopediaFavorites.includes(viewingItem.id)
+                ? "En favoritos"
+                : "Agregar a favoritos"}
+            </button>
+            <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
+              {resolveDetail(viewingItem, encyclopediaLanguage)}
+            </p>
+          </>
+        )}
       </Modal>
     </div>
   );
