@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Star } from "lucide-react";
+import { Star, SearchX } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useThemeContext } from "@/lib/context";
 import { CONDITIONS } from "@/data/conditions";
@@ -354,9 +355,10 @@ export function EncyclopediaTab() {
               {searchResults.map((item) => renderRow(item, true))}
             </div>
           ) : (
-            <p className="text-muted text-sm text-center py-8">
-              Sin resultados para &quot;{searchQuery}&quot;.
-            </p>
+            <EmptyState
+              icon={SearchX}
+              message={`Sin resultados para "${searchQuery}".`}
+            />
           )
         ) : activeCategory === FAVORITES_ID ? (
           favoriteItems.length > 0 ? (
@@ -364,10 +366,10 @@ export function EncyclopediaTab() {
               {favoriteItems.map((item) => renderRow(item, true))}
             </div>
           ) : (
-            <p className="text-muted text-sm text-center py-8">
-              Aún no tienes favoritos — toca la estrella en cualquier
-              entrada.
-            </p>
+            <EmptyState
+              icon={Star}
+              message="Aún no tienes favoritos — toca la estrella en cualquier entrada."
+            />
           )
         ) : (
           <div className="space-y-2">

@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { exportInventoryCSV } from "@/lib/export";
 import { toast } from "sonner";
-import { Sword, Shield, Wrench, FlaskConical, Heart, Plus } from "lucide-react";
+import { Sword, Shield, Wrench, FlaskConical, Heart, Plus, SearchX } from "lucide-react";
 import type { InventoryItem } from "@/lib/types";
 import type { ReactNode } from "react";
 import { WEAPONS } from "@/data/weapons";
@@ -367,9 +368,10 @@ export function InventoryTab() {
       ))}
 
       {grouped.length === 0 && (
-        <p className="text-muted text-sm text-center py-8">
-          Sin objetos que coincidan. Ajusta la búsqueda o los filtros.
-        </p>
+        <EmptyState
+          icon={SearchX}
+          message="Sin objetos que coincidan. Ajusta la búsqueda o los filtros."
+        />
       )}
 
       {/* Encumbrance Footer */}
