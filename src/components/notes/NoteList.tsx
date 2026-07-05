@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
-import { Plus } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Plus, Map, Users } from "lucide-react";
 import type { NoteEntry } from "@/lib/types";
 
 export function NoteList({
@@ -173,9 +174,10 @@ export function NoteList({
       ))}
 
       {notes.length === 0 && (
-        <p className="text-muted text-sm text-center py-8">
-          Sin notas de {title.toLowerCase()}. Toca + para agregar.
-        </p>
+        <EmptyState
+          icon={section === "world" ? Map : Users}
+          message={`Sin notas de ${title.toLowerCase()}. Toca + para agregar.`}
+        />
       )}
 
       {/* Add FAB */}

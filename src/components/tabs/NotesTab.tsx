@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { SearchX } from "lucide-react";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useCharacterContext } from "@/lib/context";
 import { QuickNotes } from "@/components/notes/QuickNotes";
 import { NoteList } from "@/components/notes/NoteList";
 import { QuestList } from "@/components/notes/QuestList";
 import { JournalList } from "@/components/notes/JournalList";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { Notes } from "@/lib/types";
 
 const SUB_TABS = [
@@ -181,9 +183,10 @@ export function NotesTab() {
               ))}
             </div>
           ) : (
-            <p className="text-muted text-sm text-center py-8">
-              Sin resultados para &quot;{searchQuery}&quot;.
-            </p>
+            <EmptyState
+              icon={SearchX}
+              message={`Sin resultados para "${searchQuery}".`}
+            />
           )
         ) : (
           <>

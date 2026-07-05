@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
-import { Plus } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Plus, BookOpen } from "lucide-react";
 import type { JournalEntry } from "@/lib/types";
 
 export function JournalList({
@@ -139,9 +140,10 @@ export function JournalList({
         ))}
 
       {journal.length === 0 && (
-        <p className="text-muted text-sm text-center py-8">
-          Sin entradas de diario. Toca + después de cada sesión.
-        </p>
+        <EmptyState
+          icon={BookOpen}
+          message="Sin entradas de diario. Toca + después de cada sesión."
+        />
       )}
 
       <button

@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { Tag } from "@/components/ui/Tag";
-import { Plus } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Plus, ScrollText } from "lucide-react";
 import type { QuestEntry } from "@/lib/types";
 
 const STATUS_CONFIG = {
@@ -198,9 +199,10 @@ export function QuestList({
       ))}
 
       {quests.length === 0 && (
-        <p className="text-muted text-sm text-center py-8">
-          Sin misiones{filter !== "all" ? ` ${STATUS_CONFIG[filter].label.toLowerCase()}s` : ""}. Toca + para agregar.
-        </p>
+        <EmptyState
+          icon={ScrollText}
+          message={`Sin misiones${filter !== "all" ? ` ${STATUS_CONFIG[filter].label.toLowerCase()}s` : ""}. Toca + para agregar.`}
+        />
       )}
 
       <button

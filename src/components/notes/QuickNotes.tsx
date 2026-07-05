@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { NotebookPen } from "lucide-react";
 import { useCharacterContext } from "@/lib/context";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export function QuickNotes() {
   const {
@@ -193,9 +195,10 @@ export function QuickNotes() {
         ))}
 
         {character.notes.quick.length === 0 && (
-          <p className="text-muted text-sm text-center py-8">
-            Sin notas rápidas. Escribe algo arriba para empezar.
-          </p>
+          <EmptyState
+            icon={NotebookPen}
+            message="Sin notas rápidas. Escribe algo arriba para empezar."
+          />
         )}
       </div>
     </div>
