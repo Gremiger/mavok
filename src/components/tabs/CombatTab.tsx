@@ -52,7 +52,6 @@ export function CombatTab() {
     "add" | Attack | null
   >(null);
   const [ragePulseKey, setRagePulseKey] = useState(0);
-  const [recklessActive, setRecklessActive] = useState(false);
   const [stoneEndurancePulseKey, setStoneEndurancePulseKey] = useState(0);
   const [healerKitPulseKey, setHealerKitPulseKey] = useState(0);
   const stoneEnduranceLongPress = useLongPress(() =>
@@ -236,7 +235,7 @@ export function CombatTab() {
             attack={a}
             rageActive={rageActive}
             rageDamage={rageDamage}
-            recklessActive={recklessActive}
+            recklessActive={combat.recklessActive}
             onEdit={() => setAttackModalState(a)}
             onDelete={() => {
               const index = attacks.findIndex((x) => x.id === a.id);
@@ -386,9 +385,11 @@ export function CombatTab() {
           </motion.button>
           {hasRecklessAttack && (
             <button
-              onClick={() => setRecklessActive((r) => !r)}
+              onClick={() =>
+                updateCombat({ recklessActive: !combat.recklessActive })
+              }
               className={`w-full p-3 rounded-lg border text-left ${
-                recklessActive
+                combat.recklessActive
                   ? "border-danger bg-danger/10 text-danger"
                   : "border-border bg-card text-foreground"
               }`}
@@ -397,7 +398,7 @@ export function CombatTab() {
                 Reckless Attack
               </span>
               <span className="text-muted ml-2">
-                {recklessActive
+                {combat.recklessActive
                   ? "(activo — tap para desactivar)"
                   : "(tap para activar)"}
               </span>
