@@ -4,6 +4,8 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import type { Attack } from "@/lib/types";
 import type { DiceRoll } from "@/lib/dice";
 import { computeRageBonus, rollAttackHit, rollAttackDamage } from "@/lib/attackRoll";
+import { exhaustionPenalty } from "@/lib/exhaustion";
+import { formatModifier } from "@/lib/utils";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { Sword, Target, Hammer } from "lucide-react";
 import { useThemeContext } from "@/lib/context";
@@ -19,6 +21,7 @@ export function AttackRow({
   rageActive,
   rageDamage,
   recklessActive,
+  exhaustionLevel,
   onEdit,
   onDelete,
   onMoveUp,
@@ -28,6 +31,7 @@ export function AttackRow({
   rageActive: boolean;
   rageDamage: number;
   recklessActive: boolean;
+  exhaustionLevel: number;
   onEdit?: () => void;
   onDelete?: () => void;
   onMoveUp?: () => void;
@@ -52,6 +56,7 @@ export function AttackRow({
   }, [menuOpen]);
 
   const rageBonus = computeRageBonus(attack, rageActive, rageDamage);
+  const effectiveAttackBonus = attack.attackBonus + exhaustionPenalty(exhaustionLevel);
   const DamageIcon = DAMAGE_TYPE_ICONS[attack.damageType];
 
   function displayDamage() {
@@ -67,7 +72,7 @@ export function AttackRow({
   }
 
   function handleRollHit() {
-    const result = rollAttackHit(attack, { recklessActive });
+    const result = rollAttackHit(attack, { recklessActive, exhaustionLevel });
     setLastRoll({ roll: result, type: "hit" });
   }
 
@@ -99,7 +104,7 @@ export function AttackRow({
             {DamageIcon && (
               <DamageIcon size={11} className="inline-block mb-0.5 mr-1" />
             )}
-            +{attack.attackBonus} · {displayDamage()} {attack.damageType.slice(0, 4).toLowerCase()}. · {attack.range}
+            {formatModifier(effectiveAttackBonus)} · {displayDamage()} {attack.damageType.slice(0, 4).toLowerCase()}. · {attack.range}
           </div>
         </div>
         <div className="flex gap-1.5 ml-2 items-center">

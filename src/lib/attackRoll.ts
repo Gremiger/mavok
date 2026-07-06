@@ -1,5 +1,6 @@
 import type { Attack } from "./types";
 import { rollD20, rollD20WithAdvantage, rollDice, type DiceRoll } from "./dice";
+import { exhaustionPenalty } from "./exhaustion";
 
 export function isStrBasedAttack(attack: Attack): boolean {
   return !attack.properties.includes("Finesse");
@@ -15,11 +16,12 @@ export function computeRageBonus(
 
 export function rollAttackHit(
   attack: Attack,
-  opts: { recklessActive: boolean }
+  opts: { recklessActive: boolean; exhaustionLevel: number }
 ): DiceRoll {
+  const bonus = attack.attackBonus + exhaustionPenalty(opts.exhaustionLevel);
   return opts.recklessActive && isStrBasedAttack(attack)
-    ? rollD20WithAdvantage(attack.attackBonus)
-    : rollD20(attack.attackBonus);
+    ? rollD20WithAdvantage(bonus)
+    : rollD20(bonus);
 }
 
 export function rollAttackDamage(

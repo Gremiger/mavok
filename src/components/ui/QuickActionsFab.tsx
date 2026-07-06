@@ -109,6 +109,7 @@ export function QuickActionsFab({ activeTab }: { activeTab: string }) {
         if (!attack) break;
         const roll = rollAttackHit(attack, {
           recklessActive: combat.recklessActive,
+          exhaustionLevel: combat.exhaustionLevel,
         });
         toast(`${attack.name}: ${roll.total} (${roll.rolls.join(", ")})`, {
           icon: "🎲",

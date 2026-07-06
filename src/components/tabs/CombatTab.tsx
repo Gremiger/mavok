@@ -249,6 +249,7 @@ export function CombatTab() {
             rageActive={rageActive}
             rageDamage={rageDamage}
             recklessActive={combat.recklessActive}
+            exhaustionLevel={combat.exhaustionLevel}
             onEdit={() => setAttackModalState(a)}
             onDelete={() => {
               const index = attacks.findIndex((x) => x.id === a.id);
