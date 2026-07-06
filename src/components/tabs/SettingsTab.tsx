@@ -17,6 +17,7 @@ import {
 } from "@/lib/export";
 import { LevelUpFlow } from "@/components/levelup/LevelUpFlow";
 import { WeaponMasteryModal } from "@/components/settings/WeaponMasteryModal";
+import { QuickActionsPicker } from "@/components/ui/QuickActionsPicker";
 import { getBackups, restoreBackup } from "@/lib/migrations";
 import { getCharacterStorageKey } from "@/lib/storage";
 import { CURRENT_DATA_VERSION } from "@/lib/types";
@@ -24,7 +25,7 @@ import { CHANGELOG } from "@/data/changelog";
 import { THEME_META } from "@/hooks/useTheme";
 
 export function SettingsTab() {
-  const { character, update, updateCombat, updateMeta } =
+  const { character, update, updateCombat, updateMeta, updateQuickActions } =
     useCharacterContext();
   const { theme, setTheme, density, toggleDensity } = useThemeContext();
   const [shortRestOpen, setShortRestOpen] = useState(false);
@@ -38,6 +39,7 @@ export function SettingsTab() {
   const [levelUpOpen, setLevelUpOpen] = useState(false);
   const [levelUpDryRun, setLevelUpDryRun] = useState(false);
   const [weaponMasteryOpen, setWeaponMasteryOpen] = useState(false);
+  const [quickActionsPickerOpen, setQuickActionsPickerOpen] = useState(false);
   const [expandedChangelogEntry, setExpandedChangelogEntry] = useState<
     string | null
   >(null);
@@ -259,6 +261,19 @@ export function SettingsTab() {
             </span>
           </button>
         </div>
+      </CollapsibleSection>
+
+      {/* Quick Actions */}
+      <CollapsibleSection title="Acciones rápidas">
+        <p className="text-sm text-muted mb-3">
+          Elegí qué acciones aparecen en el botón flotante de Ficha y Combate.
+        </p>
+        <button
+          onClick={() => setQuickActionsPickerOpen(true)}
+          className="w-full py-2 bg-card border border-border rounded-lg text-sm text-foreground hover:border-accent"
+        >
+          Configurar ({character.quickActions.length}/5)
+        </button>
       </CollapsibleSection>
 
       {/* Level Up */}
@@ -631,6 +646,15 @@ export function SettingsTab() {
       <WeaponMasteryModal
         open={weaponMasteryOpen}
         onClose={() => setWeaponMasteryOpen(false)}
+      />
+
+      {/* Quick Actions Picker */}
+      <QuickActionsPicker
+        open={quickActionsPickerOpen}
+        onClose={() => setQuickActionsPickerOpen(false)}
+        selected={character.quickActions}
+        attacks={character.attacks}
+        onSave={updateQuickActions}
       />
 
       {/* Import Preview Modal */}
