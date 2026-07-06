@@ -1,15 +1,39 @@
 import type { Character } from "./types";
 import { abilityModifier } from "./utils";
+import { ARMOR } from "../data/armor";
+
+export function computeArmorClass(character: Character): number {
+  const dexMod = abilityModifier(character.attributes.dex);
+  const conMod = abilityModifier(character.attributes.con);
+
+  const equippedArmorNames = character.inventory
+    .filter((i) => i.category === "armor" && i.equipped)
+    .map((i) => i.name);
+
+  const wornArmor = ARMOR.find(
+    (a) => equippedArmorNames.includes(a.name) && a.type !== "shield"
+  );
+  const shield = ARMOR.find(
+    (a) => equippedArmorNames.includes(a.name) && a.type === "shield"
+  );
+
+  const dexCap =
+    wornArmor?.type === "heavy" ? 0 : wornArmor?.type === "medium" ? 2 : null;
+  const base = wornArmor
+    ? wornArmor.ac + (dexCap !== null ? Math.min(dexMod, dexCap) : dexMod)
+    : 10 + dexMod + conMod; // Unarmored Defense fallback
+
+  return base + (shield?.ac ?? 0);
+}
 
 export function recalculateDerived(character: Character): Character {
   const c = structuredClone(character);
   const strMod = abilityModifier(c.attributes.str);
   const dexMod = abilityModifier(c.attributes.dex);
-  const conMod = abilityModifier(c.attributes.con);
   const wisMod = abilityModifier(c.attributes.wis);
   const pb = c.meta.proficiencyBonus;
 
-  c.combat.armorClass = 10 + dexMod + conMod;
+  c.combat.armorClass = computeArmorClass(c);
   c.combat.initiative = dexMod;
 
   const percProf = c.skills.perception?.proficient ? pb : 0;

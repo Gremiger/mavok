@@ -1,6 +1,22 @@
 import { describe, it, expect } from "vitest";
-import { recalculateDerived } from "./recalculate";
-import type { Character, Attack } from "./types";
+import { recalculateDerived, computeArmorClass } from "./recalculate";
+import type { Character, Attack, InventoryItem } from "./types";
+
+function makeInventoryItem(
+  overrides: Partial<InventoryItem> = {}
+): InventoryItem {
+  return {
+    id: "inv-1",
+    name: "Leather Armor",
+    quantity: 1,
+    weight: 10,
+    value: null,
+    category: "armor",
+    equipped: true,
+    description: "",
+    ...overrides,
+  };
+}
 
 function makeAttack(overrides: Partial<Attack> = {}): Attack {
   return {
@@ -158,5 +174,66 @@ describe("recalculateDerived", () => {
     recalculateDerived(character);
     expect(character.combat.armorClass).toBe(originalAc);
     expect(character.attacks[0].attackBonus).toBe(originalBonus);
+  });
+});
+
+describe("computeArmorClass", () => {
+  it("falls back to Unarmored Defense when no armor is equipped", () => {
+    const character = makeCharacter({ inventory: [] });
+    // dex 14 -> mod +2, con 14 -> mod +2
+    expect(computeArmorClass(character)).toBe(14);
+  });
+
+  it("ignores an unequipped armor item and falls back to Unarmored Defense", () => {
+    const character = makeCharacter({
+      inventory: [makeInventoryItem({ equipped: false })],
+    });
+    expect(computeArmorClass(character)).toBe(14);
+  });
+
+  it("adds the uncapped dex modifier for light armor", () => {
+    const character = makeCharacter({
+      attributes: { str: 16, dex: 18, con: 14, int: 8, wis: 12, cha: 10 },
+      inventory: [makeInventoryItem({ name: "Leather Armor" })],
+    });
+    // Leather Armor AC 11 + dex mod +4 (uncapped)
+    expect(computeArmorClass(character)).toBe(15);
+  });
+
+  it("caps the dex modifier at +2 for medium armor", () => {
+    const character = makeCharacter({
+      attributes: { str: 16, dex: 18, con: 14, int: 8, wis: 12, cha: 10 },
+      inventory: [makeInventoryItem({ name: "Breastplate" })],
+    });
+    // Breastplate AC 14 + dex mod capped at +2 (actual dex mod is +4)
+    expect(computeArmorClass(character)).toBe(16);
+  });
+
+  it("ignores the dex modifier entirely for heavy armor", () => {
+    const character = makeCharacter({
+      attributes: { str: 16, dex: 18, con: 14, int: 8, wis: 12, cha: 10 },
+      inventory: [makeInventoryItem({ name: "Chain Mail" })],
+    });
+    // Chain Mail AC 16 flat, no dex bonus
+    expect(computeArmorClass(character)).toBe(16);
+  });
+
+  it("adds a shield's AC on top of Unarmored Defense", () => {
+    const character = makeCharacter({
+      inventory: [makeInventoryItem({ name: "Shield" })],
+    });
+    // Unarmored Defense 14 + Shield AC 2
+    expect(computeArmorClass(character)).toBe(16);
+  });
+
+  it("adds a shield's AC on top of worn body armor", () => {
+    const character = makeCharacter({
+      inventory: [
+        makeInventoryItem({ id: "inv-1", name: "Breastplate" }),
+        makeInventoryItem({ id: "inv-2", name: "Shield" }),
+      ],
+    });
+    // Breastplate 14 + dex mod capped at +2 (dex 14 -> +2) + Shield AC 2
+    expect(computeArmorClass(character)).toBe(18);
   });
 });

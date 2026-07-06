@@ -34,16 +34,32 @@ function formFromAttack(existingAttack: Attack): typeof EMPTY_FORM {
   };
 }
 
+function formFromWeapon(weaponName: string): typeof EMPTY_FORM {
+  const w = WEAPONS.find((wp) => wp.name === weaponName);
+  if (!w) return EMPTY_FORM;
+  return {
+    ...EMPTY_FORM,
+    name: w.name,
+    damage: w.damage,
+    damageType: w.damageType,
+    properties: w.properties.join(", "),
+    mastery: w.mastery ?? "",
+    range: w.range ?? "5 ft",
+  };
+}
+
 export function AttackFormModal({
   open,
   onClose,
   onSave,
   existingAttack,
+  initialWeaponName,
 }: {
   open: boolean;
   onClose: () => void;
   onSave: (attack: Attack) => void;
   existingAttack?: Attack;
+  initialWeaponName?: string;
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
 
@@ -54,7 +70,13 @@ export function AttackFormModal({
   const [lastSyncKey, setLastSyncKey] = useState(syncKey);
   if (syncKey !== lastSyncKey) {
     setLastSyncKey(syncKey);
-    setForm(existingAttack ? formFromAttack(existingAttack) : EMPTY_FORM);
+    setForm(
+      existingAttack
+        ? formFromAttack(existingAttack)
+        : initialWeaponName
+          ? formFromWeapon(initialWeaponName)
+          : EMPTY_FORM
+    );
   }
 
   function prefillFromWeapon(weaponName: string) {

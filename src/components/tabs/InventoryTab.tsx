@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { AttackFormModal } from "@/components/combat/AttackFormModal";
 import { exportInventoryCSV } from "@/lib/export";
 import { toast } from "sonner";
 import { Sword, Shield, Wrench, FlaskConical, Heart, Plus, SearchX } from "lucide-react";
@@ -12,6 +13,7 @@ import type { ReactNode } from "react";
 import { WEAPONS } from "@/data/weapons";
 import { ARMOR } from "@/data/armor";
 import { GEAR } from "@/data/gear";
+import { computeArmorClass } from "@/lib/recalculate";
 
 const CURRENCY_LABELS = [
   { key: "cp" as const, label: "CP" },
@@ -40,15 +42,20 @@ const CATEGORY_ICONS: Record<string, ReactNode> = {
 export function InventoryTab() {
   const {
     character,
+    update,
     updateCurrency,
     addInventoryItem,
     removeInventoryItem,
     updateInventoryItem,
+    addAttack,
   } = useCharacterContext();
   const { density } = useThemeContext();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editingCurrency, setEditingCurrency] = useState<string | null>(null);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [attackPrefillWeapon, setAttackPrefillWeapon] = useState<string | null>(
+    null
+  );
   const [newItem, setNewItem] = useState({
     name: "",
     quantity: 1,
@@ -66,7 +73,7 @@ export function InventoryTab() {
 
   if (!character) return null;
 
-  const { inventory, currency, attributes } = character;
+  const { inventory, currency, attributes, attacks } = character;
   const strMod = attributes.str;
   const carryCapacity = strMod * 15 * 2;
   const totalWeight = inventory.reduce(
@@ -93,6 +100,37 @@ export function InventoryTab() {
       });
     }
     return sorted;
+  }
+
+  function toggleEquipped(item: InventoryItem) {
+    const nowEquipped = !item.equipped;
+    update((c) => {
+      const nextInventory = c.inventory.map((i) =>
+        i.id === item.id ? { ...i, equipped: nowEquipped } : i
+      );
+      const next = { ...c, inventory: nextInventory };
+      return item.category === "armor"
+        ? {
+            ...next,
+            combat: { ...next.combat, armorClass: computeArmorClass(next) },
+          }
+        : next;
+    });
+
+    if (item.category === "weapon" && nowEquipped) {
+      const alreadyTracked = attacks.some(
+        (a) => a.name === item.name || a.name.startsWith(`${item.name} (`)
+      );
+      const inCatalog = WEAPONS.some((w) => w.name === item.name);
+      if (inCatalog && !alreadyTracked) {
+        toast(`¿Agregar "${item.name}" a tus acciones de combate?`, {
+          action: {
+            label: "Agregar",
+            onClick: () => setAttackPrefillWeapon(item.name),
+          },
+        });
+      }
+    }
   }
 
   function toggleCategory(cat: InventoryItem["category"]) {
@@ -280,9 +318,7 @@ export function InventoryTab() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      updateInventoryItem(item.id, {
-                        equipped: !item.equipped,
-                      });
+                      toggleEquipped(item);
                     }}
                     className={`w-5 h-5 rounded border-2 flex items-center justify-center text-xs ${
                       item.equipped
@@ -536,6 +572,16 @@ export function InventoryTab() {
           </button>
         </div>
       </Modal>
+
+      <AttackFormModal
+        open={attackPrefillWeapon !== null}
+        onClose={() => setAttackPrefillWeapon(null)}
+        onSave={(a) => {
+          addAttack(a);
+          setAttackPrefillWeapon(null);
+        }}
+        initialWeaponName={attackPrefillWeapon ?? undefined}
+      />
     </div>
   );
 }
