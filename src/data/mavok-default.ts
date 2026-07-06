@@ -49,6 +49,7 @@ export const MAVOK_DEFAULT: Character = {
     deathSaves: { successes: 0, failures: 0 },
     conditions: [],
     recklessActive: false,
+    exhaustionLevel: 0,
   },
   resources: {
     rpiRages: { total: 2, remaining: 2, active: false, slots: [true, true] },
@@ -244,4 +245,5 @@ export const MAVOK_DEFAULT: Character = {
   notes: { world: [], npcs: [], quests: [], journal: [], quick: [] },
   levelUpHistory: [],
   quickActions: [{ type: "rage" }, { type: "hpAdjust" }],
+  weaponMasteryUsedThisRest: false,
 };

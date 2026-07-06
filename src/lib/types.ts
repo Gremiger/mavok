@@ -1,6 +1,6 @@
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
-export const CURRENT_DATA_VERSION = 7;
+export const CURRENT_DATA_VERSION = 8;
 
 export type PinnedAction =
   | { type: "rage" }
@@ -28,6 +28,7 @@ export interface Character {
   notes: Notes;
   levelUpHistory: LevelUpHistoryEntry[];
   quickActions: PinnedAction[];
+  weaponMasteryUsedThisRest: boolean;
 }
 
 export interface LevelUpHistoryEntry {
@@ -73,6 +74,7 @@ export interface CombatState {
   deathSaves: { successes: number; failures: number };
   conditions: string[];
   recklessActive: boolean;
+  exhaustionLevel: number;
 }
 
 export interface Resources {

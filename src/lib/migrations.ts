@@ -132,6 +132,22 @@ const MIGRATIONS: Record<number, MigrationFn> = {
     d._version = 7;
     return d;
   },
+
+  8: (data) => {
+    const d = data as Record<string, unknown>;
+    d._version = 8;
+
+    const combat = d.combat as Record<string, unknown> | undefined;
+    if (combat && combat.exhaustionLevel === undefined) {
+      combat.exhaustionLevel = 0;
+    }
+
+    if (d.weaponMasteryUsedThisRest === undefined) {
+      d.weaponMasteryUsedThisRest = false;
+    }
+
+    return d;
+  },
 };
 
 const BACKUP_PREFIX = "mavok_backup_pre_migration_";
