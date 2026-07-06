@@ -1,4 +1,4 @@
-const STATIC_CACHE = "mavok-aabbd6f";
+const STATIC_CACHE = "mavok-b6c5bd1";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -53,12 +53,14 @@ async function networkFirstWithFallback(request) {
     const response = await fetch(request);
     if (response.ok) {
       const cache = await caches.open(STATIC_CACHE);
-      cache.put("/index.html", response.clone());
+      cache.put(request, response.clone());
     }
     return response;
   } catch {
     const cache = await caches.open(STATIC_CACHE);
-    const cached = await cache.match("/index.html");
-    return cached || new Response("Offline", { status: 503 });
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    const shell = await cache.match("/index.html");
+    return shell || new Response("Offline", { status: 503 });
   }
 }
