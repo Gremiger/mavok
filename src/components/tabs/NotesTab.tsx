@@ -101,6 +101,9 @@ function computeSearchResults(notes: Notes, query: string): SearchResult[] {
 export function NotesTab() {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>("quick");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchScope, setSearchScope] = useState<"current" | "global">(
+    "global"
+  );
   const [pendingOpenId, setPendingOpenId] = useState<string | undefined>(
     undefined
   );
@@ -113,9 +116,13 @@ export function NotesTab() {
 
   if (!charCtx.character) return null;
 
-  const results = searchQuery
+  const rawResults = searchQuery
     ? computeSearchResults(charCtx.character.notes, searchQuery)
     : [];
+  const results =
+    searchScope === "current"
+      ? rawResults.filter((r) => r.section === activeSubTab)
+      : rawResults;
 
   function handleResultTap(result: SearchResult) {
     setActiveSubTab(result.section);
@@ -126,18 +133,40 @@ export function NotesTab() {
   return (
     <div className="flex flex-col h-full">
       {/* Search bar */}
-      <div className="p-2 border-b border-border bg-card shrink-0">
+      <div className="p-2 border-b border-border bg-card shrink-0 flex gap-2">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar en notas..."
-          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+          className="flex-1 bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground"
         />
+        <div className="flex rounded-lg border border-border overflow-hidden shrink-0">
+          <button
+            onClick={() => setSearchScope("current")}
+            className={`px-2.5 py-2 text-xs font-heading transition-colors ${
+              searchScope === "current"
+                ? "bg-accent text-white"
+                : "bg-card text-muted"
+            }`}
+          >
+            Aquí
+          </button>
+          <button
+            onClick={() => setSearchScope("global")}
+            className={`px-2.5 py-2 text-xs font-heading transition-colors ${
+              searchScope === "global"
+                ? "bg-accent text-white"
+                : "bg-card text-muted"
+            }`}
+          >
+            Todo
+          </button>
+        </div>
       </div>
 
-      {/* Sub-tab navigation (hidden while searching) */}
-      {!searchQuery && (
+      {/* Sub-tab navigation (hidden during global search) */}
+      {(!searchQuery || searchScope === "current") && (
         <div className="flex overflow-x-auto border-b border-border bg-card px-2 gap-1 shrink-0">
           {SUB_TABS.map((tab) => (
             <button
@@ -161,7 +190,7 @@ export function NotesTab() {
       <motion.div
         className="flex-1 overflow-y-auto p-4"
         style={{ x: dragX, opacity: dragOpacity, touchAction: "pan-y pinch-zoom" }}
-        drag={searchQuery ? false : "x"}
+        drag={searchQuery && searchScope === "global" ? false : "x"}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.2}
         onDragEnd={handleDragEnd}
