@@ -28,6 +28,8 @@ npx tsc --noEmit     # Type check without emitting
 
 Tests are colocated as `*.test.ts` next to the source file they cover (e.g. `src/lib/migrations.test.ts`), run via Vitest. Verify changes by running `npx tsc --noEmit && npm run build && npm run lint && npm test`. **Always include lint** — `tsc`/`build`/`test` do not catch React Hooks ordering violations (see Key Constraints below); only `npm run lint`'s `react-hooks/rules-of-hooks` rule does. A change that skips lint can look clean and still ship a real bug.
 
+Current test coverage: `migrations.ts` (the full version chain), `recalculate.ts`, and the pure roll/penalty helpers (`attackRoll.ts`, `hitDice.ts`, `exhaustion.ts`). No component/UI tests yet — verifying UI changes still means running the app (dev server + a real browser, or an MCP browser tool) and exercising the flow.
+
 `npm run lint` should report 0 errors. Two lines (in `useCharacter.ts` and `useTheme.ts`, both reading `localStorage` on mount) carry a scoped `eslint-disable-next-line react-hooks/set-state-in-effect` with an inline justification — that's deliberate (localStorage is unavailable during this static-export app's build-time prerender pass), not new debt. Don't remove those comments, and don't add a similar suppression elsewhere without the same SSR/localStorage justification.
 
 ## Commit Messages
@@ -36,7 +38,7 @@ Never include a "Co-authored-by" (or similar attribution) trailer in commit mess
 
 ## Architecture
 
-**Static export SPA**: Next.js 15 with `output: 'export'`. Everything is `"use client"` — no server components, no API routes. The app is a single page (`src/app/page.tsx`) with 5 tabs rendered conditionally via state, not routes.
+**Static export SPA**: Next.js 15 with `output: 'export'`. Everything is `"use client"` — no server components, no API routes. The app is a single page (`src/app/page.tsx`) with 6 tabs (Ficha, Combate, Inventario, Notas, Enciclopedia, Ajustes) rendered conditionally via state, not routes.
 
 **State flow**: `useCharacter()` hook → wraps LocalStorage reads/writes → provides `character` object + update functions → shared via `CharacterContext` (React context). All tabs consume this context. Saving is automatic on every state change.
 
@@ -48,7 +50,7 @@ Never include a "Co-authored-by" (or similar attribution) trailer in commit mess
 
 **Theming**: Two themes (Dark Fantasy, D&D Classic) via CSS custom properties on `[data-theme]` attribute. Variables defined in `globals.css`, toggled via `useTheme()` hook. Tailwind classes reference them as `bg-background`, `text-accent`, `bg-card`, etc.
 
-**Service worker cache-busting** (`scripts/generate-sw.ts`): Runs automatically via the `prebuild` npm script before every `npm run build`. It stamps `public/sw.js`'s `STATIC_CACHE` constant with the current git commit hash. This means `public/sw.js` will show as modified after every build — that's expected, not a stray change, and should be committed alongside whatever code change triggered the rebuild.
+**Service worker cache-busting** (`scripts/generate-sw.ts`): Runs automatically via the `prebuild` npm script before every `npm run build`. It stamps `public/sw.js`'s `STATIC_CACHE` constant with the current git commit hash. This means `public/sw.js` will show as modified after every build — that's expected, not a stray change, and should be committed alongside whatever code change triggered the rebuild. `networkFirstWithFallback` in that same generated file must cache each navigation under its own `request` object (`cache.put(request, ...)`), never a hardcoded string key — an earlier version keyed every navigation to the literal string `"/index.html"`, which meant visiting a different static page (e.g. `/print`) online silently overwrote the cached homepage, and the next offline load served the wrong page.
 
 ## Key Constraints
 
@@ -58,6 +60,8 @@ Never include a "Co-authored-by" (or similar attribution) trailer in commit mess
 - `recalculate.ts` recomputes derived values (attack bonuses, AC, saves, mastery DCs) when attributes or proficiency change. Call it after any ASI/level-up that modifies ability scores.
 - Rage slots are tracked as `boolean[]` (`slots` field on `rpiRages`), not derived from `remaining`. Each slot toggles independently.
 - **Hooks must be called before any conditional early return** (e.g. `if (!character) return null;`), never after — every component in `src/components/tabs/` and several in `src/components/notes/` guard on `character` being non-null this way, and it's tempting to add a new `useState`/`useEffect`/custom hook (like `useLongPress`) further down near the code that uses it, after the guard. That violates React's Rules of Hooks and this project has hit real bugs from it. `npx tsc --noEmit` and `npm run build` do not catch this — only `npm run lint` does.
+- Same reason: don't call `setState` synchronously inside a `useEffect` body (`react-hooks/set-state-in-effect`) — if you need to reset local state when a prop changes (e.g. a modal's "open" prop), compare against a `prevProp` state value and call `setState` directly in the render body, not in an effect. `QuickActionsPicker.tsx` does this for its `open`/`selected` props.
+- `combat.exhaustionLevel` (0-6) penalizes d20 tests via `exhaustionPenalty()` (`src/lib/exhaustion.ts`), applied additively at each roll-and-display site (attack rolls, ability checks, saves, skills — see `AttackRow.tsx`, `SheetTab.tsx`). Never fold it into `saveTotal`/`skillTotal`/`abilityModifier` (`src/lib/utils.ts`) — those also compute passive scores (`passivePerception` etc.), which are not d20 tests and must stay unpenalized.
 
 ## Adding a New Data Model Field
 

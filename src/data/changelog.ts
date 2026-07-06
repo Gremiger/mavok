@@ -7,6 +7,23 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "v8",
+    date: "2026-07-06",
+    title: "Acciones rápidas y Exhaustion",
+    summary: [
+      "Botón flotante de Acciones rápidas en Ficha y Combate, configurable con hasta 5 accesos directos",
+      "Deshacer al eliminar notas de mundo/NPCs, misiones, entradas de diario y notas rápidas",
+      "Entrada rápida de HP con signo (+5 / -8)",
+      "Condiciones: descripción desplegable al tocar, buscador agrupado por categoría",
+      "Búsqueda en Notas: alternar entre la sección actual y todas",
+      "Historial de niveles rediseñado como línea de tiempo, mostrando HP y rasgos ganados por nivel",
+      "Exhaustion: nivel de 0 a 6 con penalización real en tiradas y reducción de Velocidad",
+      "Cambiar la maestría de un arma ya no se bloquea tras el primer uso, solo avisa si excede la regla",
+      "Corrección: gastar un dado de golpe con modificador de Constitución negativo",
+      "Corrección: la app instalada podía mostrar la página equivocada al abrir sin conexión",
+    ],
+  },
+  {
     version: "v7",
     date: "2026-07-03",
     title: "Historial de versiones",
