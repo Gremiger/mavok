@@ -43,6 +43,7 @@ export function CombatTab() {
     null
   );
   const [conditionFilter, setConditionFilter] = useState("");
+  const [exhaustionExpanded, setExhaustionExpanded] = useState(false);
   const [tempHpInput, setTempHpInput] = useState(false);
   const [tempAcMod, setTempAcMod] = useState(0);
   const [acModalOpen, setAcModalOpen] = useState(false);
@@ -133,12 +134,21 @@ export function CombatTab() {
     });
   }
 
+  function setExhaustionLevel(next: number) {
+    updateCombat({ exhaustionLevel: Math.max(0, Math.min(6, next)) });
+    if (next >= 6) {
+      toast("Nivel de Exhaustion 6 — tu personaje muere", { icon: "💀" });
+    }
+  }
+
   function toggleInspiration() {
     updateMeta({ inspiration: !meta.inspiration });
   }
 
   const isDying = combat.currentHp === 0;
   const displayAc = combat.armorClass + tempAcMod;
+  const speedReduction = 5 * combat.exhaustionLevel;
+  const effectiveSpeed = Math.max(0, combat.speed - speedReduction);
 
   return (
     <div className="p-4 space-y-3">
@@ -187,6 +197,11 @@ export function CombatTab() {
               value={meta.inspiration ? "★" : "☆"}
               onClick={toggleInspiration}
               highlight={meta.inspiration}
+            />
+            <StatBadge
+              label="Vel"
+              value={speedReduction > 0 ? `${effectiveSpeed} (-${speedReduction})` : combat.speed}
+              highlight={speedReduction > 0}
             />
           </div>
         )}
@@ -239,6 +254,34 @@ export function CombatTab() {
           </div>
         )}
       </div>
+
+      <div className="flex items-center justify-between stone-card rounded-lg p-2">
+        <button
+          onClick={() => setExhaustionExpanded((e) => !e)}
+          className="text-sm font-heading text-accent"
+        >
+          Exhaustion: {combat.exhaustionLevel}/6
+        </button>
+        <div className="flex gap-1.5">
+          <button
+            onClick={() => setExhaustionLevel(combat.exhaustionLevel - 1)}
+            className="w-7 h-7 rounded-full border border-border text-muted flex items-center justify-center hover:border-accent hover:text-accent"
+          >
+            −
+          </button>
+          <button
+            onClick={() => setExhaustionLevel(combat.exhaustionLevel + 1)}
+            className="w-7 h-7 rounded-full border border-border text-muted flex items-center justify-center hover:border-accent hover:text-accent"
+          >
+            +
+          </button>
+        </div>
+      </div>
+      {exhaustionExpanded && (
+        <div className="text-xs text-foreground/80 leading-relaxed bg-card/50 border border-border rounded-lg p-2">
+          {CONDITIONS.find((c) => c.name === "Exhaustion")?.description}
+        </div>
+      )}
 
       {/* Actions */}
       <CollapsibleSection title="Acciones" defaultOpen>

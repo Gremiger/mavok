@@ -81,6 +81,6 @@ export const CONDITION_GROUPS: { name: string; conditions: string[] }[] = [
   },
   {
     name: "Otros",
-    conditions: ["Poisoned", "Exhaustion"],
+    conditions: ["Poisoned"],
   },
 ];
