@@ -27,6 +27,8 @@ function flattenEntries(entries: unknown[]): string {
 }
 
 // --- Conditions ---
+// Condition UI groupings (Combat tab picker) live in src/data/condition-groups.ts,
+// hand-maintained and untouched by this script — do not add them here.
 function extractConditions() {
   const raw = JSON.parse(
     fs.readFileSync(path.join(TOOLS_DIR, "conditionsdiseases.json"), "utf-8")
