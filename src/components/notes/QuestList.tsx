@@ -7,6 +7,7 @@ import { Tag } from "@/components/ui/Tag";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Plus, ScrollText } from "lucide-react";
 import type { QuestEntry } from "@/lib/types";
+import { toast } from "sonner";
 
 const STATUS_CONFIG = {
   active: { label: "Activa", variant: "default" as const },
@@ -269,8 +270,19 @@ export function QuestList({
             {editingId && (
               <button
                 onClick={() => {
+                  const quest = character.notes.quests.find(
+                    (q) => q.id === editingId
+                  );
                   removeQuest(editingId);
                   setFormOpen(false);
+                  if (quest) {
+                    toast(`${quest.title} eliminada`, {
+                      action: {
+                        label: "Deshacer",
+                        onClick: () => addQuest(quest),
+                      },
+                    });
+                  }
                 }}
                 className="px-4 py-2 text-sm text-danger border border-danger/30 rounded-lg hover:bg-danger/10"
               >

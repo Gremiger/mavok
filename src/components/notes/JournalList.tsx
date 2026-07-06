@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Plus, BookOpen } from "lucide-react";
 import type { JournalEntry } from "@/lib/types";
+import { toast } from "sonner";
 
 export function JournalList({
   initialOpenId,
@@ -288,6 +289,12 @@ export function JournalList({
                   onClick={() => {
                     removeJournalEntry(viewingEntry.id);
                     setViewingId(null);
+                    toast(`${viewingEntry.title} eliminada`, {
+                      action: {
+                        label: "Deshacer",
+                        onClick: () => addJournalEntry(viewingEntry),
+                      },
+                    });
                   }}
                   className="text-xs text-danger hover:underline"
                 >

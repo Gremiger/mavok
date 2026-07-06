@@ -7,6 +7,7 @@ import type {
   NoteEntry,
   QuestEntry,
   JournalEntry,
+  QuickNote,
   Attack,
 } from "@/lib/types";
 import { loadCharacter, saveCharacter } from "@/lib/storage";
@@ -175,6 +176,15 @@ export function useCharacter(id: string = "mavok-1") {
     [update]
   );
 
+  const restoreQuickNote = useCallback(
+    (note: QuickNote) =>
+      update((c) => ({
+        ...c,
+        notes: { ...c.notes, quick: [note, ...c.notes.quick] },
+      })),
+    [update]
+  );
+
   const addNote = useCallback(
     (section: "world" | "npcs", note: NoteEntry) =>
       update((c) => ({
@@ -298,6 +308,7 @@ export function useCharacter(id: string = "mavok-1") {
     addQuickNote,
     updateQuickNote,
     removeQuickNote,
+    restoreQuickNote,
     addNote,
     updateNote,
     removeNote,

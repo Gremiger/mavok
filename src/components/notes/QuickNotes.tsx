@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { NotebookPen } from "lucide-react";
 import { useCharacterContext } from "@/lib/context";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { toast } from "sonner";
 
 export function QuickNotes() {
   const {
@@ -11,6 +12,7 @@ export function QuickNotes() {
     addQuickNote,
     updateQuickNote,
     removeQuickNote,
+    restoreQuickNote,
     addNote,
     addQuest,
   } = useCharacterContext();
@@ -183,6 +185,12 @@ export function QuickNotes() {
                     onClick={() => {
                       removeQuickNote(note.id);
                       setMenuOpen(null);
+                      toast("Nota eliminada", {
+                        action: {
+                          label: "Deshacer",
+                          onClick: () => restoreQuickNote(note),
+                        },
+                      });
                     }}
                     className="w-full text-left px-3 py-2 text-xs text-danger hover:bg-background"
                   >

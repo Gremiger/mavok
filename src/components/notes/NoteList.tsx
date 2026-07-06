@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Plus, Map, Users } from "lucide-react";
 import type { NoteEntry } from "@/lib/types";
+import { toast } from "sonner";
 
 export function NoteList({
   section,
@@ -275,8 +276,19 @@ export function NoteList({
             {editingId && (
               <button
                 onClick={() => {
+                  const note = character.notes[section].find(
+                    (n) => n.id === editingId
+                  );
                   removeNote(section, editingId);
                   setFormOpen(false);
+                  if (note) {
+                    toast(`${note.title} eliminada`, {
+                      action: {
+                        label: "Deshacer",
+                        onClick: () => addNote(section, note),
+                      },
+                    });
+                  }
                 }}
                 className="px-4 py-2 text-sm text-danger border border-danger/30 rounded-lg hover:bg-danger/10"
               >
