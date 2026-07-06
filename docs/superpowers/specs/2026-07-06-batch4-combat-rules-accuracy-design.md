@@ -32,7 +32,7 @@ Migration backfill: `weaponMasteryUsedThisRest: false`, `exhaustionLevel: 0`.
 
 - `applyLongRest()` in `SettingsTab.tsx` (currently resets HP/hit dice/death saves/conditions via `updateCombat`, and Rage/Stone's Endurance via a separate `update()` call) gains two additions: `exhaustionLevel: Math.max(0, character!.combat.exhaustionLevel - 1)` added to the existing `updateCombat({...})` call, and `weaponMasteryUsedThisRest: false` added to the existing top-level `update((c) => ({...}))` call.
 - `WeaponMasteryModal.tsx`'s `performSwap()` sets `weaponMasteryUsedThisRest: true` (via `update()`, since this is a top-level Character field, not nested under `attacks`/`resources`) right before its existing `toast.success(...)` call.
-- `SettingsTab.tsx`'s "Practicar con armas" button becomes disabled with copy "Ya practicaste este descanso largo" when `character.weaponMasteryUsedThisRest` is `true`; otherwise unchanged from today (including the existing "(1 por descanso largo)" hint, which now becomes accurate instead of aspirational).
+- **Not blocked, warned instead**: the "Practicar con armas" button in `SettingsTab.tsx` stays enabled regardless of `weaponMasteryUsedThisRest` — swapping is never prevented. When `character.weaponMasteryUsedThisRest` is already `true`, `SettingsTab.tsx` shows an inline warning line under the button ("⚠️ Ya practicaste este descanso largo — esto no sigue las reglas") instead of the current plain hint text, and `performSwap()`'s success toast reflects the same warning when it fires as an extra swap (`"⚠️ Mastery cambiada fuera de las reglas: ${deactivateName} → ${activateName}"` instead of the normal `"Mastery cambiada: ${deactivateName} → ${activateName}"`).
 
 ## Feature: Exhaustion tracking
 
