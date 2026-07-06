@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import type { Attack } from "@/lib/types";
-import { rollD20, rollD20WithAdvantage, rollDice, type DiceRoll } from "@/lib/dice";
+import type { DiceRoll } from "@/lib/dice";
+import { computeRageBonus, rollAttackHit, rollAttackDamage } from "@/lib/attackRoll";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { Sword, Target, Hammer } from "lucide-react";
 import { useThemeContext } from "@/lib/context";
@@ -50,8 +51,7 @@ export function AttackRow({
       document.removeEventListener("pointerdown", handleClickOutside);
   }, [menuOpen]);
 
-  const isStrBased = !attack.properties.includes("Finesse");
-  const rageBonus = rageActive && isStrBased ? rageDamage : 0;
+  const rageBonus = computeRageBonus(attack, rageActive, rageDamage);
   const DamageIcon = DAMAGE_TYPE_ICONS[attack.damageType];
 
   function displayDamage() {
@@ -67,26 +67,12 @@ export function AttackRow({
   }
 
   function handleRollHit() {
-    const result =
-      recklessActive && isStrBased
-        ? rollD20WithAdvantage(attack.attackBonus)
-        : rollD20(attack.attackBonus);
+    const result = rollAttackHit(attack, { recklessActive });
     setLastRoll({ roll: result, type: "hit" });
   }
 
   function handleRollDamage() {
-    const dmgExpr = attack.damage.replace(/\s/g, "");
-    let expr = dmgExpr;
-    if (rageBonus > 0) {
-      const match = expr.match(/^(.+?)([+-]\d+)$/);
-      if (match) {
-        const newMod = parseInt(match[2]) + rageBonus;
-        expr = `${match[1]}${newMod >= 0 ? "+" : ""}${newMod}`;
-      } else {
-        expr = `${expr}+${rageBonus}`;
-      }
-    }
-    const result = rollDice(expr);
+    const result = rollAttackDamage(attack, { rageActive, rageDamage });
     setLastRoll({ roll: result, type: "damage" });
   }
 

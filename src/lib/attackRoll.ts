@@ -1,0 +1,42 @@
+import type { Attack } from "./types";
+import { rollD20, rollD20WithAdvantage, rollDice, type DiceRoll } from "./dice";
+
+export function isStrBasedAttack(attack: Attack): boolean {
+  return !attack.properties.includes("Finesse");
+}
+
+export function computeRageBonus(
+  attack: Attack,
+  rageActive: boolean,
+  rageDamage: number
+): number {
+  return rageActive && isStrBasedAttack(attack) ? rageDamage : 0;
+}
+
+export function rollAttackHit(
+  attack: Attack,
+  opts: { recklessActive: boolean }
+): DiceRoll {
+  return opts.recklessActive && isStrBasedAttack(attack)
+    ? rollD20WithAdvantage(attack.attackBonus)
+    : rollD20(attack.attackBonus);
+}
+
+export function rollAttackDamage(
+  attack: Attack,
+  opts: { rageActive: boolean; rageDamage: number }
+): DiceRoll {
+  const rageBonus = computeRageBonus(attack, opts.rageActive, opts.rageDamage);
+  const dmgExpr = attack.damage.replace(/\s/g, "");
+  let expr = dmgExpr;
+  if (rageBonus > 0) {
+    const match = expr.match(/^(.+?)([+-]\d+)$/);
+    if (match) {
+      const newMod = parseInt(match[2]) + rageBonus;
+      expr = `${match[1]}${newMod >= 0 ? "+" : ""}${newMod}`;
+    } else {
+      expr = `${expr}+${rageBonus}`;
+    }
+  }
+  return rollDice(expr);
+}

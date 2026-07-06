@@ -6,7 +6,7 @@ import { useCharacterContext } from "@/lib/context";
 import { useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
-import { rollDice } from "@/lib/dice";
+import { spendHitDie as computeHitDieSpend } from "@/lib/hitDice";
 import { abilityModifier } from "@/lib/utils";
 import { toast } from "sonner";
 import {
@@ -49,25 +49,14 @@ export function SettingsTab() {
   const conMod = abilityModifier(character.attributes.con);
 
   function spendHitDie() {
-    if (character!.combat.hitDice.remaining <= 0) return;
-    const roll = rollDice(`1d12+${conMod}`);
-    const healing = Math.max(1, roll.total);
-    const newHp = Math.min(
-      character!.combat.currentHp + healing,
-      character!.combat.maxHp
-    );
-    updateCombat({
-      currentHp: newHp,
-      hitDice: {
-        ...character!.combat.hitDice,
-        remaining: character!.combat.hitDice.remaining - 1,
-      },
-    });
+    const result = computeHitDieSpend(character!.combat, conMod);
+    if (!result) return;
+    updateCombat(result.combat);
     setShortRestLog((prev) => [
-      `1d12+${conMod} = [${roll.rolls[0]}]+${conMod} = ${healing} HP (${newHp}/${character!.combat.maxHp})`,
+      `1d12+${conMod} = ${result.rollTotal} → ${result.healing} HP (${result.combat.currentHp}/${character!.combat.maxHp})`,
       ...prev,
     ]);
-    toast(`+${healing} HP curados`, { icon: "💚" });
+    toast(`+${result.healing} HP curados`, { icon: "💚" });
   }
 
   function applyLongRest() {
