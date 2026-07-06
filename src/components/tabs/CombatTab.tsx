@@ -168,6 +168,12 @@ export function CombatTab() {
             onChange={(s, f) =>
               updateCombat({ deathSaves: { successes: s, failures: f } })
             }
+            onRegainConsciousness={() =>
+              updateCombat({
+                currentHp: 1,
+                deathSaves: { successes: 0, failures: 0 },
+              })
+            }
           />
         ) : (
           <div className="flex items-center justify-around flex-wrap gap-2">
