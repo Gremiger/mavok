@@ -23,12 +23,18 @@ export function HpModal({
   const [amount, setAmount] = useState("");
 
   function apply() {
-    const val = parseInt(amount);
+    const signMatch = amount.match(/^([+-])(\d+)$/);
+    const effectiveMode = signMatch
+      ? signMatch[1] === "-"
+        ? "damage"
+        : "heal"
+      : mode;
+    const val = signMatch ? parseInt(signMatch[2]) : parseInt(amount);
     if (isNaN(val) || val <= 0) return;
 
-    if (mode === "temp") {
+    if (effectiveMode === "temp") {
       onApply(currentHp, Math.max(tempHp, val));
-    } else if (mode === "heal") {
+    } else if (effectiveMode === "heal") {
       onApply(Math.min(currentHp + val, maxHp), tempHp);
     } else {
       let remaining = val;
@@ -42,8 +48,8 @@ export function HpModal({
       newHp = Math.max(0, newHp - remaining);
       onApply(newHp, newTemp);
     }
-    if (mode === "damage") toast(`-${val} HP`, { icon: "💥" });
-    else if (mode === "heal") toast(`+${val} HP`, { icon: "💚" });
+    if (effectiveMode === "damage") toast(`-${val} HP`, { icon: "💥" });
+    else if (effectiveMode === "heal") toast(`+${val} HP`, { icon: "💚" });
     else toast(`Temp HP: ${Math.max(tempHp, val)}`, { icon: "🛡️" });
     setAmount("");
     onClose();
@@ -73,11 +79,11 @@ export function HpModal({
         </div>
 
         <input
-          type="number"
-          inputMode="numeric"
+          type="text"
+          inputMode="text"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          placeholder="Cantidad"
+          placeholder="Cantidad (o +5 / -8)"
           className="w-full bg-background border border-border rounded-lg p-3 text-center text-2xl font-heading text-foreground"
           autoFocus
         />
