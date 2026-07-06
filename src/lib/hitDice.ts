@@ -12,7 +12,7 @@ export function spendHitDie(
   conMod: number
 ): HitDiceSpendResult | null {
   if (combat.hitDice.remaining <= 0) return null;
-  const roll = rollDice(`1d12+${conMod}`);
+  const roll = rollDice(`1d12${conMod >= 0 ? "+" : ""}${conMod}`);
   const healing = Math.max(1, roll.total);
   const newHp = Math.min(combat.currentHp + healing, combat.maxHp);
   return {
