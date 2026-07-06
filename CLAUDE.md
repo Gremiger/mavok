@@ -22,10 +22,11 @@ A phone-first PWA for managing a D&D 5.5e (2024 rules) Barbarian character (Mavo
 npm run dev          # Start dev server
 npm run build        # Static export to out/ (must pass for deploy)
 npm run lint         # ESLint
+npm test             # Vitest, single run
 npx tsc --noEmit     # Type check without emitting
 ```
 
-There are no tests. Verify changes by running `npx tsc --noEmit && npm run build && npm run lint`. **Always include lint** — `tsc`/`build` do not catch React Hooks ordering violations (see Key Constraints below); only `npm run lint`'s `react-hooks/rules-of-hooks` rule does. A change that skips lint can look clean and still ship a real bug.
+Tests are colocated as `*.test.ts` next to the source file they cover (e.g. `src/lib/migrations.test.ts`), run via Vitest. Verify changes by running `npx tsc --noEmit && npm run build && npm run lint && npm test`. **Always include lint** — `tsc`/`build`/`test` do not catch React Hooks ordering violations (see Key Constraints below); only `npm run lint`'s `react-hooks/rules-of-hooks` rule does. A change that skips lint can look clean and still ship a real bug.
 
 `npm run lint` should report 0 errors. Two lines (in `useCharacter.ts` and `useTheme.ts`, both reading `localStorage` on mount) carry a scoped `eslint-disable-next-line react-hooks/set-state-in-effect` with an inline justification — that's deliberate (localStorage is unavailable during this static-export app's build-time prerender pass), not new debt. Don't remove those comments, and don't add a similar suppression elsewhere without the same SSR/localStorage justification.
 
@@ -64,4 +65,4 @@ Never include a "Co-authored-by" (or similar attribution) trailer in commit mess
 2. Increment `CURRENT_DATA_VERSION`
 3. Add a migration in `src/lib/migrations.ts` that backfills the field from old data
 4. Update `src/data/mavok-default.ts` with the field
-5. Verify: `npx tsc --noEmit && npm run build && npm run lint`
+5. Verify: `npx tsc --noEmit && npm run build && npm run lint && npm test`
