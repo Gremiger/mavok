@@ -18,6 +18,7 @@ import {
 import { LevelUpFlow } from "@/components/levelup/LevelUpFlow";
 import { WeaponMasteryModal } from "@/components/settings/WeaponMasteryModal";
 import { QuickActionsPicker } from "@/components/ui/QuickActionsPicker";
+import { LevelUpHistoryModal } from "@/components/settings/LevelUpHistoryModal";
 import { getBackups, restoreBackup } from "@/lib/migrations";
 import { getCharacterStorageKey } from "@/lib/storage";
 import { CURRENT_DATA_VERSION } from "@/lib/types";
@@ -40,6 +41,7 @@ export function SettingsTab() {
   const [levelUpDryRun, setLevelUpDryRun] = useState(false);
   const [weaponMasteryOpen, setWeaponMasteryOpen] = useState(false);
   const [quickActionsPickerOpen, setQuickActionsPickerOpen] = useState(false);
+  const [levelUpHistoryOpen, setLevelUpHistoryOpen] = useState(false);
   const [expandedChangelogEntry, setExpandedChangelogEntry] = useState<
     string | null
   >(null);
@@ -347,35 +349,12 @@ export function SettingsTab() {
 
       {/* Level-up History */}
       <CollapsibleSection title="Historial de niveles">
-        {character.levelUpHistory.length === 0 ? (
-          <p className="text-xs text-muted text-center py-2">
-            Sin historial todavía. Se registra cada vez que subes de nivel.
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {character.levelUpHistory
-              .slice()
-              .reverse()
-              .map((entry) => (
-                <div
-                  key={`${entry.level}-${entry.date}`}
-                  className="flex items-center justify-between p-2 bg-card rounded-lg border border-border"
-                >
-                  <div>
-                    <span className="text-sm font-heading text-accent">
-                      Nivel {entry.level}
-                    </span>
-                    <span className="text-xs text-muted ml-2">
-                      {new Date(entry.date).toLocaleDateString("es")}
-                    </span>
-                  </div>
-                  <span className="text-xs text-muted">
-                    {[entry.asiChoice, entry.featChosen].filter(Boolean).join(" · ") || "—"}
-                  </span>
-                </div>
-              ))}
-          </div>
-        )}
+        <button
+          onClick={() => setLevelUpHistoryOpen(true)}
+          className="w-full py-2 bg-card border border-border rounded-lg text-sm text-foreground hover:border-accent"
+        >
+          Ver historial completo
+        </button>
       </CollapsibleSection>
 
       {/* Import / Export */}
@@ -655,6 +634,12 @@ export function SettingsTab() {
         selected={character.quickActions}
         attacks={character.attacks}
         onSave={updateQuickActions}
+      />
+
+      {/* Level-up History */}
+      <LevelUpHistoryModal
+        open={levelUpHistoryOpen}
+        onClose={() => setLevelUpHistoryOpen(false)}
       />
 
       {/* Import Preview Modal */}

@@ -296,6 +296,7 @@ export function LevelUpFlow({
           date: new Date().toISOString(),
           asiChoice,
           featChosen: changes.feat?.name,
+          hpIncrease: changes.hpIncrease,
         },
       ];
 

@@ -1,6 +1,6 @@
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
-export const CURRENT_DATA_VERSION = 6;
+export const CURRENT_DATA_VERSION = 7;
 
 export type PinnedAction =
   | { type: "rage" }
@@ -35,6 +35,7 @@ export interface LevelUpHistoryEntry {
   date: string;
   asiChoice?: string;
   featChosen?: string;
+  hpIncrease?: number;
 }
 
 export interface CharacterMeta {

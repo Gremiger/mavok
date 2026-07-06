@@ -126,6 +126,12 @@ const MIGRATIONS: Record<number, MigrationFn> = {
 
     return d;
   },
+
+  7: (data) => {
+    const d = data as Record<string, unknown>;
+    d._version = 7;
+    return d;
+  },
 };
 
 const BACKUP_PREFIX = "mavok_backup_pre_migration_";
