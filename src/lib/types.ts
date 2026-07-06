@@ -1,6 +1,15 @@
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
-export const CURRENT_DATA_VERSION = 5;
+export const CURRENT_DATA_VERSION = 6;
+
+export type PinnedAction =
+  | { type: "rage" }
+  | { type: "hitDice" }
+  | { type: "hpAdjust" }
+  | { type: "resource"; resource: "healerKit" | "stoneEndurance" }
+  | { type: "attackRoll"; attackId: string }
+  | { type: "attackDamage"; attackId: string }
+  | { type: "attackDefinition"; attackId: string };
 
 export interface Character {
   _version: number;
@@ -18,6 +27,7 @@ export interface Character {
   currency: Currency;
   notes: Notes;
   levelUpHistory: LevelUpHistoryEntry[];
+  quickActions: PinnedAction[];
 }
 
 export interface LevelUpHistoryEntry {
@@ -61,6 +71,7 @@ export interface CombatState {
   hitDice: { total: number; remaining: number; die: string };
   deathSaves: { successes: number; failures: number };
   conditions: string[];
+  recklessActive: boolean;
 }
 
 export interface Resources {

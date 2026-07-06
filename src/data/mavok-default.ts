@@ -48,6 +48,7 @@ export const MAVOK_DEFAULT: Character = {
     hitDice: { total: 1, remaining: 1, die: "d12" },
     deathSaves: { successes: 0, failures: 0 },
     conditions: [],
+    recklessActive: false,
   },
   resources: {
     rpiRages: { total: 2, remaining: 2, active: false, slots: [true, true] },
@@ -242,4 +243,5 @@ export const MAVOK_DEFAULT: Character = {
   currency: { cp: 0, sp: 0, ep: 0, gp: 30, pp: 0 },
   notes: { world: [], npcs: [], quests: [], journal: [], quick: [] },
   levelUpHistory: [],
+  quickActions: [{ type: "rage" }, { type: "hpAdjust" }],
 };

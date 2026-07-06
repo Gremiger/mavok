@@ -110,6 +110,22 @@ const MIGRATIONS: Record<number, MigrationFn> = {
 
     return d;
   },
+
+  6: (data) => {
+    const d = data as Record<string, unknown>;
+    d._version = 6;
+
+    const combat = d.combat as Record<string, unknown> | undefined;
+    if (combat && combat.recklessActive === undefined) {
+      combat.recklessActive = false;
+    }
+
+    if (d.quickActions === undefined) {
+      d.quickActions = [{ type: "rage" }, { type: "hpAdjust" }];
+    }
+
+    return d;
+  },
 };
 
 const BACKUP_PREFIX = "mavok_backup_pre_migration_";
