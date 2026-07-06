@@ -9,6 +9,7 @@ import { User } from "lucide-react";
 import type { AbilityScore } from "@/lib/types";
 import { rollD20, rollD20WithAdvantage, type DiceRoll } from "@/lib/dice";
 import { describeWeaponMastery } from "@/lib/weaponMatch";
+import { exhaustionPenalty } from "@/lib/exhaustion";
 import {
   abilityModifier,
   formatModifier,
@@ -52,6 +53,7 @@ export function SheetTab() {
     features,
     resources,
     attacks,
+    combat,
   } = character;
 
   const hasDangerSense = features.some((f) => f.name === "Danger Sense");
@@ -64,13 +66,13 @@ export function SheetTab() {
   const passiveInvestigation = 10 + skillTotal(character, 'investigation');
 
   function rollAbility(ab: AbilityScore) {
-    const mod = abilityModifier(attributes[ab]);
+    const mod = abilityModifier(attributes[ab]) + exhaustionPenalty(combat.exhaustionLevel);
     const result = rollD20(mod);
     setActiveRoll({ key: `ability-${ab}`, roll: result });
   }
 
   function rollSave(ab: AbilityScore) {
-    const total = saveTotal(character!, ab);
+    const total = saveTotal(character!, ab) + exhaustionPenalty(combat.exhaustionLevel);
     const result =
       ab === "dex" && hasDangerSense
         ? rollD20WithAdvantage(total)
@@ -79,7 +81,7 @@ export function SheetTab() {
   }
 
   function rollSkill(key: string) {
-    const total = skillTotal(character!, key);
+    const total = skillTotal(character!, key) + exhaustionPenalty(combat.exhaustionLevel);
     const result = rollD20(total);
     setActiveRoll({ key: `skill-${key}`, roll: result });
   }
@@ -87,7 +89,10 @@ export function SheetTab() {
   function rollSkillStr(key: string) {
     const skill = skills[key];
     const strMod = abilityModifier(attributes.str);
-    const total = strMod + (skill?.proficient ? meta.proficiencyBonus : 0);
+    const total =
+      strMod +
+      (skill?.proficient ? meta.proficiencyBonus : 0) +
+      exhaustionPenalty(combat.exhaustionLevel);
     const result = rollD20(total);
     setActiveRoll({ key: `skill-str-${key}`, roll: result });
   }
@@ -117,7 +122,7 @@ export function SheetTab() {
             )}
           </div>
           <span className="font-heading text-accent">
-            {formatModifier(skillTotal(character!, key))}
+            {formatModifier(skillTotal(character!, key) + exhaustionPenalty(combat.exhaustionLevel))}
           </span>
         </button>
         {primalKnowledgeActive && PRIMAL_KNOWLEDGE_SKILLS.includes(key) && (
@@ -184,7 +189,7 @@ export function SheetTab() {
                 {attributes[ab]}
               </div>
               <div className="text-xs text-foreground/70 font-heading">
-                {formatModifier(abilityModifier(attributes[ab]))}
+                {formatModifier(abilityModifier(attributes[ab]) + exhaustionPenalty(combat.exhaustionLevel))}
               </div>
             </button>
           ))}
@@ -229,7 +234,7 @@ export function SheetTab() {
                 )}
               </div>
               <span className="font-heading text-accent">
-                {formatModifier(saveTotal(character, ab))}
+                {formatModifier(saveTotal(character, ab) + exhaustionPenalty(combat.exhaustionLevel))}
               </span>
             </button>
           ))}
