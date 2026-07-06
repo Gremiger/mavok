@@ -202,29 +202,41 @@ export function CombatTab() {
       <div className="crack-divider" />
 
       {/* Conditions */}
-      <div className="flex flex-wrap items-center gap-1.5">
-        {combat.conditions.map((c) => (
-          <Tag
-            key={c}
-            label={c}
-            onClick={() => setViewingCondition(c)}
-            onRemove={() => {
-              removeCondition(c);
-              toast(`${c} eliminada`, {
-                action: {
-                  label: "Deshacer",
-                  onClick: () => addCondition(c),
-                },
-              });
-            }}
-          />
-        ))}
-        <button
-          onClick={() => setConditionModalOpen(true)}
-          className="w-6 h-6 rounded-full border border-border text-muted text-sm flex items-center justify-center hover:border-accent hover:text-accent"
-        >
-          +
-        </button>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
+          {combat.conditions.map((c) => (
+            <Tag
+              key={c}
+              label={c}
+              onClick={() =>
+                setViewingCondition(viewingCondition === c ? null : c)
+              }
+              onRemove={() => {
+                removeCondition(c);
+                toast(`${c} eliminada`, {
+                  action: {
+                    label: "Deshacer",
+                    onClick: () => addCondition(c),
+                  },
+                });
+              }}
+            />
+          ))}
+          <button
+            onClick={() => setConditionModalOpen(true)}
+            className="w-6 h-6 rounded-full border border-border text-muted text-sm flex items-center justify-center hover:border-accent hover:text-accent"
+          >
+            +
+          </button>
+        </div>
+        {viewingCondition && combat.conditions.includes(viewingCondition) && (
+          <div className="text-xs text-foreground/80 leading-relaxed bg-card/50 border border-border rounded-lg p-2">
+            <span className="font-heading text-accent">
+              {viewingCondition}:
+            </span>{" "}
+            {CONDITIONS.find((c) => c.name === viewingCondition)?.description}
+          </div>
+        )}
       </div>
 
       {/* Actions */}
@@ -550,17 +562,6 @@ export function CombatTab() {
           updateCombat({ currentHp: hp, tempHp: temp })
         }
       />
-
-      {/* Condition Detail Modal */}
-      <Modal
-        open={viewingCondition !== null}
-        onClose={() => setViewingCondition(null)}
-        title={viewingCondition ?? ""}
-      >
-        <p className="text-sm text-foreground/80 leading-relaxed">
-          {CONDITIONS.find((c) => c.name === viewingCondition)?.description}
-        </p>
-      </Modal>
 
       {/* Condition Selection Modal */}
       <Modal
