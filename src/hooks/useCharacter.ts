@@ -8,6 +8,7 @@ import type {
   QuestEntry,
   JournalEntry,
   QuickNote,
+  PinnedAction,
   Attack,
 } from "@/lib/types";
 import { loadCharacter, saveCharacter } from "@/lib/storage";
@@ -62,6 +63,12 @@ export function useCharacter(id: string = "mavok-1") {
   const updateAttributes = useCallback(
     (patch: Partial<Character["attributes"]>) =>
       update((c) => ({ ...c, attributes: { ...c.attributes, ...patch } })),
+    [update]
+  );
+
+  const updateQuickActions = useCallback(
+    (actions: PinnedAction[]) =>
+      update((c) => ({ ...c, quickActions: actions })),
     [update]
   );
 
@@ -298,6 +305,7 @@ export function useCharacter(id: string = "mavok-1") {
     updateResources,
     updateCurrency,
     updateAttributes,
+    updateQuickActions,
     addInventoryItem,
     removeInventoryItem,
     updateInventoryItem,
