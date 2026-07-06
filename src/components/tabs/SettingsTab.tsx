@@ -80,9 +80,11 @@ export function SettingsTab() {
       },
       deathSaves: { successes: 0, failures: 0 },
       conditions: [],
+      exhaustionLevel: Math.max(0, character!.combat.exhaustionLevel - 1),
     });
     update((c) => ({
       ...c,
+      weaponMasteryUsedThisRest: false,
       resources: {
         ...c.resources,
         rpiRages: {
@@ -259,7 +261,9 @@ export function SettingsTab() {
               Practicar con armas
             </span>
             <span className="text-xs text-muted block mt-0.5">
-              Cambiar una maestría de arma (1 por descanso largo)
+              {character.weaponMasteryUsedThisRest
+                ? "⚠️ Ya practicaste este descanso largo — esto no sigue las reglas"
+                : "Cambiar una maestría de arma (1 por descanso largo)"}
             </span>
           </button>
         </div>

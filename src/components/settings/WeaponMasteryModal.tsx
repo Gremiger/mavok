@@ -17,7 +17,7 @@ export function WeaponMasteryModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const { character, updateAttack } = useCharacterContext();
+  const { character, update, updateAttack } = useCharacterContext();
   const [deactivate, setDeactivate] = useState<string | null>(null);
 
   if (!character) return null;
@@ -52,6 +52,8 @@ export function WeaponMasteryModal({
   }
 
   function performSwap(deactivateName: string, activateName: string) {
+    const alreadyUsedThisRest = character!.weaponMasteryUsedThisRest;
+
     character!.attacks
       .filter((a) => baseWeaponName(a.name) === deactivateName)
       .forEach((a) =>
@@ -83,7 +85,13 @@ export function WeaponMasteryModal({
         })
       );
 
-    toast.success(`Mastery cambiada: ${deactivateName} → ${activateName}`);
+    update((c) => ({ ...c, weaponMasteryUsedThisRest: true }));
+
+    if (alreadyUsedThisRest) {
+      toast.success(`⚠️ Mastery cambiada fuera de las reglas: ${deactivateName} → ${activateName}`);
+    } else {
+      toast.success(`Mastery cambiada: ${deactivateName} → ${activateName}`);
+    }
     reset();
     onClose();
   }
