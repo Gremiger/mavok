@@ -11,6 +11,7 @@ import { NotesTab } from "@/components/tabs/NotesTab";
 import { EncyclopediaTab } from "@/components/tabs/EncyclopediaTab";
 import { SettingsTab } from "@/components/tabs/SettingsTab";
 import { OfflineBadge } from "@/components/OfflineBadge";
+import { QuickActionsFab } from "@/components/ui/QuickActionsFab";
 import { Toaster } from "sonner";
 import { Shield, Swords, Backpack, BookOpen, Library, Settings } from "lucide-react";
 import { motion } from "framer-motion";
@@ -137,6 +138,9 @@ export default function Home() {
               ))}
             </div>
           </nav>
+          {(activeTab === "ficha" || activeTab === "combate") && (
+            <QuickActionsFab activeTab={activeTab} />
+          )}
         </div>
       </ThemeContext.Provider>
     </CharacterContext.Provider>
