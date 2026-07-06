@@ -15,7 +15,7 @@ import { DiceRoller } from "@/components/combat/DiceRoller";
 import { RageTracker } from "@/components/combat/RageTracker";
 import { StandardActionsModal } from "@/components/combat/StandardActionsModal";
 import { AttackFormModal } from "@/components/combat/AttackFormModal";
-import { CONDITIONS } from "@/data/conditions";
+import { CONDITIONS, CONDITION_GROUPS } from "@/data/conditions";
 import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
 import type { Attack } from "@/lib/types";
 import { formatModifier } from "@/lib/utils";
@@ -42,6 +42,7 @@ export function CombatTab() {
   const [viewingCondition, setViewingCondition] = useState<string | null>(
     null
   );
+  const [conditionFilter, setConditionFilter] = useState("");
   const [tempHpInput, setTempHpInput] = useState(false);
   const [tempAcMod, setTempAcMod] = useState(0);
   const [acModalOpen, setAcModalOpen] = useState(false);
@@ -566,24 +567,54 @@ export function CombatTab() {
       {/* Condition Selection Modal */}
       <Modal
         open={conditionModalOpen}
-        onClose={() => setConditionModalOpen(false)}
+        onClose={() => {
+          setConditionModalOpen(false);
+          setConditionFilter("");
+        }}
         title="Agregar condición"
       >
-        <div className="grid grid-cols-2 gap-2">
-          {CONDITIONS.map((c) => (
-            <button
-              key={c.name}
-              onClick={() => addCondition(c.name)}
-              disabled={combat.conditions.includes(c.name)}
-              className={`p-2 rounded-lg border text-left text-sm ${
-                combat.conditions.includes(c.name)
-                  ? "border-border bg-card/50 text-muted opacity-50"
-                  : "border-border bg-card text-foreground hover:border-accent"
-              }`}
-            >
-              {c.name}
-            </button>
-          ))}
+        <input
+          type="text"
+          value={conditionFilter}
+          onChange={(e) => setConditionFilter(e.target.value)}
+          placeholder="Buscar condición..."
+          className="w-full bg-background border border-border rounded-lg p-2 mb-3 text-sm text-foreground"
+          autoFocus
+        />
+        <div className="space-y-4">
+          {CONDITION_GROUPS.map((group) => {
+            const matches = group.conditions.filter((name) =>
+              name.toLowerCase().includes(conditionFilter.trim().toLowerCase())
+            );
+            if (matches.length === 0) return null;
+            return (
+              <div key={group.name}>
+                <p className="text-xs font-heading text-muted uppercase tracking-wide mb-1.5">
+                  {group.name}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {matches.map((name) => {
+                    const c = CONDITIONS.find((cond) => cond.name === name);
+                    if (!c) return null;
+                    return (
+                      <button
+                        key={c.name}
+                        onClick={() => addCondition(c.name)}
+                        disabled={combat.conditions.includes(c.name)}
+                        className={`p-2 rounded-lg border text-left text-sm ${
+                          combat.conditions.includes(c.name)
+                            ? "border-border bg-card/50 text-muted opacity-50"
+                            : "border-border bg-card text-foreground hover:border-accent"
+                        }`}
+                      >
+                        {c.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </Modal>
 
