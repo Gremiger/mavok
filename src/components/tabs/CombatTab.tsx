@@ -439,6 +439,11 @@ export function CombatTab() {
                 ? "(activo — tap para desactivar)"
                 : `(${resources.rpiRages.remaining} usos restantes)`}
             </span>
+            {rageActive && (
+              <p className="text-muted/60 text-[0.6rem] mt-0.5">
+                Termina si no atacas a un enemigo ni recibes daño desde tu último turno (o si quedas inconsciente).
+              </p>
+            )}
           </motion.button>
           {hasRecklessAttack && (
             <button
