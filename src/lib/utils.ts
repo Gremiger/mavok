@@ -26,7 +26,10 @@ export function saveTotal(
   const prof = character.savingThrows[ability]?.proficient
     ? character.meta.proficiencyBonus
     : 0;
-  return mod + prof;
+  const itemBonus = character.inventory
+    .filter((i) => i.equipped && i.magicBonusTargets.includes("save"))
+    .reduce((sum, i) => sum + (i.magicBonus ?? 0), 0);
+  return mod + prof + itemBonus;
 }
 
 const SKILL_LABELS: Record<string, string> = {

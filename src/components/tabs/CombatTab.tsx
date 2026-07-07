@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useLongPress } from "@/hooks/useLongPress";
 import { motion } from "framer-motion";
-import { useCharacterContext } from "@/lib/context";
+import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { StatBadge } from "@/components/ui/StatBadge";
 import { Tag } from "@/components/ui/Tag";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
@@ -20,6 +20,7 @@ import { CONDITION_GROUPS } from "@/data/condition-groups";
 import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
 import type { Attack } from "@/lib/types";
 import { formatModifier } from "@/lib/utils";
+import { findMagicWeaponBonus, sumMagicBonus } from "@/lib/recalculate";
 import { toast } from "sonner";
 
 function baseDice(damage: string): string {
@@ -38,6 +39,7 @@ export function CombatTab() {
     removeAttack,
     moveAttack,
   } = useCharacterContext();
+  const { magicItemIndicator } = useThemeContext();
   const [hpModalOpen, setHpModalOpen] = useState(false);
   const [conditionModalOpen, setConditionModalOpen] = useState(false);
   const [viewingCondition, setViewingCondition] = useState<string | null>(
@@ -148,6 +150,7 @@ export function CombatTab() {
 
   const isDying = combat.currentHp === 0;
   const displayAc = combat.armorClass + tempAcMod;
+  const magicAcBonus = sumMagicBonus(character, "ac");
   const speedReduction = 5 * combat.exhaustionLevel;
   const effectiveSpeed = Math.max(0, combat.speed - speedReduction);
 
@@ -191,7 +194,7 @@ export function CombatTab() {
             />
             <StatBadge
               label="AC"
-              value={tempAcMod !== 0 ? `${displayAc} (${formatModifier(tempAcMod)})` : displayAc}
+              value={`${tempAcMod !== 0 ? `${displayAc} (${formatModifier(tempAcMod)})` : displayAc}${magicItemIndicator === "explicit-tag" && magicAcBonus !== 0 ? ` ✦${formatModifier(magicAcBonus)}` : ""}`}
               onClick={() => setAcModalOpen(true)}
               highlight={tempAcMod !== 0}
             />
@@ -300,6 +303,7 @@ export function CombatTab() {
             rageDamage={rageDamage}
             recklessActive={combat.recklessActive}
             exhaustionLevel={combat.exhaustionLevel}
+            magicBonus={findMagicWeaponBonus(character, a)}
             onEdit={() => setAttackModalState(a)}
             onDelete={() => {
               const index = attacks.findIndex((x) => x.id === a.id);

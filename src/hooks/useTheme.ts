@@ -26,6 +26,9 @@ export function useTheme() {
   const [encyclopediaLanguage, setEncyclopediaLanguageState] = useState<
     AppSettings["encyclopediaLanguage"]
   >("en");
+  const [magicItemIndicator, setMagicItemIndicatorState] = useState<
+    AppSettings["magicItemIndicator"]
+  >("number-only");
 
   useEffect(() => {
     const settings = loadSettings();
@@ -34,6 +37,7 @@ export function useTheme() {
     setDensity(settings.density);
     setEncyclopediaFavorites(settings.encyclopediaFavorites);
     setEncyclopediaLanguageState(settings.encyclopediaLanguage);
+    setMagicItemIndicatorState(settings.magicItemIndicator);
     document.documentElement.setAttribute("data-theme", settings.theme);
   }, []);
 
@@ -73,6 +77,15 @@ export function useTheme() {
     []
   );
 
+  const setMagicItemIndicator = useCallback(
+    (mode: AppSettings["magicItemIndicator"]) => {
+      setMagicItemIndicatorState(mode);
+      const settings = loadSettings();
+      saveSettings({ ...settings, magicItemIndicator: mode });
+    },
+    []
+  );
+
   return {
     theme,
     setTheme,
@@ -82,5 +95,7 @@ export function useTheme() {
     toggleFavorite,
     encyclopediaLanguage,
     setEncyclopediaLanguage,
+    magicItemIndicator,
+    setMagicItemIndicator,
   };
 }

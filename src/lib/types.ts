@@ -1,6 +1,6 @@
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
-export const CURRENT_DATA_VERSION = 8;
+export const CURRENT_DATA_VERSION = 9;
 
 export type PinnedAction =
   | { type: "rage" }
@@ -119,6 +119,8 @@ export interface InventoryItem {
   category: "weapon" | "armor" | "gear" | "consumable" | "personal";
   equipped: boolean;
   description: string;
+  magicBonus: number | null;
+  magicBonusTargets: ("weapon" | "ac" | "save")[];
 }
 
 export interface Currency {
@@ -172,4 +174,5 @@ export interface AppSettings {
   density: "compact" | "spacious";
   encyclopediaFavorites: string[];
   encyclopediaLanguage: "en" | "es";
+  magicItemIndicator: "number-only" | "explicit-tag";
 }

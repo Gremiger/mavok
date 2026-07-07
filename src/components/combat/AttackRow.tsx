@@ -22,6 +22,7 @@ export function AttackRow({
   rageDamage,
   recklessActive,
   exhaustionLevel,
+  magicBonus = 0,
   onEdit,
   onDelete,
   onMoveUp,
@@ -32,12 +33,13 @@ export function AttackRow({
   rageDamage: number;
   recklessActive: boolean;
   exhaustionLevel: number;
+  magicBonus?: number;
   onEdit?: () => void;
   onDelete?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
 }) {
-  const { density } = useThemeContext();
+  const { density, magicItemIndicator } = useThemeContext();
   const [expanded, setExpanded] = useState(false);
   const [lastRoll, setLastRoll] = useState<{ roll: DiceRoll; type: "hit" | "damage" } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -105,6 +107,11 @@ export function AttackRow({
               <DamageIcon size={11} className="inline-block mb-0.5 mr-1" />
             )}
             {formatModifier(effectiveAttackBonus)} · {displayDamage()} {attack.damageType.slice(0, 4).toLowerCase()}. · {attack.range}
+            {magicItemIndicator === "explicit-tag" && magicBonus !== 0 && (
+              <span className="text-accent ml-1">
+                ✦{formatModifier(magicBonus)}
+              </span>
+            )}
           </div>
         </div>
         <div className="flex gap-1.5 ml-2 items-center">

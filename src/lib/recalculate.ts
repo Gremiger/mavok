@@ -1,6 +1,28 @@
-import type { Character } from "./types";
+import type { Attack, Character } from "./types";
 import { abilityModifier } from "./utils";
 import { ARMOR } from "../data/armor";
+
+export function sumMagicBonus(
+  character: Character,
+  target: "weapon" | "ac" | "save"
+): number {
+  return character.inventory
+    .filter((i) => i.equipped && i.magicBonusTargets.includes(target))
+    .reduce((sum, i) => sum + (i.magicBonus ?? 0), 0);
+}
+
+export function findMagicWeaponBonus(
+  character: Character,
+  attack: Attack
+): number {
+  const matchingWeapon = character.inventory.find(
+    (i) =>
+      i.equipped &&
+      i.magicBonusTargets.includes("weapon") &&
+      (i.name === attack.name || attack.name.startsWith(`${i.name} (`))
+  );
+  return matchingWeapon?.magicBonus ?? 0;
+}
 
 export function computeArmorClass(character: Character): number {
   const dexMod = abilityModifier(character.attributes.dex);
@@ -23,7 +45,7 @@ export function computeArmorClass(character: Character): number {
     ? wornArmor.ac + (dexCap !== null ? Math.min(dexMod, dexCap) : dexMod)
     : 10 + dexMod + conMod; // Unarmored Defense fallback
 
-  return base + (shield?.ac ?? 0);
+  return base + (shield?.ac ?? 0) + sumMagicBonus(character, "ac");
 }
 
 export function recalculateDerived(character: Character): Character {
@@ -50,9 +72,10 @@ export function recalculateDerived(character: Character): Character {
         ? strMod
         : dexMod;
 
-    const newBonus = atkMod + pb;
+    const magicBonus = findMagicWeaponBonus(c, a);
+    const newBonus = atkMod + pb + magicBonus;
     const baseDice = a.damage.replace(/[+-]\d+$/, "");
-    const newDamage = `${baseDice}+${atkMod}`;
+    const newDamage = `${baseDice}+${atkMod + magicBonus}`;
 
     return {
       ...a,

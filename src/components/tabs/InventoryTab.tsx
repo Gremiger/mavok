@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { AttackFormModal } from "@/components/combat/AttackFormModal";
 import { exportInventoryCSV } from "@/lib/export";
+import { formatModifier } from "@/lib/utils";
 import { toast } from "sonner";
 import { Sword, Shield, Wrench, FlaskConical, Heart, Plus, SearchX } from "lucide-react";
 import type { InventoryItem } from "@/lib/types";
@@ -13,7 +14,7 @@ import type { ReactNode } from "react";
 import { WEAPONS } from "@/data/weapons";
 import { ARMOR } from "@/data/armor";
 import { GEAR } from "@/data/gear";
-import { computeArmorClass } from "@/lib/recalculate";
+import { recalculateDerived } from "@/lib/recalculate";
 
 const CURRENCY_LABELS = [
   { key: "cp" as const, label: "CP" },
@@ -63,6 +64,8 @@ export function InventoryTab() {
     value: "",
     category: "gear" as InventoryItem["category"],
     description: "",
+    magicBonus: "",
+    magicBonusTargets: [] as ("weapon" | "ac" | "save")[],
   });
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -108,13 +111,7 @@ export function InventoryTab() {
       const nextInventory = c.inventory.map((i) =>
         i.id === item.id ? { ...i, equipped: nowEquipped } : i
       );
-      const next = { ...c, inventory: nextInventory };
-      return item.category === "armor"
-        ? {
-            ...next,
-            combat: { ...next.combat, armorClass: computeArmorClass(next) },
-          }
-        : next;
+      return recalculateDerived({ ...c, inventory: nextInventory });
     });
 
     if (item.category === "weapon" && nowEquipped) {
@@ -153,6 +150,7 @@ export function InventoryTab() {
 
   function handleAddItem() {
     if (!newItem.name.trim()) return;
+    const magicBonus = newItem.magicBonus ? parseInt(newItem.magicBonus) : 0;
     const item: InventoryItem = {
       id: `inv-${Date.now()}`,
       name: newItem.name.trim(),
@@ -162,6 +160,8 @@ export function InventoryTab() {
       category: newItem.category,
       equipped: false,
       description: newItem.description,
+      magicBonus: magicBonus ? magicBonus : null,
+      magicBonusTargets: magicBonus ? newItem.magicBonusTargets : [],
     };
     addInventoryItem(item);
     toast(`${item.name} agregado`, { icon: "📦" });
@@ -172,8 +172,19 @@ export function InventoryTab() {
       value: "",
       category: "gear",
       description: "",
+      magicBonus: "",
+      magicBonusTargets: [],
     });
     setAddModalOpen(false);
+  }
+
+  function toggleMagicBonusTarget(target: "weapon" | "ac" | "save") {
+    setNewItem((prev) => ({
+      ...prev,
+      magicBonusTargets: prev.magicBonusTargets.includes(target)
+        ? prev.magicBonusTargets.filter((t) => t !== target)
+        : [...prev.magicBonusTargets, target],
+    }));
   }
 
   function prefillFromWeapon(weaponName: string) {
@@ -335,6 +346,11 @@ export function InventoryTab() {
                         ×{item.quantity}
                       </span>
                     )}
+                    {!!item.magicBonus && (
+                      <span className="text-accent text-xs ml-1 font-heading">
+                        {formatModifier(item.magicBonus)}
+                      </span>
+                    )}
                   </div>
                   {(item.weight !== null || item.value !== null) && (
                     <span className="text-muted text-xs">
@@ -352,6 +368,21 @@ export function InventoryTab() {
                     {item.description && (
                       <p className="text-xs text-foreground/80">
                         {item.description}
+                      </p>
+                    )}
+                    {!!item.magicBonus && (
+                      <p className="text-xs text-accent">
+                        Bono mágico: {formatModifier(item.magicBonus)} (
+                        {item.magicBonusTargets
+                          .map((t) =>
+                            t === "weapon"
+                              ? "Ataque y daño"
+                              : t === "ac"
+                                ? "CA"
+                                : "Salvaciones"
+                          )
+                          .join(", ") || "sin aplicar"}
+                        )
                       </p>
                     )}
                     <div className="flex gap-2">
@@ -563,6 +594,44 @@ export function InventoryTab() {
             rows={2}
             className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"
           />
+
+          <input
+            type="number"
+            inputMode="numeric"
+            value={newItem.magicBonus}
+            onChange={(e) =>
+              setNewItem({ ...newItem, magicBonus: e.target.value })
+            }
+            placeholder="Bono mágico (opcional, ej. 1 o -1)"
+            className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+          />
+
+          {newItem.magicBonus && parseInt(newItem.magicBonus) !== 0 && (
+            <div>
+              <label className="text-xs text-muted">Aplica a</label>
+              <div className="flex gap-3 mt-1">
+                {(
+                  [
+                    { value: "weapon", label: "Ataque y daño" },
+                    { value: "ac", label: "CA" },
+                    { value: "save", label: "Salvaciones" },
+                  ] as const
+                ).map((t) => (
+                  <label
+                    key={t.value}
+                    className="flex items-center gap-1.5 text-xs text-foreground"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={newItem.magicBonusTargets.includes(t.value)}
+                      onChange={() => toggleMagicBonusTarget(t.value)}
+                    />
+                    {t.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           <button
             onClick={handleAddItem}

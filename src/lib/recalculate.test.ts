@@ -14,6 +14,8 @@ function makeInventoryItem(
     category: "armor",
     equipped: true,
     description: "",
+    magicBonus: null,
+    magicBonusTargets: [],
     ...overrides,
   };
 }
@@ -235,5 +237,150 @@ describe("computeArmorClass", () => {
     });
     // Breastplate 14 + dex mod capped at +2 (dex 14 -> +2) + Shield AC 2
     expect(computeArmorClass(character)).toBe(18);
+  });
+
+  it("adds a magic AC bonus from an equipped armor-category item", () => {
+    const character = makeCharacter({
+      inventory: [
+        makeInventoryItem({
+          name: "Leather Armor",
+          magicBonus: 1,
+          magicBonusTargets: ["ac"],
+        }),
+      ],
+    });
+    // Leather Armor AC 11 + dex mod +2 (uncapped) + magic bonus +1
+    expect(computeArmorClass(character)).toBe(14);
+  });
+
+  it("adds a magic AC bonus from a non-armor-category item", () => {
+    const character = makeCharacter({
+      inventory: [
+        makeInventoryItem({
+          category: "personal",
+          name: "Ring of Protection",
+          magicBonus: 1,
+          magicBonusTargets: ["ac"],
+        }),
+      ],
+    });
+    // Unarmored Defense 14 + magic bonus +1 (Ring never touches the armor catalog)
+    expect(computeArmorClass(character)).toBe(15);
+  });
+
+  it("subtracts a negative magic AC bonus", () => {
+    const character = makeCharacter({
+      inventory: [
+        makeInventoryItem({
+          category: "personal",
+          name: "Cursed Amulet",
+          magicBonus: -1,
+          magicBonusTargets: ["ac"],
+        }),
+      ],
+    });
+    // Unarmored Defense 14 - 1
+    expect(computeArmorClass(character)).toBe(13);
+  });
+
+  it("stacks magic AC bonuses from worn armor, a shield, and a ring", () => {
+    const character = makeCharacter({
+      inventory: [
+        makeInventoryItem({
+          id: "inv-1",
+          name: "Breastplate",
+          magicBonus: 1,
+          magicBonusTargets: ["ac"],
+        }),
+        makeInventoryItem({ id: "inv-2", name: "Shield" }),
+        makeInventoryItem({
+          id: "inv-3",
+          category: "personal",
+          name: "Ring of Protection",
+          magicBonus: 1,
+          magicBonusTargets: ["ac"],
+        }),
+      ],
+    });
+    // Breastplate 14 + dex mod capped at +2 + magic +1, Shield +2, Ring +1
+    expect(computeArmorClass(character)).toBe(20);
+  });
+});
+
+describe("recalculateDerived — weapon magic bonus", () => {
+  it("adds a magic weapon bonus to attackBonus and damage for a matching equipped item", () => {
+    const character = makeCharacter({
+      attacks: [makeAttack({ range: "5 ft", properties: ["Heavy"] })],
+      inventory: [
+        makeInventoryItem({
+          category: "weapon",
+          name: "Greataxe",
+          equipped: true,
+          magicBonus: 1,
+          magicBonusTargets: ["weapon"],
+        }),
+      ],
+    });
+    const result = recalculateDerived(character);
+    // str 16 -> mod +3, pb +2, magic +1
+    expect(result.attacks[0].attackBonus).toBe(6);
+    expect(result.attacks[0].damage).toBe("1d12+4");
+  });
+
+  it("matches a variant attack name via the established naming convention", () => {
+    const character = makeCharacter({
+      attacks: [
+        makeAttack({
+          name: "Handaxe (melee)",
+          range: "5 ft",
+          properties: [],
+        }),
+      ],
+      inventory: [
+        makeInventoryItem({
+          category: "weapon",
+          name: "Handaxe",
+          equipped: true,
+          magicBonus: 1,
+          magicBonusTargets: ["weapon"],
+        }),
+      ],
+    });
+    const result = recalculateDerived(character);
+    expect(result.attacks[0].attackBonus).toBe(6);
+  });
+
+  it("ignores an unequipped weapon's magic bonus", () => {
+    const character = makeCharacter({
+      attacks: [makeAttack({ range: "5 ft", properties: ["Heavy"] })],
+      inventory: [
+        makeInventoryItem({
+          category: "weapon",
+          name: "Greataxe",
+          equipped: false,
+          magicBonus: 1,
+          magicBonusTargets: ["weapon"],
+        }),
+      ],
+    });
+    const result = recalculateDerived(character);
+    expect(result.attacks[0].attackBonus).toBe(5);
+  });
+
+  it("ignores a matching item whose targets don't include \"weapon\"", () => {
+    const character = makeCharacter({
+      attacks: [makeAttack({ range: "5 ft", properties: ["Heavy"] })],
+      inventory: [
+        makeInventoryItem({
+          category: "weapon",
+          name: "Greataxe",
+          equipped: true,
+          magicBonus: 1,
+          magicBonusTargets: ["ac"],
+        }),
+      ],
+    });
+    const result = recalculateDerived(character);
+    expect(result.attacks[0].attackBonus).toBe(5);
   });
 });

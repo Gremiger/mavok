@@ -148,6 +148,25 @@ const MIGRATIONS: Record<number, MigrationFn> = {
 
     return d;
   },
+
+  9: (data) => {
+    const d = data as Record<string, unknown>;
+    d._version = 9;
+
+    const inventory = d.inventory as Array<Record<string, unknown>> | undefined;
+    if (Array.isArray(inventory)) {
+      for (const item of inventory) {
+        if (item.magicBonus === undefined) {
+          item.magicBonus = null;
+        }
+        if (item.magicBonusTargets === undefined) {
+          item.magicBonusTargets = [];
+        }
+      }
+    }
+
+    return d;
+  },
 };
 
 const BACKUP_PREFIX = "mavok_backup_pre_migration_";

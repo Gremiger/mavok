@@ -40,6 +40,8 @@ describe("migrateCharacterData", () => {
     expect(result.quickActions).toEqual([{ type: "rage" }, { type: "hpAdjust" }]);
     expect(result.combat.exhaustionLevel).toBe(0);
     expect(result.weaponMasteryUsedThisRest).toBe(false);
+    expect(result.inventory[0].magicBonus).toBeNull();
+    expect(result.inventory[0].magicBonusTargets).toEqual([]);
   });
 
   it("returns unmigrated data when already at CURRENT_DATA_VERSION", () => {

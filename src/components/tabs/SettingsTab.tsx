@@ -28,7 +28,14 @@ import { THEME_META } from "@/hooks/useTheme";
 export function SettingsTab() {
   const { character, update, updateCombat, updateMeta, updateQuickActions } =
     useCharacterContext();
-  const { theme, setTheme, density, toggleDensity } = useThemeContext();
+  const {
+    theme,
+    setTheme,
+    density,
+    toggleDensity,
+    magicItemIndicator,
+    setMagicItemIndicator,
+  } = useThemeContext();
   const [shortRestOpen, setShortRestOpen] = useState(false);
   const [longRestOpen, setLongRestOpen] = useState(false);
   const [importPreview, setImportPreview] = useState<{
@@ -183,6 +190,24 @@ export function SettingsTab() {
           >
             <span className="text-sm">
               {density === "compact" ? "Compacto" : "Espacioso"}
+            </span>
+            <span className="text-xs text-muted">Tap para cambiar</span>
+          </button>
+          <button
+            onClick={() =>
+              setMagicItemIndicator(
+                magicItemIndicator === "number-only"
+                  ? "explicit-tag"
+                  : "number-only"
+              )
+            }
+            className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border"
+          >
+            <span className="text-sm">
+              Indicador de bonos mágicos:{" "}
+              {magicItemIndicator === "explicit-tag"
+                ? "Etiqueta explícita"
+                : "Solo número"}
             </span>
             <span className="text-xs text-muted">Tap para cambiar</span>
           </button>

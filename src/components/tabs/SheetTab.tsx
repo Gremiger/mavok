@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useCharacterContext } from "@/lib/context";
+import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { FeatsBrowserModal } from "@/components/sheet/FeatsBrowserModal";
@@ -19,6 +19,7 @@ import {
   skillTotal,
   saveTotal,
 } from "@/lib/utils";
+import { sumMagicBonus } from "@/lib/recalculate";
 
 const ABILITIES: AbilityScore[] = ["str", "dex", "con", "int", "wis", "cha"];
 const PRIMAL_KNOWLEDGE_SKILLS = [
@@ -31,6 +32,7 @@ const PRIMAL_KNOWLEDGE_SKILLS = [
 
 export function SheetTab() {
   const { character } = useCharacterContext();
+  const { magicItemIndicator } = useThemeContext();
   const [activeRoll, setActiveRoll] = useState<{
     key: string;
     roll: DiceRoll;
@@ -61,6 +63,7 @@ export function SheetTab() {
     resources.rpiRages.active &&
     features.some((f) => f.name === "Primal Knowledge");
 
+  const magicSaveBonus = sumMagicBonus(character, "save");
   const passivePerception = 10 + skillTotal(character, 'perception');
   const passiveInsight = 10 + skillTotal(character, 'insight');
   const passiveInvestigation = 10 + skillTotal(character, 'investigation');
@@ -235,6 +238,9 @@ export function SheetTab() {
               </div>
               <span className="font-heading text-accent">
                 {formatModifier(saveTotal(character, ab) + exhaustionPenalty(combat.exhaustionLevel))}
+                {magicItemIndicator === "explicit-tag" && magicSaveBonus !== 0 && (
+                  <span className="ml-1">✦{formatModifier(magicSaveBonus)}</span>
+                )}
               </span>
             </button>
           ))}

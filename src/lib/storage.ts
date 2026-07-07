@@ -47,6 +47,7 @@ export function loadSettings(): AppSettings {
     density: "spacious",
     encyclopediaFavorites: [],
     encyclopediaLanguage: "en",
+    magicItemIndicator: "number-only",
   };
   if (typeof window === "undefined") return defaults;
   try {
