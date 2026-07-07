@@ -15,11 +15,12 @@ import { DiceRoller } from "@/components/combat/DiceRoller";
 import { RageTracker } from "@/components/combat/RageTracker";
 import { StandardActionsModal } from "@/components/combat/StandardActionsModal";
 import { AttackFormModal } from "@/components/combat/AttackFormModal";
+import { GrantedActionCard } from "@/components/combat/GrantedActionCard";
 import { CONDITIONS } from "@/data/conditions";
 import { CONDITION_GROUPS } from "@/data/condition-groups";
 import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
-import type { Attack } from "@/lib/types";
-import { formatModifier } from "@/lib/utils";
+import type { Attack, InventoryItem } from "@/lib/types";
+import { formatModifier, getEquippedGrantedActions } from "@/lib/utils";
 import { findMagicWeaponBonus, sumMagicBonus } from "@/lib/recalculate";
 import { toast } from "sonner";
 
@@ -38,6 +39,7 @@ export function CombatTab() {
     updateAttack,
     removeAttack,
     moveAttack,
+    updateInventoryItem,
   } = useCharacterContext();
   const { magicItemIndicator } = useThemeContext();
   const [hpModalOpen, setHpModalOpen] = useState(false);
@@ -98,6 +100,17 @@ export function CombatTab() {
       },
     });
     setHealerKitPulseKey((k) => k + 1);
+  }
+
+  function adjustGrantedActionCharges(item: InventoryItem, remaining: number) {
+    const grantedAction = item.grantedAction;
+    if (!grantedAction?.charges) return;
+    updateInventoryItem(item.id, {
+      grantedAction: {
+        ...grantedAction,
+        charges: { ...grantedAction.charges, remaining },
+      },
+    });
   }
 
   function spendStoneEndurance() {
@@ -416,6 +429,21 @@ export function CombatTab() {
             Acción · estabiliza o cura 1d6+4 HP a una criatura · usos no se recuperan con descansos
           </p>
         </motion.div>
+        {getEquippedGrantedActions(character, "action").map((item) => (
+          <div key={item.id} className="mt-2">
+            <GrantedActionCard
+              itemName={item.name}
+              grantedAction={item.grantedAction!}
+              onUse={() =>
+                adjustGrantedActionCharges(
+                  item,
+                  Math.max(0, item.grantedAction!.charges!.remaining - 1)
+                )
+              }
+              onAdjust={(remaining) => adjustGrantedActionCharges(item, remaining)}
+            />
+          </div>
+        ))}
         <button
           onClick={() => setStandardActionsOpen("actions")}
           className="w-full mt-2 p-2 rounded-lg border border-border/50 bg-card/50 text-left"
@@ -491,6 +519,20 @@ export function CombatTab() {
               </span>
             </div>
           )}
+          {getEquippedGrantedActions(character, "bonus").map((item) => (
+            <GrantedActionCard
+              key={item.id}
+              itemName={item.name}
+              grantedAction={item.grantedAction!}
+              onUse={() =>
+                adjustGrantedActionCharges(
+                  item,
+                  Math.max(0, item.grantedAction!.charges!.remaining - 1)
+                )
+              }
+              onAdjust={(remaining) => adjustGrantedActionCharges(item, remaining)}
+            />
+          ))}
           <button
             onClick={() => setStandardActionsOpen("bonus")}
             className="w-full mt-1 p-2 rounded-lg border border-border/50 bg-card/50 text-left"
@@ -595,6 +637,21 @@ export function CombatTab() {
               Mismas armas que Acciones
             </span>
           </div>
+
+          {getEquippedGrantedActions(character, "reaction").map((item) => (
+            <GrantedActionCard
+              key={item.id}
+              itemName={item.name}
+              grantedAction={item.grantedAction!}
+              onUse={() =>
+                adjustGrantedActionCharges(
+                  item,
+                  Math.max(0, item.grantedAction!.charges!.remaining - 1)
+                )
+              }
+              onAdjust={(remaining) => adjustGrantedActionCharges(item, remaining)}
+            />
+          ))}
 
           {/* Standard reactions compact card */}
           <button

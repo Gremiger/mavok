@@ -9,7 +9,7 @@ import { exportInventoryCSV } from "@/lib/export";
 import { formatModifier } from "@/lib/utils";
 import { toast } from "sonner";
 import { Sword, Shield, Wrench, FlaskConical, Heart, Plus, SearchX } from "lucide-react";
-import type { InventoryItem } from "@/lib/types";
+import type { InventoryItem, GrantedAction } from "@/lib/types";
 import type { ReactNode } from "react";
 import { WEAPONS } from "@/data/weapons";
 import { ARMOR } from "@/data/armor";
@@ -66,6 +66,13 @@ export function InventoryTab() {
     description: "",
     magicBonus: "",
     magicBonusTargets: [] as ("weapon" | "ac" | "save")[],
+    grantsAction: false,
+    actionName: "",
+    actionType: "action" as GrantedAction["actionType"],
+    actionDescription: "",
+    actionLimitedUses: false,
+    actionTotalUses: "",
+    actionRecharge: "long" as NonNullable<GrantedAction["charges"]>["recharge"],
   });
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -151,6 +158,25 @@ export function InventoryTab() {
   function handleAddItem() {
     if (!newItem.name.trim()) return;
     const magicBonus = newItem.magicBonus ? parseInt(newItem.magicBonus) : 0;
+    const totalUses = newItem.actionTotalUses
+      ? parseInt(newItem.actionTotalUses)
+      : 0;
+    const grantedAction: GrantedAction | null =
+      newItem.grantsAction && newItem.actionName.trim()
+        ? {
+            name: newItem.actionName.trim(),
+            actionType: newItem.actionType,
+            description: newItem.actionDescription,
+            charges:
+              newItem.actionLimitedUses && totalUses > 0
+                ? {
+                    total: totalUses,
+                    remaining: totalUses,
+                    recharge: newItem.actionRecharge,
+                  }
+                : null,
+          }
+        : null;
     const item: InventoryItem = {
       id: `inv-${Date.now()}`,
       name: newItem.name.trim(),
@@ -162,6 +188,7 @@ export function InventoryTab() {
       description: newItem.description,
       magicBonus: magicBonus ? magicBonus : null,
       magicBonusTargets: magicBonus ? newItem.magicBonusTargets : [],
+      grantedAction,
     };
     addInventoryItem(item);
     toast(`${item.name} agregado`, { icon: "📦" });
@@ -174,6 +201,13 @@ export function InventoryTab() {
       description: "",
       magicBonus: "",
       magicBonusTargets: [],
+      grantsAction: false,
+      actionName: "",
+      actionType: "action",
+      actionDescription: "",
+      actionLimitedUses: false,
+      actionTotalUses: "",
+      actionRecharge: "long",
     });
     setAddModalOpen(false);
   }
@@ -382,6 +416,20 @@ export function InventoryTab() {
                                 : "Salvaciones"
                           )
                           .join(", ") || "sin aplicar"}
+                        )
+                      </p>
+                    )}
+                    {item.grantedAction && (
+                      <p className="text-xs text-accent">
+                        {item.grantedAction.name} (
+                        {item.grantedAction.actionType === "action"
+                          ? "Acción"
+                          : item.grantedAction.actionType === "bonus"
+                            ? "Bonus Action"
+                            : "Reacción"}
+                        {item.grantedAction.charges
+                          ? ` · ${item.grantedAction.charges.remaining}/${item.grantedAction.charges.total} usos`
+                          : ""}
                         )
                       </p>
                     )}
@@ -630,6 +678,98 @@ export function InventoryTab() {
                   </label>
                 ))}
               </div>
+            </div>
+          )}
+
+          <label className="flex items-center gap-1.5 text-xs text-foreground">
+            <input
+              type="checkbox"
+              checked={newItem.grantsAction}
+              onChange={(e) =>
+                setNewItem({ ...newItem, grantsAction: e.target.checked })
+              }
+            />
+            Otorga una acción especial (opcional)
+          </label>
+
+          {newItem.grantsAction && (
+            <div className="space-y-2 pl-2 border-l border-border">
+              <input
+                value={newItem.actionName}
+                onChange={(e) =>
+                  setNewItem({ ...newItem, actionName: e.target.value })
+                }
+                placeholder="Nombre de la acción"
+                className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+              />
+              <select
+                value={newItem.actionType}
+                onChange={(e) =>
+                  setNewItem({
+                    ...newItem,
+                    actionType: e.target.value as GrantedAction["actionType"],
+                  })
+                }
+                className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+              >
+                <option value="action">Acción</option>
+                <option value="bonus">Bonus Action</option>
+                <option value="reaction">Reacción</option>
+              </select>
+              <textarea
+                value={newItem.actionDescription}
+                onChange={(e) =>
+                  setNewItem({ ...newItem, actionDescription: e.target.value })
+                }
+                placeholder="Descripción del efecto"
+                rows={2}
+                className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"
+              />
+              <label className="flex items-center gap-1.5 text-xs text-foreground">
+                <input
+                  type="checkbox"
+                  checked={newItem.actionLimitedUses}
+                  onChange={(e) =>
+                    setNewItem({
+                      ...newItem,
+                      actionLimitedUses: e.target.checked,
+                    })
+                  }
+                />
+                Usos limitados
+              </label>
+              {newItem.actionLimitedUses && (
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    value={newItem.actionTotalUses}
+                    onChange={(e) =>
+                      setNewItem({
+                        ...newItem,
+                        actionTotalUses: e.target.value,
+                      })
+                    }
+                    placeholder="Total de usos"
+                    className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+                  />
+                  <select
+                    value={newItem.actionRecharge}
+                    onChange={(e) =>
+                      setNewItem({
+                        ...newItem,
+                        actionRecharge: e.target
+                          .value as NonNullable<GrantedAction["charges"]>["recharge"],
+                      })
+                    }
+                    className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+                  >
+                    <option value="short">Descanso corto</option>
+                    <option value="long">Descanso largo</option>
+                    <option value="none">Sin recarga</option>
+                  </select>
+                </div>
+              )}
             </div>
           )}
 

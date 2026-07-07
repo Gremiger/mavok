@@ -16,6 +16,7 @@ function makeInventoryItem(
     description: "",
     magicBonus: null,
     magicBonusTargets: [],
+    grantedAction: null,
     ...overrides,
   };
 }

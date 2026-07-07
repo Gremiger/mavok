@@ -1,4 +1,4 @@
-import type { AbilityScore, Character } from "./types";
+import type { AbilityScore, Character, InventoryItem } from "./types";
 
 export function abilityModifier(score: number): number {
   return Math.floor((score - 10) / 2);
@@ -30,6 +30,15 @@ export function saveTotal(
     .filter((i) => i.equipped && i.magicBonusTargets.includes("save"))
     .reduce((sum, i) => sum + (i.magicBonus ?? 0), 0);
   return mod + prof + itemBonus;
+}
+
+export function getEquippedGrantedActions(
+  character: Character,
+  actionType: "action" | "bonus" | "reaction"
+): InventoryItem[] {
+  return character.inventory.filter(
+    (i) => i.equipped && i.grantedAction?.actionType === actionType
+  );
 }
 
 const SKILL_LABELS: Record<string, string> = {

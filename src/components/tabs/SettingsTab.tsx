@@ -105,6 +105,20 @@ export function SettingsTab() {
           remaining: c.resources.stoneEndurance.total,
         },
       },
+      inventory: c.inventory.map((item) =>
+        item.grantedAction?.charges
+          ? {
+              ...item,
+              grantedAction: {
+                ...item.grantedAction,
+                charges: {
+                  ...item.grantedAction.charges,
+                  remaining: item.grantedAction.charges.total,
+                },
+              },
+            }
+          : item
+      ),
     }));
     setLongRestOpen(false);
     toast.success("Descanso largo completado");
@@ -595,6 +609,23 @@ export function SettingsTab() {
                 }));
                 toast("Rage +1 recuperado", { icon: "🔥" });
               }
+              update((c) => ({
+                ...c,
+                inventory: c.inventory.map((item) =>
+                  item.grantedAction?.charges?.recharge === "short"
+                    ? {
+                        ...item,
+                        grantedAction: {
+                          ...item.grantedAction,
+                          charges: {
+                            ...item.grantedAction.charges,
+                            remaining: item.grantedAction.charges.total,
+                          },
+                        },
+                      }
+                    : item
+                ),
+              }));
               setShortRestOpen(false);
             }}
             className="w-full py-2 text-sm text-muted border border-border rounded-lg"

@@ -1,6 +1,6 @@
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
-export const CURRENT_DATA_VERSION = 9;
+export const CURRENT_DATA_VERSION = 10;
 
 export type PinnedAction =
   | { type: "rage" }
@@ -110,6 +110,17 @@ export interface Attack {
   masterySaveDC: number | null;
 }
 
+export interface GrantedAction {
+  name: string;
+  actionType: "action" | "bonus" | "reaction";
+  description: string;
+  charges: {
+    total: number;
+    remaining: number;
+    recharge: "short" | "long" | "none";
+  } | null;
+}
+
 export interface InventoryItem {
   id: string;
   name: string;
@@ -121,6 +132,7 @@ export interface InventoryItem {
   description: string;
   magicBonus: number | null;
   magicBonusTargets: ("weapon" | "ac" | "save")[];
+  grantedAction: GrantedAction | null;
 }
 
 export interface Currency {

@@ -42,6 +42,7 @@ describe("migrateCharacterData", () => {
     expect(result.weaponMasteryUsedThisRest).toBe(false);
     expect(result.inventory[0].magicBonus).toBeNull();
     expect(result.inventory[0].magicBonusTargets).toEqual([]);
+    expect(result.inventory[0].grantedAction).toBeNull();
   });
 
   it("returns unmigrated data when already at CURRENT_DATA_VERSION", () => {

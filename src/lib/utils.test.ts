@@ -1,6 +1,18 @@
 import { describe, it, expect } from "vitest";
-import { saveTotal } from "./utils";
-import type { Character, InventoryItem } from "./types";
+import { saveTotal, getEquippedGrantedActions } from "./utils";
+import type { Character, InventoryItem, GrantedAction } from "./types";
+
+function makeGrantedAction(
+  overrides: Partial<GrantedAction> = {}
+): GrantedAction {
+  return {
+    name: "Zap",
+    actionType: "action",
+    description: "Do a zap.",
+    charges: null,
+    ...overrides,
+  };
+}
 
 function makeInventoryItem(
   overrides: Partial<InventoryItem> = {}
@@ -16,6 +28,7 @@ function makeInventoryItem(
     description: "",
     magicBonus: null,
     magicBonusTargets: [],
+    grantedAction: null,
     ...overrides,
   };
 }
@@ -135,5 +148,67 @@ describe("saveTotal", () => {
       ],
     });
     expect(saveTotal(character, "str")).toBe(5);
+  });
+});
+
+describe("getEquippedGrantedActions", () => {
+  it("returns an equipped item whose grantedAction matches the requested type", () => {
+    const character = makeCharacter({
+      inventory: [
+        makeInventoryItem({
+          id: "inv-1",
+          grantedAction: makeGrantedAction({ actionType: "bonus" }),
+        }),
+      ],
+    });
+    expect(getEquippedGrantedActions(character, "bonus")).toHaveLength(1);
+  });
+
+  it("ignores an unequipped item", () => {
+    const character = makeCharacter({
+      inventory: [
+        makeInventoryItem({
+          equipped: false,
+          grantedAction: makeGrantedAction({ actionType: "bonus" }),
+        }),
+      ],
+    });
+    expect(getEquippedGrantedActions(character, "bonus")).toHaveLength(0);
+  });
+
+  it("ignores an item whose grantedAction is a different type", () => {
+    const character = makeCharacter({
+      inventory: [
+        makeInventoryItem({
+          grantedAction: makeGrantedAction({ actionType: "reaction" }),
+        }),
+      ],
+    });
+    expect(getEquippedGrantedActions(character, "bonus")).toHaveLength(0);
+  });
+
+  it("ignores an item with no grantedAction", () => {
+    const character = makeCharacter({
+      inventory: [makeInventoryItem({ grantedAction: null })],
+    });
+    expect(getEquippedGrantedActions(character, "action")).toHaveLength(0);
+  });
+
+  it("returns multiple equipped items matching the same type", () => {
+    const character = makeCharacter({
+      inventory: [
+        makeInventoryItem({
+          id: "inv-1",
+          name: "Wand",
+          grantedAction: makeGrantedAction({ actionType: "action" }),
+        }),
+        makeInventoryItem({
+          id: "inv-2",
+          name: "Amulet",
+          grantedAction: makeGrantedAction({ actionType: "action" }),
+        }),
+      ],
+    });
+    expect(getEquippedGrantedActions(character, "action")).toHaveLength(2);
   });
 });
