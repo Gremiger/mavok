@@ -4,24 +4,34 @@ import { ARMOR } from "../data/armor";
 
 export function sumMagicBonus(
   character: Character,
-  target: "weapon" | "ac" | "save"
+  target: "ac" | "save"
 ): number {
   return character.inventory
     .filter((i) => i.equipped && i.magicBonusTargets.includes(target))
     .reduce((sum, i) => sum + (i.magicBonus ?? 0), 0);
 }
 
-export function findMagicWeaponBonus(
+/**
+ * A non-weapon item's attack/damage bonus (e.g. a Ring granting "+1 to hit")
+ * applies to every attack, since it isn't tied to a specific weapon. A
+ * weapon-category item's bonus only applies to its own matching Attack,
+ * linked via `baseWeaponName` (falling back to `name`) so a flavor name like
+ * "Fangbreaker" can still resolve to the "Maul" it's based on.
+ */
+export function computeAttackMagicBonus(
   character: Character,
-  attack: Attack
+  attack: Attack,
+  field: "attack" | "damage"
 ): number {
-  const matchingWeapon = character.inventory.find(
-    (i) =>
-      i.equipped &&
-      i.magicBonusTargets.includes("weapon") &&
-      (i.name === attack.name || attack.name.startsWith(`${i.name} (`))
-  );
-  return matchingWeapon?.magicBonus ?? 0;
+  const bonusKey = field === "attack" ? "magicAttackBonus" : "magicDamageBonus";
+  return character.inventory.reduce((sum, i) => {
+    if (!i.equipped || i[bonusKey] === null) return sum;
+    if (i.category !== "weapon") return sum + i[bonusKey]!;
+    const linkName = i.baseWeaponName ?? i.name;
+    const matches =
+      linkName === attack.name || attack.name.startsWith(`${linkName} (`);
+    return matches ? sum + i[bonusKey]! : sum;
+  }, 0);
 }
 
 export function computeArmorClass(character: Character): number {
@@ -72,10 +82,11 @@ export function recalculateDerived(character: Character): Character {
         ? strMod
         : dexMod;
 
-    const magicBonus = findMagicWeaponBonus(c, a);
-    const newBonus = atkMod + pb + magicBonus;
+    const attackMagicBonus = computeAttackMagicBonus(c, a, "attack");
+    const damageMagicBonus = computeAttackMagicBonus(c, a, "damage");
+    const newBonus = atkMod + pb + attackMagicBonus;
     const baseDice = a.damage.replace(/[+-]\d+$/, "");
-    const newDamage = `${baseDice}+${atkMod + magicBonus}`;
+    const newDamage = `${baseDice}+${atkMod + damageMagicBonus}`;
 
     return {
       ...a,

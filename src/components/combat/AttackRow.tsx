@@ -22,7 +22,8 @@ export function AttackRow({
   rageDamage,
   recklessActive,
   exhaustionLevel,
-  magicBonus = 0,
+  attackMagicBonus = 0,
+  damageMagicBonus = 0,
   onEdit,
   onDelete,
   onMoveUp,
@@ -33,7 +34,8 @@ export function AttackRow({
   rageDamage: number;
   recklessActive: boolean;
   exhaustionLevel: number;
-  magicBonus?: number;
+  attackMagicBonus?: number;
+  damageMagicBonus?: number;
   onEdit?: () => void;
   onDelete?: () => void;
   onMoveUp?: () => void;
@@ -107,11 +109,18 @@ export function AttackRow({
               <DamageIcon size={11} className="inline-block mb-0.5 mr-1" />
             )}
             {formatModifier(effectiveAttackBonus)} · {displayDamage()} {attack.damageType.slice(0, 4).toLowerCase()}. · {attack.range}
-            {magicItemIndicator === "explicit-tag" && magicBonus !== 0 && (
-              <span className="text-accent ml-1">
-                ✦{formatModifier(magicBonus)}
-              </span>
-            )}
+            {magicItemIndicator === "explicit-tag" &&
+              (attackMagicBonus !== 0 || damageMagicBonus !== 0) &&
+              (attackMagicBonus === damageMagicBonus ? (
+                <span className="text-accent ml-1">
+                  ✦{formatModifier(attackMagicBonus)}
+                </span>
+              ) : (
+                <span className="text-accent ml-1">
+                  ✦atq{formatModifier(attackMagicBonus)}/dañ
+                  {formatModifier(damageMagicBonus)}
+                </span>
+              ))}
           </div>
         </div>
         <div className="flex gap-1.5 ml-2 items-center">

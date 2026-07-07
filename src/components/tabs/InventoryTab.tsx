@@ -57,6 +57,9 @@ export function InventoryTab() {
   const [attackPrefillWeapon, setAttackPrefillWeapon] = useState<string | null>(
     null
   );
+  const [attackPrefillDisplayName, setAttackPrefillDisplayName] = useState<
+    string | undefined
+  >(undefined);
   const [newItem, setNewItem] = useState({
     name: "",
     quantity: 1,
@@ -65,7 +68,10 @@ export function InventoryTab() {
     category: "gear" as InventoryItem["category"],
     description: "",
     magicBonus: "",
-    magicBonusTargets: [] as ("weapon" | "ac" | "save")[],
+    magicBonusTargets: [] as ("ac" | "save")[],
+    magicAttackBonus: "",
+    magicDamageBonus: "",
+    baseWeaponName: "",
     grantsAction: false,
     actionName: "",
     actionType: "action" as GrantedAction["actionType"],
@@ -125,12 +131,16 @@ export function InventoryTab() {
       const alreadyTracked = attacks.some(
         (a) => a.name === item.name || a.name.startsWith(`${item.name} (`)
       );
-      const inCatalog = WEAPONS.some((w) => w.name === item.name);
+      const catalogName = item.baseWeaponName ?? item.name;
+      const inCatalog = WEAPONS.some((w) => w.name === catalogName);
       if (inCatalog && !alreadyTracked) {
         toast(`¿Agregar "${item.name}" a tus acciones de combate?`, {
           action: {
             label: "Agregar",
-            onClick: () => setAttackPrefillWeapon(item.name),
+            onClick: () => {
+              setAttackPrefillWeapon(catalogName);
+              setAttackPrefillDisplayName(item.name);
+            },
           },
         });
       }
@@ -158,6 +168,12 @@ export function InventoryTab() {
   function handleAddItem() {
     if (!newItem.name.trim()) return;
     const magicBonus = newItem.magicBonus ? parseInt(newItem.magicBonus) : 0;
+    const magicAttackBonus = newItem.magicAttackBonus
+      ? parseInt(newItem.magicAttackBonus)
+      : 0;
+    const magicDamageBonus = newItem.magicDamageBonus
+      ? parseInt(newItem.magicDamageBonus)
+      : 0;
     const totalUses = newItem.actionTotalUses
       ? parseInt(newItem.actionTotalUses)
       : 0;
@@ -188,6 +204,9 @@ export function InventoryTab() {
       description: newItem.description,
       magicBonus: magicBonus ? magicBonus : null,
       magicBonusTargets: magicBonus ? newItem.magicBonusTargets : [],
+      magicAttackBonus: magicAttackBonus ? magicAttackBonus : null,
+      magicDamageBonus: magicDamageBonus ? magicDamageBonus : null,
+      baseWeaponName: newItem.baseWeaponName.trim() || null,
       grantedAction,
     };
     addInventoryItem(item);
@@ -201,6 +220,9 @@ export function InventoryTab() {
       description: "",
       magicBonus: "",
       magicBonusTargets: [],
+      magicAttackBonus: "",
+      magicDamageBonus: "",
+      baseWeaponName: "",
       grantsAction: false,
       actionName: "",
       actionType: "action",
@@ -212,7 +234,7 @@ export function InventoryTab() {
     setAddModalOpen(false);
   }
 
-  function toggleMagicBonusTarget(target: "weapon" | "ac" | "save") {
+  function toggleMagicBonusTarget(target: "ac" | "save") {
     setNewItem((prev) => ({
       ...prev,
       magicBonusTargets: prev.magicBonusTargets.includes(target)
@@ -380,11 +402,20 @@ export function InventoryTab() {
                         ×{item.quantity}
                       </span>
                     )}
-                    {!!item.magicBonus && (
-                      <span className="text-accent text-xs ml-1 font-heading">
-                        {formatModifier(item.magicBonus)}
-                      </span>
-                    )}
+                    {(() => {
+                      const values = [
+                        item.magicBonus,
+                        item.magicAttackBonus,
+                        item.magicDamageBonus,
+                      ].filter((v): v is number => v !== null);
+                      const unique = [...new Set(values)];
+                      if (unique.length === 0) return null;
+                      return (
+                        <span className="text-accent text-xs ml-1 font-heading">
+                          {unique.length === 1 ? formatModifier(unique[0]) : "✦"}
+                        </span>
+                      );
+                    })()}
                   </div>
                   {(item.weight !== null || item.value !== null) && (
                     <span className="text-muted text-xs">
@@ -408,15 +439,25 @@ export function InventoryTab() {
                       <p className="text-xs text-accent">
                         Bono mágico: {formatModifier(item.magicBonus)} (
                         {item.magicBonusTargets
-                          .map((t) =>
-                            t === "weapon"
-                              ? "Ataque y daño"
-                              : t === "ac"
-                                ? "CA"
-                                : "Salvaciones"
-                          )
+                          .map((t) => (t === "ac" ? "CA" : "Salvaciones"))
                           .join(", ") || "sin aplicar"}
                         )
+                      </p>
+                    )}
+                    {!!item.magicAttackBonus && (
+                      <p className="text-xs text-accent">
+                        Bono de ataque: {formatModifier(item.magicAttackBonus)}
+                        {item.category === "weapon"
+                          ? ` (vinculado a ${item.baseWeaponName ?? item.name})`
+                          : " (a todos tus ataques)"}
+                      </p>
+                    )}
+                    {!!item.magicDamageBonus && (
+                      <p className="text-xs text-accent">
+                        Bono de daño: {formatModifier(item.magicDamageBonus)}
+                        {item.category === "weapon"
+                          ? ` (vinculado a ${item.baseWeaponName ?? item.name})`
+                          : " (a todos tus ataques)"}
                       </p>
                     )}
                     {item.grantedAction && (
@@ -645,12 +686,11 @@ export function InventoryTab() {
 
           <input
             type="number"
-            inputMode="numeric"
             value={newItem.magicBonus}
             onChange={(e) =>
               setNewItem({ ...newItem, magicBonus: e.target.value })
             }
-            placeholder="Bono mágico (opcional, ej. 1 o -1)"
+            placeholder="Bono mágico a CA/Salvaciones (opcional, ej. 1 o -1)"
             className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
           />
 
@@ -660,7 +700,6 @@ export function InventoryTab() {
               <div className="flex gap-3 mt-1">
                 {(
                   [
-                    { value: "weapon", label: "Ataque y daño" },
                     { value: "ac", label: "CA" },
                     { value: "save", label: "Salvaciones" },
                   ] as const
@@ -680,6 +719,52 @@ export function InventoryTab() {
               </div>
             </div>
           )}
+
+          <div className="flex gap-2">
+            <input
+              type="number"
+              value={newItem.magicAttackBonus}
+              onChange={(e) =>
+                setNewItem({ ...newItem, magicAttackBonus: e.target.value })
+              }
+              placeholder="Bono de ataque (opcional)"
+              className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+            />
+            <input
+              type="number"
+              value={newItem.magicDamageBonus}
+              onChange={(e) =>
+                setNewItem({ ...newItem, magicDamageBonus: e.target.value })
+              }
+              placeholder="Bono de daño (opcional)"
+              className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+            />
+          </div>
+          <p className="text-[0.65rem] text-muted -mt-1">
+            {newItem.category === "weapon"
+              ? "En un objeto de categoría Arma, aplica solo a esa arma. En cualquier otra categoría (anillo, capa, etc.), aplica a todos tus ataques."
+              : "Aplica a todos tus ataques (no está atado a un arma específica)."}
+          </p>
+
+          {newItem.category === "weapon" &&
+            (!!newItem.magicAttackBonus || !!newItem.magicDamageBonus) && (
+              <select
+                value={newItem.baseWeaponName}
+                onChange={(e) =>
+                  setNewItem({ ...newItem, baseWeaponName: e.target.value })
+                }
+                className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+              >
+                <option value="">
+                  Vincular a arma del catálogo (si el nombre no coincide)...
+                </option>
+                {WEAPONS.map((w) => (
+                  <option key={w.name} value={w.name}>
+                    {w.name}
+                  </option>
+                ))}
+              </select>
+            )}
 
           <label className="flex items-center gap-1.5 text-xs text-foreground">
             <input
@@ -790,6 +875,7 @@ export function InventoryTab() {
           setAttackPrefillWeapon(null);
         }}
         initialWeaponName={attackPrefillWeapon ?? undefined}
+        initialDisplayName={attackPrefillDisplayName}
       />
     </div>
   );

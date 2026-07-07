@@ -34,12 +34,15 @@ function formFromAttack(existingAttack: Attack): typeof EMPTY_FORM {
   };
 }
 
-function formFromWeapon(weaponName: string): typeof EMPTY_FORM {
+function formFromWeapon(
+  weaponName: string,
+  displayName?: string
+): typeof EMPTY_FORM {
   const w = WEAPONS.find((wp) => wp.name === weaponName);
   if (!w) return EMPTY_FORM;
   return {
     ...EMPTY_FORM,
-    name: w.name,
+    name: displayName ?? w.name,
     damage: w.damage,
     damageType: w.damageType,
     properties: w.properties.join(", "),
@@ -54,12 +57,14 @@ export function AttackFormModal({
   onSave,
   existingAttack,
   initialWeaponName,
+  initialDisplayName,
 }: {
   open: boolean;
   onClose: () => void;
   onSave: (attack: Attack) => void;
   existingAttack?: Attack;
   initialWeaponName?: string;
+  initialDisplayName?: string;
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
 
@@ -74,7 +79,7 @@ export function AttackFormModal({
       existingAttack
         ? formFromAttack(existingAttack)
         : initialWeaponName
-          ? formFromWeapon(initialWeaponName)
+          ? formFromWeapon(initialWeaponName, initialDisplayName)
           : EMPTY_FORM
     );
   }

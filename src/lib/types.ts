@@ -1,6 +1,6 @@
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
-export const CURRENT_DATA_VERSION = 10;
+export const CURRENT_DATA_VERSION = 11;
 
 export type PinnedAction =
   | { type: "rage" }
@@ -131,7 +131,10 @@ export interface InventoryItem {
   equipped: boolean;
   description: string;
   magicBonus: number | null;
-  magicBonusTargets: ("weapon" | "ac" | "save")[];
+  magicBonusTargets: ("ac" | "save")[];
+  magicAttackBonus: number | null;
+  magicDamageBonus: number | null;
+  baseWeaponName: string | null;
   grantedAction: GrantedAction | null;
 }
 

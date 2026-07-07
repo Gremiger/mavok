@@ -21,7 +21,7 @@ import { CONDITION_GROUPS } from "@/data/condition-groups";
 import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
 import type { Attack, InventoryItem } from "@/lib/types";
 import { formatModifier, getEquippedGrantedActions } from "@/lib/utils";
-import { findMagicWeaponBonus, sumMagicBonus } from "@/lib/recalculate";
+import { computeAttackMagicBonus, sumMagicBonus } from "@/lib/recalculate";
 import { toast } from "sonner";
 
 function baseDice(damage: string): string {
@@ -316,7 +316,8 @@ export function CombatTab() {
             rageDamage={rageDamage}
             recklessActive={combat.recklessActive}
             exhaustionLevel={combat.exhaustionLevel}
-            magicBonus={findMagicWeaponBonus(character, a)}
+            attackMagicBonus={computeAttackMagicBonus(character, a, "attack")}
+            damageMagicBonus={computeAttackMagicBonus(character, a, "damage")}
             onEdit={() => setAttackModalState(a)}
             onDelete={() => {
               const index = attacks.findIndex((x) => x.id === a.id);

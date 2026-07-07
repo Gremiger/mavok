@@ -16,6 +16,9 @@ function makeInventoryItem(
     description: "",
     magicBonus: null,
     magicBonusTargets: [],
+    magicAttackBonus: null,
+    magicDamageBonus: null,
+    baseWeaponName: null,
     grantedAction: null,
     ...overrides,
   };
@@ -308,8 +311,8 @@ describe("computeArmorClass", () => {
   });
 });
 
-describe("recalculateDerived — weapon magic bonus", () => {
-  it("adds a magic weapon bonus to attackBonus and damage for a matching equipped item", () => {
+describe("recalculateDerived — weapon-linked magic bonus", () => {
+  it("adds a weapon-linked bonus to attackBonus and damage for a matching equipped item", () => {
     const character = makeCharacter({
       attacks: [makeAttack({ range: "5 ft", properties: ["Heavy"] })],
       inventory: [
@@ -317,8 +320,8 @@ describe("recalculateDerived — weapon magic bonus", () => {
           category: "weapon",
           name: "Greataxe",
           equipped: true,
-          magicBonus: 1,
-          magicBonusTargets: ["weapon"],
+          magicAttackBonus: 1,
+          magicDamageBonus: 1,
         }),
       ],
     });
@@ -342,13 +345,64 @@ describe("recalculateDerived — weapon magic bonus", () => {
           category: "weapon",
           name: "Handaxe",
           equipped: true,
-          magicBonus: 1,
-          magicBonusTargets: ["weapon"],
+          magicAttackBonus: 1,
         }),
       ],
     });
     const result = recalculateDerived(character);
     expect(result.attacks[0].attackBonus).toBe(6);
+  });
+
+  it("matches via baseWeaponName when the item's display name differs from the attack", () => {
+    const character = makeCharacter({
+      attacks: [makeAttack({ name: "Maul", range: "5 ft", properties: ["Heavy"] })],
+      inventory: [
+        makeInventoryItem({
+          category: "weapon",
+          name: "Fangbreaker",
+          baseWeaponName: "Maul",
+          equipped: true,
+          magicAttackBonus: 1,
+          magicDamageBonus: 1,
+        }),
+      ],
+    });
+    const result = recalculateDerived(character);
+    expect(result.attacks[0].attackBonus).toBe(6);
+    expect(result.attacks[0].damage).toBe("1d12+4");
+  });
+
+  it("does NOT match when the display name diverges without a baseWeaponName link", () => {
+    const character = makeCharacter({
+      attacks: [makeAttack({ name: "Maul", range: "5 ft", properties: ["Heavy"] })],
+      inventory: [
+        makeInventoryItem({
+          category: "weapon",
+          name: "+1 Maul",
+          equipped: true,
+          magicAttackBonus: 1,
+        }),
+      ],
+    });
+    const result = recalculateDerived(character);
+    expect(result.attacks[0].attackBonus).toBe(5);
+  });
+
+  it("applies attack and damage bonuses independently (e.g. a damage-only bonus)", () => {
+    const character = makeCharacter({
+      attacks: [makeAttack({ range: "5 ft", properties: ["Heavy"] })],
+      inventory: [
+        makeInventoryItem({
+          category: "weapon",
+          name: "Greataxe",
+          equipped: true,
+          magicDamageBonus: 2,
+        }),
+      ],
+    });
+    const result = recalculateDerived(character);
+    expect(result.attacks[0].attackBonus).toBe(5); // unaffected
+    expect(result.attacks[0].damage).toBe("1d12+5"); // atkMod 3 + damage bonus 2
   });
 
   it("ignores an unequipped weapon's magic bonus", () => {
@@ -359,25 +413,45 @@ describe("recalculateDerived — weapon magic bonus", () => {
           category: "weapon",
           name: "Greataxe",
           equipped: false,
-          magicBonus: 1,
-          magicBonusTargets: ["weapon"],
+          magicAttackBonus: 1,
         }),
       ],
     });
     const result = recalculateDerived(character);
     expect(result.attacks[0].attackBonus).toBe(5);
   });
+});
 
-  it("ignores a matching item whose targets don't include \"weapon\"", () => {
+describe("recalculateDerived — universal (non-weapon) attack/damage bonus", () => {
+  it("applies a non-weapon item's attack bonus to every attack, regardless of name", () => {
+    const character = makeCharacter({
+      attacks: [
+        makeAttack({ name: "Maul", range: "5 ft", properties: ["Heavy"] }),
+        makeAttack({ id: "atk-2", name: "Javelin", range: "30/120 ft", properties: ["Thrown"] }),
+      ],
+      inventory: [
+        makeInventoryItem({
+          category: "personal",
+          name: "Ring of Precision",
+          equipped: true,
+          magicAttackBonus: 1,
+        }),
+      ],
+    });
+    const result = recalculateDerived(character);
+    expect(result.attacks[0].attackBonus).toBe(6);
+    expect(result.attacks[1].attackBonus).toBe(6);
+  });
+
+  it("ignores an unequipped non-weapon item's universal bonus", () => {
     const character = makeCharacter({
       attacks: [makeAttack({ range: "5 ft", properties: ["Heavy"] })],
       inventory: [
         makeInventoryItem({
-          category: "weapon",
-          name: "Greataxe",
-          equipped: true,
-          magicBonus: 1,
-          magicBonusTargets: ["ac"],
+          category: "personal",
+          name: "Ring of Precision",
+          equipped: false,
+          magicAttackBonus: 1,
         }),
       ],
     });

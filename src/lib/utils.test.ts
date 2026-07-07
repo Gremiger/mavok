@@ -28,6 +28,9 @@ function makeInventoryItem(
     description: "",
     magicBonus: null,
     magicBonusTargets: [],
+    magicAttackBonus: null,
+    magicDamageBonus: null,
+    baseWeaponName: null,
     grantedAction: null,
     ...overrides,
   };

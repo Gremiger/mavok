@@ -43,6 +43,31 @@ describe("migrateCharacterData", () => {
     expect(result.inventory[0].magicBonus).toBeNull();
     expect(result.inventory[0].magicBonusTargets).toEqual([]);
     expect(result.inventory[0].grantedAction).toBeNull();
+    expect(result.inventory[0].magicAttackBonus).toBeNull();
+    expect(result.inventory[0].magicDamageBonus).toBeNull();
+    expect(result.inventory[0].baseWeaponName).toBeNull();
+  });
+
+  it("splits an old combined 'weapon' magic bonus into attack+damage bonuses", () => {
+    const raw = JSON.stringify(
+      makeV1Data({
+        inventory: [
+          {
+            id: "inv-1",
+            name: "+1 Maul",
+            quantity: 1,
+            magicBonus: 1,
+            magicBonusTargets: ["weapon", "ac"],
+          },
+        ],
+      })
+    );
+    const { data } = migrateCharacterData(raw);
+    const result = JSON.parse(data);
+
+    expect(result.inventory[0].magicAttackBonus).toBe(1);
+    expect(result.inventory[0].magicDamageBonus).toBe(1);
+    expect(result.inventory[0].magicBonusTargets).toEqual(["ac"]);
   });
 
   it("returns unmigrated data when already at CURRENT_DATA_VERSION", () => {

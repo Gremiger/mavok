@@ -183,6 +183,37 @@ const MIGRATIONS: Record<number, MigrationFn> = {
 
     return d;
   },
+
+  11: (data) => {
+    const d = data as Record<string, unknown>;
+    d._version = 11;
+
+    const inventory = d.inventory as Array<Record<string, unknown>> | undefined;
+    if (Array.isArray(inventory)) {
+      for (const item of inventory) {
+        const targets = (item.magicBonusTargets as string[] | undefined) ?? [];
+        const hadWeaponTarget = targets.includes("weapon");
+        const oldBonus = (item.magicBonus as number | null | undefined) ?? null;
+
+        if (item.magicAttackBonus === undefined) {
+          item.magicAttackBonus = hadWeaponTarget ? oldBonus : null;
+        }
+        if (item.magicDamageBonus === undefined) {
+          item.magicDamageBonus = hadWeaponTarget ? oldBonus : null;
+        }
+        if (item.baseWeaponName === undefined) {
+          item.baseWeaponName = null;
+        }
+        if (Array.isArray(item.magicBonusTargets)) {
+          item.magicBonusTargets = (item.magicBonusTargets as string[]).filter(
+            (t) => t !== "weapon"
+          );
+        }
+      }
+    }
+
+    return d;
+  },
 };
 
 const BACKUP_PREFIX = "mavok_backup_pre_migration_";
