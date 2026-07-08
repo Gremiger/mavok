@@ -17,6 +17,7 @@ import { MAVOK_DEFAULT } from "@/data/mavok-default";
 export function useCharacter(id: string = "mavok-1") {
   const [character, setCharacter] = useState<Character | null>(null);
   const [ready, setReady] = useState(false);
+  const [lastSaved, setLastSaved] = useState<number | null>(null);
 
   useEffect(() => {
     const data = loadCharacter(id);
@@ -32,6 +33,7 @@ export function useCharacter(id: string = "mavok-1") {
   const update = useCallback(
     (updater: (prev: Character) => Character) => {
       setCharacter((prev) => (prev ? updater(prev) : prev));
+      setLastSaved(Date.now());
     },
     []
   );
@@ -299,6 +301,7 @@ export function useCharacter(id: string = "mavok-1") {
 
   return {
     character,
+    lastSaved,
     update,
     updateMeta,
     updateCombat,

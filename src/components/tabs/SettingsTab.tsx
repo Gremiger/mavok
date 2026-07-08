@@ -26,8 +26,14 @@ import { CHANGELOG } from "@/data/changelog";
 import { THEME_META } from "@/hooks/useTheme";
 
 export function SettingsTab() {
-  const { character, update, updateCombat, updateMeta, updateQuickActions } =
-    useCharacterContext();
+  const {
+    character,
+    lastSaved,
+    update,
+    updateCombat,
+    updateMeta,
+    updateQuickActions,
+  } = useCharacterContext();
   const {
     theme,
     setTheme,
@@ -539,6 +545,11 @@ export function SettingsTab() {
         <p className="mt-1">
           D&D 5.5e (2024) · Data v{CURRENT_DATA_VERSION}
         </p>
+        {lastSaved && (
+          <p className="mt-1">
+            Guardado: {new Date(lastSaved).toLocaleTimeString("es")}
+          </p>
+        )}
         <p className="mt-1 font-mono text-[0.6rem] text-muted/60">
           {process.env.NEXT_PUBLIC_COMMIT_SHA?.slice(0, 7) || "dev"}
         </p>

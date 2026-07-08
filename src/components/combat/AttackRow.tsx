@@ -6,6 +6,8 @@ import type { DiceRoll } from "@/lib/dice";
 import { computeRageBonus, rollAttackHit, rollAttackDamage } from "@/lib/attackRoll";
 import { exhaustionPenalty } from "@/lib/exhaustion";
 import { formatModifier } from "@/lib/utils";
+import { linkifyConditions } from "@/lib/linkifyConditions";
+import { CONDITIONS } from "@/data/conditions";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { Sword, Target, Hammer } from "lucide-react";
 import { useThemeContext } from "@/lib/context";
@@ -45,6 +47,9 @@ export function AttackRow({
 }) {
   const { density, magicItemIndicator } = useThemeContext();
   const [expanded, setExpanded] = useState(false);
+  const [viewingMasteryCondition, setViewingMasteryCondition] = useState<
+    string | null
+  >(null);
   const [lastRoll, setLastRoll] = useState<{ roll: DiceRoll; type: "hit" | "damage" } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -252,8 +257,23 @@ export function AttackRow({
                 {attack.masterySaveDC && ` (DC ${attack.masterySaveDC})`}:
               </span>{" "}
               <span className="text-foreground/80">
-                {attack.masteryEffect}
+                {linkifyConditions(attack.masteryEffect, (name) =>
+                  setViewingMasteryCondition((prev) =>
+                    prev === name ? null : name
+                  )
+                )}
               </span>
+              {viewingMasteryCondition && (
+                <p className="text-foreground/70 mt-1 pl-2 border-l border-border">
+                  <span className="text-accent font-heading">
+                    {viewingMasteryCondition}:
+                  </span>{" "}
+                  {
+                    CONDITIONS.find((c) => c.name === viewingMasteryCondition)
+                      ?.description
+                  }
+                </p>
+              )}
             </div>
           )}
           {rageActive && rageBonus > 0 && (

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { saveTotal, getEquippedGrantedActions } from "./utils";
+import { saveTotal, getEquippedGrantedActions, simplifyCurrency } from "./utils";
 import type { Character, InventoryItem, GrantedAction } from "./types";
 
 function makeGrantedAction(
@@ -213,5 +213,30 @@ describe("getEquippedGrantedActions", () => {
       ],
     });
     expect(getEquippedGrantedActions(character, "action")).toHaveLength(2);
+  });
+});
+
+describe("simplifyCurrency", () => {
+  it("consolidates loose cp/sp into fewer gp/sp/cp", () => {
+    const result = simplifyCurrency({ cp: 25, sp: 13, ep: 0, gp: 2, pp: 0 });
+    // 25cp + 130sp-as-cp(13*10) + 200gp-as-cp(2*100) = 355 copper
+    // -> 3gp (300), 5sp (50), 5cp
+    expect(result).toEqual({ cp: 5, sp: 5, ep: 0, gp: 3, pp: 0 });
+  });
+
+  it("leaves platinum untouched", () => {
+    const result = simplifyCurrency({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 7 });
+    expect(result.pp).toBe(7);
+  });
+
+  it("zeroes out electrum, folding its value into the total", () => {
+    const result = simplifyCurrency({ cp: 0, sp: 0, ep: 4, gp: 0, pp: 0 });
+    // 4ep * 50cp = 200 copper -> 2gp
+    expect(result).toEqual({ cp: 0, sp: 0, ep: 0, gp: 2, pp: 0 });
+  });
+
+  it("stays all-zero for all-zero input", () => {
+    const result = simplifyCurrency({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 });
+    expect(result).toEqual({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 });
   });
 });

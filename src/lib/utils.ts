@@ -1,4 +1,4 @@
-import type { AbilityScore, Character, InventoryItem } from "./types";
+import type { AbilityScore, Character, Currency, InventoryItem } from "./types";
 
 export function abilityModifier(score: number): number {
   return Math.floor((score - 10) / 2);
@@ -30,6 +30,16 @@ export function saveTotal(
     .filter((i) => i.equipped && i.magicBonusTargets.includes("save"))
     .reduce((sum, i) => sum + (i.magicBonus ?? 0), 0);
   return mod + prof + itemBonus;
+}
+
+export function simplifyCurrency(currency: Currency): Currency {
+  const totalCopper =
+    currency.cp + currency.sp * 10 + currency.ep * 50 + currency.gp * 100;
+  const gp = Math.floor(totalCopper / 100);
+  const remainder = totalCopper % 100;
+  const sp = Math.floor(remainder / 10);
+  const cp = remainder % 10;
+  return { cp, sp, ep: 0, gp, pp: currency.pp };
 }
 
 export function getEquippedGrantedActions(

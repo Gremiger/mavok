@@ -6,7 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { AttackFormModal } from "@/components/combat/AttackFormModal";
 import { exportInventoryCSV } from "@/lib/export";
-import { formatModifier } from "@/lib/utils";
+import { formatModifier, simplifyCurrency } from "@/lib/utils";
 import { toast } from "sonner";
 import { Sword, Shield, Wrench, FlaskConical, Heart, Plus, SearchX } from "lucide-react";
 import type { InventoryItem, GrantedAction } from "@/lib/types";
@@ -288,38 +288,46 @@ export function InventoryTab() {
   return (
     <div className="p-4 space-y-4">
       {/* Currency Bar */}
-      <div className="flex justify-around stone-card rounded-lg p-3">
-        {CURRENCY_LABELS.map(({ key, label }) => (
-          <div key={key} className="text-center">
-            {editingCurrency === key ? (
-              <input
-                type="number"
-                inputMode="numeric"
-                defaultValue={currency[key]}
-                className="w-12 bg-background border border-accent rounded text-center text-sm font-heading text-foreground"
-                autoFocus
-                onBlur={(e) => {
-                  const val = parseInt(e.target.value);
-                  if (!isNaN(val) && val >= 0) {
-                    updateCurrency({ [key]: val });
-                  }
-                  setEditingCurrency(null);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                }}
-              />
-            ) : (
-              <button
-                onClick={() => setEditingCurrency(key)}
-                className="font-heading text-lg text-accent min-w-[2rem]"
-              >
-                {currency[key]}
-              </button>
-            )}
-            <div className="text-muted text-xs">{label}</div>
-          </div>
-        ))}
+      <div className="stone-card rounded-lg p-3">
+        <div className="flex justify-around">
+          {CURRENCY_LABELS.map(({ key, label }) => (
+            <div key={key} className="text-center">
+              {editingCurrency === key ? (
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  defaultValue={currency[key]}
+                  className="w-12 bg-background border border-accent rounded text-center text-sm font-heading text-foreground"
+                  autoFocus
+                  onBlur={(e) => {
+                    const val = parseInt(e.target.value);
+                    if (!isNaN(val) && val >= 0) {
+                      updateCurrency({ [key]: val });
+                    }
+                    setEditingCurrency(null);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                  }}
+                />
+              ) : (
+                <button
+                  onClick={() => setEditingCurrency(key)}
+                  className="font-heading text-lg text-accent min-w-[2rem]"
+                >
+                  {currency[key]}
+                </button>
+              )}
+              <div className="text-muted text-xs">{label}</div>
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={() => updateCurrency(simplifyCurrency(currency))}
+          className="w-full mt-2 text-xs text-muted hover:text-accent border-t border-border pt-2"
+        >
+          Simplificar monedas
+        </button>
       </div>
 
       {/* Search, Sort, Filter */}
