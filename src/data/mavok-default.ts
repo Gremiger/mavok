@@ -171,6 +171,7 @@ export const MAVOK_DEFAULT: Character = {
       mastery: "Topple",
       masteryEffect: "El objetivo hace una salvación de CON o queda Prone.",
       masterySaveDC: 13,
+      versatileDamage: null,
     },
     {
       id: "handaxe-melee",
@@ -184,6 +185,7 @@ export const MAVOK_DEFAULT: Character = {
       masteryEffect:
         "El siguiente ataque contra el objetivo tiene ventaja.",
       masterySaveDC: null,
+      versatileDamage: null,
     },
     {
       id: "handaxe-thrown",
@@ -197,6 +199,7 @@ export const MAVOK_DEFAULT: Character = {
       masteryEffect:
         "El siguiente ataque contra el objetivo tiene ventaja.",
       masterySaveDC: null,
+      versatileDamage: null,
     },
     {
       id: "javelin",
@@ -209,6 +212,7 @@ export const MAVOK_DEFAULT: Character = {
       mastery: null,
       masteryEffect: null,
       masterySaveDC: null,
+      versatileDamage: null,
     },
     {
       id: "sickle",
@@ -221,6 +225,7 @@ export const MAVOK_DEFAULT: Character = {
       mastery: null,
       masteryEffect: null,
       masterySaveDC: null,
+      versatileDamage: null,
     },
   ],
   inventory: [

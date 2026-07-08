@@ -1,5 +1,5 @@
 import type { Attack, Character } from "./types";
-import { abilityModifier } from "./utils";
+import { abilityModifier, formatModifier } from "./utils";
 import { ARMOR } from "../data/armor";
 
 export function sumMagicBonus(
@@ -86,7 +86,7 @@ export function recalculateDerived(character: Character): Character {
     const damageMagicBonus = computeAttackMagicBonus(c, a, "damage");
     const newBonus = atkMod + pb + attackMagicBonus;
     const baseDice = a.damage.replace(/[+-]\d+$/, "");
-    const newDamage = `${baseDice}+${atkMod + damageMagicBonus}`;
+    const newDamage = `${baseDice}${formatModifier(atkMod + damageMagicBonus)}`;
 
     return {
       ...a,

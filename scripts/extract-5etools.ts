@@ -97,6 +97,7 @@ function extractWeapons() {
         mastery: masteries[0] || null,
         range,
         value: typeof i.value === "number" ? i.value / 100 : null,
+        versatileDamage: (i.dmg2 as string) || null,
       };
     });
 
@@ -111,6 +112,7 @@ function extractWeapons() {
   mastery: string | null;
   range: string | null;
   value: number | null;
+  versatileDamage: string | null;
 }
 
 export const WEAPONS: WeaponData[] = ${JSON.stringify(weapons, null, 2)};

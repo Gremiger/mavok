@@ -70,6 +70,44 @@ describe("migrateCharacterData", () => {
     expect(result.inventory[0].magicBonusTargets).toEqual(["ac"]);
   });
 
+  it("backfills versatileDamage on an old Versatile attack by matching the weapons catalog", () => {
+    const raw = JSON.stringify(
+      makeV1Data({
+        attacks: [
+          {
+            id: "atk-1",
+            name: "Longsword",
+            attackBonus: 5,
+            damage: "1d8+3",
+            damageType: "Slashing",
+            range: "5 ft",
+            properties: ["Versatile"],
+            mastery: null,
+            masteryEffect: null,
+            masterySaveDC: null,
+          },
+          {
+            id: "atk-2",
+            name: "Sickle",
+            attackBonus: 5,
+            damage: "1d4+3",
+            damageType: "Slashing",
+            range: "5 ft",
+            properties: ["Light"],
+            mastery: null,
+            masteryEffect: null,
+            masterySaveDC: null,
+          },
+        ],
+      })
+    );
+    const { data } = migrateCharacterData(raw);
+    const result = JSON.parse(data);
+
+    expect(result.attacks[0].versatileDamage).toBe("1d10");
+    expect(result.attacks[1].versatileDamage).toBeNull();
+  });
+
   it("returns unmigrated data when already at CURRENT_DATA_VERSION", () => {
     const raw = JSON.stringify({ _version: CURRENT_DATA_VERSION, foo: "bar" });
     const { data, migrated } = migrateCharacterData(raw);

@@ -4,6 +4,7 @@ import {
   computeRageBonus,
   rollAttackHit,
   rollAttackDamage,
+  toggleVersatileDamage,
 } from "./attackRoll";
 import type { Attack } from "./types";
 
@@ -19,6 +20,7 @@ function makeAttack(overrides: Partial<Attack> = {}): Attack {
     mastery: null,
     masteryEffect: null,
     masterySaveDC: null,
+    versatileDamage: null,
     ...overrides,
   };
 }
@@ -109,5 +111,56 @@ describe("rollAttackDamage", () => {
       rageDamage: 2,
     });
     expect(result.modifier).toBe(2);
+  });
+});
+
+describe("toggleVersatileDamage", () => {
+  it("swaps the base dice with the stored alternate, preserving the modifier", () => {
+    const attack = makeAttack({
+      damage: "1d8+3",
+      versatileDamage: "1d10",
+      properties: ["Versatile"],
+    });
+    const result = toggleVersatileDamage(attack);
+    expect(result.damage).toBe("1d10+3");
+    expect(result.versatileDamage).toBe("1d8");
+  });
+
+  it("toggling twice returns to the original state", () => {
+    const attack = makeAttack({
+      damage: "1d8+3",
+      versatileDamage: "1d10",
+      properties: ["Versatile"],
+    });
+    const result = toggleVersatileDamage(toggleVersatileDamage(attack));
+    expect(result.damage).toBe("1d8+3");
+    expect(result.versatileDamage).toBe("1d10");
+  });
+
+  it("preserves a negative modifier", () => {
+    const attack = makeAttack({
+      damage: "1d8-2",
+      versatileDamage: "1d10",
+      properties: ["Versatile"],
+    });
+    const result = toggleVersatileDamage(attack);
+    expect(result.damage).toBe("1d10-2");
+  });
+
+  it("handles a damage string with no modifier", () => {
+    const attack = makeAttack({
+      damage: "1d8",
+      versatileDamage: "1d10",
+      properties: ["Versatile"],
+    });
+    const result = toggleVersatileDamage(attack);
+    expect(result.damage).toBe("1d10");
+    expect(result.versatileDamage).toBe("1d8");
+  });
+
+  it("is a no-op when versatileDamage is null", () => {
+    const attack = makeAttack({ damage: "1d12+3", versatileDamage: null });
+    const result = toggleVersatileDamage(attack);
+    expect(result).toEqual(attack);
   });
 });

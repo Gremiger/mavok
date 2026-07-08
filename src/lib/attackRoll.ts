@@ -6,6 +6,18 @@ export function isStrBasedAttack(attack: Attack): boolean {
   return !attack.properties.includes("Finesse");
 }
 
+export function toggleVersatileDamage(attack: Attack): Attack {
+  if (!attack.versatileDamage) return attack;
+  const match = attack.damage.match(/^(.+?)([+-]\d+)?$/);
+  const currentBase = match ? match[1].trim() : attack.damage;
+  const mod = match?.[2] ?? "";
+  return {
+    ...attack,
+    damage: `${attack.versatileDamage}${mod}`,
+    versatileDamage: currentBase,
+  };
+}
+
 export function computeRageBonus(
   attack: Attack,
   rageActive: boolean,

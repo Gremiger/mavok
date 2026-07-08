@@ -15,6 +15,7 @@ const EMPTY_FORM = {
   mastery: "",
   masteryEffect: "",
   masterySaveDC: "",
+  versatileDamage: "",
 };
 
 function formFromAttack(existingAttack: Attack): typeof EMPTY_FORM {
@@ -31,6 +32,7 @@ function formFromAttack(existingAttack: Attack): typeof EMPTY_FORM {
       existingAttack.masterySaveDC != null
         ? String(existingAttack.masterySaveDC)
         : "",
+    versatileDamage: existingAttack.versatileDamage ?? "",
   };
 }
 
@@ -48,6 +50,7 @@ function formFromWeapon(
     properties: w.properties.join(", "),
     mastery: w.mastery ?? "",
     range: w.range ?? "5 ft",
+    versatileDamage: w.versatileDamage ?? "",
   };
 }
 
@@ -95,6 +98,7 @@ export function AttackFormModal({
         properties: w.properties.join(", "),
         mastery: w.mastery ?? "",
         range: w.range ?? "5 ft",
+        versatileDamage: w.versatileDamage ?? "",
       });
     }
   }
@@ -117,6 +121,7 @@ export function AttackFormModal({
       masterySaveDC: form.masterySaveDC.trim()
         ? parseInt(form.masterySaveDC)
         : null,
+      versatileDamage: form.versatileDamage.trim() || null,
     };
     onSave(attack);
     onClose();
@@ -192,6 +197,15 @@ export function AttackFormModal({
             className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
           />
         </div>
+
+        <input
+          value={form.versatileDamage}
+          onChange={(e) =>
+            setForm({ ...form, versatileDamage: e.target.value })
+          }
+          placeholder="Daño versátil (opcional, ej. 1d10)"
+          className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+        />
 
         <input
           value={form.properties}

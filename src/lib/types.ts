@@ -1,6 +1,6 @@
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
-export const CURRENT_DATA_VERSION = 11;
+export const CURRENT_DATA_VERSION = 12;
 
 export type PinnedAction =
   | { type: "rage" }
@@ -108,6 +108,7 @@ export interface Attack {
   mastery: string | null;
   masteryEffect: string | null;
   masterySaveDC: number | null;
+  versatileDamage: string | null;
 }
 
 export interface GrantedAction {

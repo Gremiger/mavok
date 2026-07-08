@@ -24,6 +24,7 @@ export function AttackRow({
   exhaustionLevel,
   attackMagicBonus = 0,
   damageMagicBonus = 0,
+  onToggleVersatile,
   onEdit,
   onDelete,
   onMoveUp,
@@ -36,6 +37,7 @@ export function AttackRow({
   exhaustionLevel: number;
   attackMagicBonus?: number;
   damageMagicBonus?: number;
+  onToggleVersatile?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
   onMoveUp?: () => void;
@@ -226,7 +228,22 @@ export function AttackRow({
       {expanded && (
         <div className="px-3 py-2 border-t border-border text-xs space-y-1">
           <div className="text-muted">
-            Propiedades: {attack.properties.join(", ")}
+            Propiedades:{" "}
+            {attack.properties.map((prop, i) => (
+              <span key={prop}>
+                {i > 0 && ", "}
+                {prop === "Versatile" && attack.versatileDamage ? (
+                  <button
+                    onClick={onToggleVersatile}
+                    className="underline decoration-dotted text-accent"
+                  >
+                    {prop}
+                  </button>
+                ) : (
+                  prop
+                )}
+              </span>
+            ))}
           </div>
           {attack.mastery && attack.masteryEffect && (
             <div>

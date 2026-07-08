@@ -36,6 +36,7 @@ function makeAttack(overrides: Partial<Attack> = {}): Attack {
     mastery: null,
     masteryEffect: null,
     masterySaveDC: null,
+    versatileDamage: null,
     ...overrides,
   };
 }

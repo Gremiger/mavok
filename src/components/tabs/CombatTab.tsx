@@ -22,6 +22,7 @@ import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
 import type { Attack, InventoryItem } from "@/lib/types";
 import { formatModifier, getEquippedGrantedActions } from "@/lib/utils";
 import { computeAttackMagicBonus, sumMagicBonus } from "@/lib/recalculate";
+import { toggleVersatileDamage } from "@/lib/attackRoll";
 import { toast } from "sonner";
 
 function baseDice(damage: string): string {
@@ -318,6 +319,9 @@ export function CombatTab() {
             exhaustionLevel={combat.exhaustionLevel}
             attackMagicBonus={computeAttackMagicBonus(character, a, "attack")}
             damageMagicBonus={computeAttackMagicBonus(character, a, "damage")}
+            onToggleVersatile={() =>
+              updateAttack(a.id, toggleVersatileDamage(a))
+            }
             onEdit={() => setAttackModalState(a)}
             onDelete={() => {
               const index = attacks.findIndex((x) => x.id === a.id);

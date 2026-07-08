@@ -1,4 +1,5 @@
 import { CURRENT_DATA_VERSION } from "./types";
+import { WEAPONS } from "../data/weapons";
 
 type MigrationFn = (data: Record<string, unknown>) => Record<string, unknown>;
 
@@ -209,6 +210,31 @@ const MIGRATIONS: Record<number, MigrationFn> = {
             (t) => t !== "weapon"
           );
         }
+      }
+    }
+
+    return d;
+  },
+
+  12: (data) => {
+    const d = data as Record<string, unknown>;
+    d._version = 12;
+
+    const attacks = d.attacks as Array<Record<string, unknown>> | undefined;
+    if (Array.isArray(attacks)) {
+      for (const attack of attacks) {
+        if (attack.versatileDamage !== undefined) continue;
+
+        const properties = (attack.properties as string[] | undefined) ?? [];
+        const name = (attack.name as string | undefined) ?? "";
+        const match = properties.includes("Versatile")
+          ? WEAPONS.find(
+              (w) =>
+                w.versatileDamage &&
+                (w.name === name || name.startsWith(`${w.name} (`))
+            )
+          : undefined;
+        attack.versatileDamage = match?.versatileDamage ?? null;
       }
     }
 
