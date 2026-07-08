@@ -272,7 +272,7 @@ export function RageTracker({
               className="overflow-hidden"
             >
               <div className="mt-2 px-1 space-y-0.5">
-                <p className="text-[0.65rem] text-orange-300/80 leading-relaxed">
+                <p className="text-[0.65rem] text-rage/80 leading-relaxed">
                   +2 daño · Resistencia Bludgeoning/Piercing/Slashing · Ventaja FUE checks/saves
                 </p>
                 <p className="text-[0.65rem] text-muted leading-relaxed">
