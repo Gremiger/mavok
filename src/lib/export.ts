@@ -35,14 +35,22 @@ export function exportQuickNotes(notes: QuickNote[]): void {
   );
 }
 
+export function parseCharacterJSON(text: string): Character {
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error("Archivo JSON inválido");
+  }
+}
+
 export function importCharacterJSON(file: File): Promise<Character> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        resolve(JSON.parse(reader.result as string));
-      } catch {
-        reject(new Error("Archivo JSON inválido"));
+        resolve(parseCharacterJSON(reader.result as string));
+      } catch (err) {
+        reject(err);
       }
     };
     reader.onerror = () => reject(reader.error);

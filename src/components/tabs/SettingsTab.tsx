@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
+import Script from "next/script";
 import { useCharacterContext } from "@/lib/context";
 import { useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
@@ -15,6 +16,16 @@ import {
   exportQuickNotes,
   importCharacterJSON,
 } from "@/lib/export";
+import {
+  initGoogleAuth,
+  requestGoogleDriveToken,
+  backupToGoogleDrive,
+  listGoogleDriveBackups,
+  restoreFromGoogleDrive,
+  parseBackupTimestamp,
+  DriveAuthError,
+  type DriveFile,
+} from "@/lib/googleDrive";
 import { LevelUpFlow } from "@/components/levelup/LevelUpFlow";
 import { WeaponMasteryModal } from "@/components/settings/WeaponMasteryModal";
 import { QuickActionsPicker } from "@/components/ui/QuickActionsPicker";
@@ -58,12 +69,93 @@ export function SettingsTab() {
   const [expandedChangelogEntry, setExpandedChangelogEntry] = useState<
     string | null
   >(null);
+  const [driveToken, setDriveToken] = useState<string | null>(null);
+  const [driveConnecting, setDriveConnecting] = useState(false);
+  const [driveBackingUp, setDriveBackingUp] = useState(false);
+  const [driveBackups, setDriveBackups] = useState<DriveFile[] | null>(null);
+  const [driveBackupsLoading, setDriveBackupsLoading] = useState(false);
+  const [driveRestoringId, setDriveRestoringId] = useState<string | null>(
+    null
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const portraitInputRef = useRef<HTMLInputElement>(null);
 
   if (!character) return null;
 
   const conMod = abilityModifier(character.attributes.con);
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+  function handleDriveAuthError(err: unknown, fallback: string) {
+    if (err instanceof DriveAuthError) {
+      setDriveToken(null);
+      toast.error("La sesión con Google Drive expiró — conectate de nuevo");
+      return;
+    }
+    toast.error(err instanceof Error ? err.message : fallback);
+  }
+
+  async function handleDriveConnect() {
+    if (!googleClientId) {
+      toast.error("Falta configurar NEXT_PUBLIC_GOOGLE_CLIENT_ID");
+      return;
+    }
+    setDriveConnecting(true);
+    try {
+      const token = await requestGoogleDriveToken();
+      setDriveToken(token);
+      setDriveBackups(null);
+      toast.success("Conectado con Google Drive");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "No se pudo conectar con Google Drive"
+      );
+    } finally {
+      setDriveConnecting(false);
+    }
+  }
+
+  async function handleDriveBackup() {
+    if (!driveToken) return;
+    setDriveBackingUp(true);
+    try {
+      await backupToGoogleDrive(driveToken, character!);
+      toast.success("Backup subido a Google Drive");
+      setDriveBackups(null);
+    } catch (err) {
+      handleDriveAuthError(err, "Error al subir el backup");
+    } finally {
+      setDriveBackingUp(false);
+    }
+  }
+
+  async function loadDriveBackups() {
+    if (!driveToken) return;
+    setDriveBackupsLoading(true);
+    try {
+      setDriveBackups(await listGoogleDriveBackups(driveToken));
+    } catch (err) {
+      handleDriveAuthError(err, "Error al cargar los backups");
+    } finally {
+      setDriveBackupsLoading(false);
+    }
+  }
+
+  async function handleDriveRestore(file: DriveFile) {
+    if (!driveToken) return;
+    setDriveRestoringId(file.id);
+    try {
+      const data = await restoreFromGoogleDrive(driveToken, file.id);
+      setImportPreview({
+        name: data.meta?.name || "Desconocido",
+        level: data.meta?.level || 0,
+        data,
+      });
+    } catch (err) {
+      handleDriveAuthError(err, "Error al restaurar desde Google Drive");
+    } finally {
+      setDriveRestoringId(null);
+    }
+  }
 
   function spendHitDie() {
     const result = computeHitDieSpend(character!.combat, conMod);
@@ -147,6 +239,7 @@ export function SettingsTab() {
     if (importPreview) {
       update(() => importPreview.data);
       setImportPreview(null);
+      toast.success("Personaje restaurado");
     }
   }
 
@@ -181,6 +274,13 @@ export function SettingsTab() {
 
   return (
     <div className="p-4 space-y-4">
+      {googleClientId && (
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+          onLoad={() => initGoogleAuth(googleClientId)}
+        />
+      )}
       {/* Theme */}
       <CollapsibleSection title="Tema" defaultOpen>
         <div className="space-y-2">
@@ -451,6 +551,86 @@ export function SettingsTab() {
             }}
           />
         </div>
+      </CollapsibleSection>
+
+      {/* Google Drive backup */}
+      <CollapsibleSection title="Backup en Google Drive">
+        {!driveToken ? (
+          <div className="space-y-2">
+            <p className="text-xs text-muted">
+              Guardá una copia de tus datos en tu Google Drive, accesible
+              desde cualquier dispositivo.
+            </p>
+            <button
+              onClick={handleDriveConnect}
+              disabled={driveConnecting}
+              className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm disabled:opacity-50"
+            >
+              {driveConnecting ? "Conectando..." : "Conectar con Google Drive"}
+            </button>
+            {!googleClientId && (
+              <p className="text-xs text-danger">
+                Falta configurar NEXT_PUBLIC_GOOGLE_CLIENT_ID.
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-xs text-success">Google Drive conectado</p>
+            <button
+              onClick={handleDriveBackup}
+              disabled={driveBackingUp}
+              className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm disabled:opacity-50"
+            >
+              {driveBackingUp ? "Subiendo..." : "Subir a Google Drive"}
+            </button>
+            <button
+              onClick={() => {
+                if (driveBackups === null) loadDriveBackups();
+              }}
+              className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm"
+            >
+              Restaurar desde Google Drive
+            </button>
+            {driveBackupsLoading && (
+              <p className="text-xs text-muted text-center py-2">
+                Cargando...
+              </p>
+            )}
+            {driveBackups !== null &&
+              !driveBackupsLoading &&
+              (driveBackups.length === 0 ? (
+                <p className="text-xs text-muted text-center py-2">
+                  No hay backups en Google Drive todavía.
+                </p>
+              ) : (
+                <div className="space-y-1">
+                  {driveBackups.map((f) => {
+                    const ts = parseBackupTimestamp(f.name);
+                    return (
+                      <div
+                        key={f.id}
+                        className="flex items-center justify-between p-2 bg-card rounded-lg border border-border"
+                      >
+                        <span className="text-xs text-foreground">
+                          {ts ? ts.toLocaleString("es") : f.name}
+                        </span>
+                        <button
+                          onClick={() => handleDriveRestore(f)}
+                          disabled={driveRestoringId === f.id}
+                          className="text-xs text-accent hover:underline disabled:opacity-50"
+                        >
+                          {driveRestoringId === f.id
+                            ? "Restaurando..."
+                            : "Restaurar"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+          </div>
+        )}
       </CollapsibleSection>
 
       {/* Backups */}
