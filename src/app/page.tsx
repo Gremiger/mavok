@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Script from "next/script";
 import { useCharacter } from "@/hooks/useCharacter";
 import { useTheme } from "@/hooks/useTheme";
-import { CharacterContext, ThemeContext } from "@/lib/context";
+import { useGoogleDriveAuth } from "@/hooks/useGoogleDriveAuth";
+import { CharacterContext, ThemeContext, GoogleDriveContext } from "@/lib/context";
+import { initGoogleAuth } from "@/lib/googleDrive";
 import { SheetTab } from "@/components/tabs/SheetTab";
 import { CombatTab } from "@/components/tabs/CombatTab";
 import { InventoryTab } from "@/components/tabs/InventoryTab";
@@ -36,6 +39,8 @@ export default function Home() {
   const [isPinching, setIsPinching] = useState(false);
   const charState = useCharacter();
   const themeState = useTheme();
+  const driveState = useGoogleDriveAuth();
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const { dragX, dragOpacity, handleDragEnd } = useSwipeNavigation(
     TAB_ORDER,
     activeTab,
@@ -64,84 +69,93 @@ export default function Home() {
   return (
     <CharacterContext.Provider value={charState}>
       <ThemeContext.Provider value={themeState}>
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            style: {
-              background: "var(--card)",
-              color: "var(--fg)",
-              border: "1px solid var(--border-color)",
-              fontFamily: "var(--font-inter)",
-            },
-          }}
-        />
-        <OfflineBadge />
-        <div className="flex flex-col min-h-dvh">
-          <motion.main
-            className="flex-1 overflow-y-auto pb-safe-nav"
-            style={{ x: dragX, opacity: dragOpacity, touchAction: 'pan-y pinch-zoom' }}
-            drag={
-              isPinching ||
-              activeTab === "enciclopedia" ||
-              activeTab === "notas"
-                ? false
-                : "x"
-            }
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            onDragEnd={handleDragEnd}
-            onTouchStart={(e) => {
-              if (e.touches.length > 1) setIsPinching(true);
+        <GoogleDriveContext.Provider value={driveState}>
+          {googleClientId && (
+            <Script
+              src="https://accounts.google.com/gsi/client"
+              strategy="afterInteractive"
+              onLoad={() => initGoogleAuth(googleClientId)}
+            />
+          )}
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              style: {
+                background: "var(--card)",
+                color: "var(--fg)",
+                border: "1px solid var(--border-color)",
+                fontFamily: "var(--font-inter)",
+              },
             }}
-            onTouchMove={(e) => {
-              if (e.touches.length > 1) setIsPinching(true);
-            }}
-            onTouchEnd={(e) => {
-              if (e.touches.length === 0) setIsPinching(false);
-            }}
-          >
-            {tabContent[activeTab]}
-          </motion.main>
-
-          <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 nav-island-bottom">
-            <div
-              className="mx-auto max-w-md flex items-center justify-around h-16 rounded-2xl border border-border/60"
-              style={{
-                background: "rgba(26,25,23,0.92)",
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
-                boxShadow: "0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)",
+          />
+          <OfflineBadge />
+          <div className="flex flex-col min-h-dvh">
+            <motion.main
+              className="flex-1 overflow-y-auto pb-safe-nav"
+              style={{ x: dragX, opacity: dragOpacity, touchAction: 'pan-y pinch-zoom' }}
+              drag={
+                isPinching ||
+                activeTab === "enciclopedia" ||
+                activeTab === "notas"
+                  ? false
+                  : "x"
+              }
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              onDragEnd={handleDragEnd}
+              onTouchStart={(e) => {
+                if (e.touches.length > 1) setIsPinching(true);
+              }}
+              onTouchMove={(e) => {
+                if (e.touches.length > 1) setIsPinching(true);
+              }}
+              onTouchEnd={(e) => {
+                if (e.touches.length === 0) setIsPinching(false);
               }}
             >
-              {TAB_META.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex flex-col items-center justify-center gap-0.5 text-[0.65rem] flex-1 h-full transition-colors ${
-                    activeTab === tab.id ? "text-accent" : "text-muted"
-                  }`}
-                >
-                  {activeTab === tab.id && (
-                    <motion.div
-                      layoutId="tab-indicator"
-                      className="absolute -bottom-0.5 left-3 right-3 h-0.5 bg-accent rounded-full"
-                      transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                  {tab.icon}
-                  <span>{tab.label}</span>
-                </button>
-              ))}
-            </div>
-          </nav>
-          {(activeTab === "ficha" || activeTab === "combate") && (
-            <QuickActionsFab activeTab={activeTab} />
-          )}
-        </div>
+              {tabContent[activeTab]}
+            </motion.main>
+
+            <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 nav-island-bottom">
+              <div
+                className="mx-auto max-w-md flex items-center justify-around h-16 rounded-2xl border border-border/60"
+                style={{
+                  background: "rgba(26,25,23,0.92)",
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)",
+                }}
+              >
+                {TAB_META.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`relative flex flex-col items-center justify-center gap-0.5 text-[0.65rem] flex-1 h-full transition-colors ${
+                      activeTab === tab.id ? "text-accent" : "text-muted"
+                    }`}
+                  >
+                    {activeTab === tab.id && (
+                      <motion.div
+                        layoutId="tab-indicator"
+                        className="absolute -bottom-0.5 left-3 right-3 h-0.5 bg-accent rounded-full"
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 30,
+                        }}
+                      />
+                    )}
+                    {tab.icon}
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
+              </div>
+            </nav>
+            {(activeTab === "ficha" || activeTab === "combate") && (
+              <QuickActionsFab activeTab={activeTab} />
+            )}
+          </div>
+        </GoogleDriveContext.Provider>
       </ThemeContext.Provider>
     </CharacterContext.Provider>
   );

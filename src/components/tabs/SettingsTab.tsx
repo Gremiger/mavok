@@ -2,8 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import Script from "next/script";
-import { useCharacterContext } from "@/lib/context";
+import { useCharacterContext, useGoogleDriveContext } from "@/lib/context";
 import { useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
@@ -17,14 +16,8 @@ import {
   importCharacterJSON,
 } from "@/lib/export";
 import {
-  initGoogleAuth,
-  requestGoogleDriveToken,
-  backupToGoogleDrive,
-  listGoogleDriveBackups,
-  restoreFromGoogleDrive,
   parseBackupTimestamp,
   isRunningAsStandalonePWA,
-  DriveAuthError,
   type DriveFile,
 } from "@/lib/googleDrive";
 import { LevelUpFlow } from "@/components/levelup/LevelUpFlow";
@@ -70,14 +63,7 @@ export function SettingsTab() {
   const [expandedChangelogEntry, setExpandedChangelogEntry] = useState<
     string | null
   >(null);
-  const [driveToken, setDriveToken] = useState<string | null>(null);
-  const [driveConnecting, setDriveConnecting] = useState(false);
-  const [driveBackingUp, setDriveBackingUp] = useState(false);
-  const [driveBackups, setDriveBackups] = useState<DriveFile[] | null>(null);
-  const [driveBackupsLoading, setDriveBackupsLoading] = useState(false);
-  const [driveRestoringId, setDriveRestoringId] = useState<string | null>(
-    null
-  );
+  const drive = useGoogleDriveContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const portraitInputRef = useRef<HTMLInputElement>(null);
 
@@ -86,76 +72,14 @@ export function SettingsTab() {
   const conMod = abilityModifier(character.attributes.con);
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-  function handleDriveAuthError(err: unknown, fallback: string) {
-    if (err instanceof DriveAuthError) {
-      setDriveToken(null);
-      toast.error("La sesión con Google Drive expiró — conectate de nuevo");
-      return;
-    }
-    toast.error(err instanceof Error ? err.message : fallback);
-  }
-
-  async function handleDriveConnect() {
-    if (!googleClientId) {
-      toast.error("Falta configurar NEXT_PUBLIC_GOOGLE_CLIENT_ID");
-      return;
-    }
-    setDriveConnecting(true);
-    try {
-      const token = await requestGoogleDriveToken();
-      setDriveToken(token);
-      setDriveBackups(null);
-      toast.success("Conectado con Google Drive");
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "No se pudo conectar con Google Drive"
-      );
-    } finally {
-      setDriveConnecting(false);
-    }
-  }
-
-  async function handleDriveBackup() {
-    if (!driveToken) return;
-    setDriveBackingUp(true);
-    try {
-      await backupToGoogleDrive(driveToken, character!);
-      toast.success("Backup subido a Google Drive");
-      setDriveBackups(null);
-    } catch (err) {
-      handleDriveAuthError(err, "Error al subir el backup");
-    } finally {
-      setDriveBackingUp(false);
-    }
-  }
-
-  async function loadDriveBackups() {
-    if (!driveToken) return;
-    setDriveBackupsLoading(true);
-    try {
-      setDriveBackups(await listGoogleDriveBackups(driveToken));
-    } catch (err) {
-      handleDriveAuthError(err, "Error al cargar los backups");
-    } finally {
-      setDriveBackupsLoading(false);
-    }
-  }
-
   async function handleDriveRestore(file: DriveFile) {
-    if (!driveToken) return;
-    setDriveRestoringId(file.id);
-    try {
-      const data = await restoreFromGoogleDrive(driveToken, file.id);
-      setImportPreview({
-        name: data.meta?.name || "Desconocido",
-        level: data.meta?.level || 0,
-        data,
-      });
-    } catch (err) {
-      handleDriveAuthError(err, "Error al restaurar desde Google Drive");
-    } finally {
-      setDriveRestoringId(null);
-    }
+    const data = await drive.restore(file);
+    if (!data) return;
+    setImportPreview({
+      name: data.meta?.name || "Desconocido",
+      level: data.meta?.level || 0,
+      data,
+    });
   }
 
   function spendHitDie() {
@@ -275,13 +199,6 @@ export function SettingsTab() {
 
   return (
     <div className="p-4 space-y-4">
-      {googleClientId && (
-        <Script
-          src="https://accounts.google.com/gsi/client"
-          strategy="afterInteractive"
-          onLoad={() => initGoogleAuth(googleClientId)}
-        />
-      )}
       {/* Theme */}
       <CollapsibleSection title="Tema" defaultOpen>
         <div className="space-y-2">
@@ -556,7 +473,7 @@ export function SettingsTab() {
 
       {/* Google Drive backup */}
       <CollapsibleSection title="Backup en Google Drive">
-        {!driveToken ? (
+        {!drive.driveToken ? (
           <div className="space-y-2">
             <p className="text-xs text-muted">
               Guardá una copia de tus datos en tu Google Drive, accesible
@@ -571,11 +488,11 @@ export function SettingsTab() {
             ) : (
               <>
                 <button
-                  onClick={handleDriveConnect}
-                  disabled={driveConnecting}
+                  onClick={() => drive.connect(googleClientId)}
+                  disabled={drive.driveConnecting}
                   className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm disabled:opacity-50"
                 >
-                  {driveConnecting
+                  {drive.driveConnecting
                     ? "Conectando..."
                     : "Conectar con Google Drive"}
                 </button>
@@ -591,34 +508,34 @@ export function SettingsTab() {
           <div className="space-y-2">
             <p className="text-xs text-success">Google Drive conectado</p>
             <button
-              onClick={handleDriveBackup}
-              disabled={driveBackingUp}
+              onClick={() => drive.backup(character)}
+              disabled={drive.driveBackingUp}
               className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm disabled:opacity-50"
             >
-              {driveBackingUp ? "Subiendo..." : "Subir a Google Drive"}
+              {drive.driveBackingUp ? "Subiendo..." : "Subir a Google Drive"}
             </button>
             <button
               onClick={() => {
-                if (driveBackups === null) loadDriveBackups();
+                if (drive.driveBackups === null) drive.loadBackups();
               }}
               className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm"
             >
               Restaurar desde Google Drive
             </button>
-            {driveBackupsLoading && (
+            {drive.driveBackupsLoading && (
               <p className="text-xs text-muted text-center py-2">
                 Cargando...
               </p>
             )}
-            {driveBackups !== null &&
-              !driveBackupsLoading &&
-              (driveBackups.length === 0 ? (
+            {drive.driveBackups !== null &&
+              !drive.driveBackupsLoading &&
+              (drive.driveBackups.length === 0 ? (
                 <p className="text-xs text-muted text-center py-2">
                   No hay backups en Google Drive todavía.
                 </p>
               ) : (
                 <div className="space-y-1">
-                  {driveBackups.map((f) => {
+                  {drive.driveBackups.map((f) => {
                     const ts = parseBackupTimestamp(f.name);
                     return (
                       <div
@@ -630,10 +547,10 @@ export function SettingsTab() {
                         </span>
                         <button
                           onClick={() => handleDriveRestore(f)}
-                          disabled={driveRestoringId === f.id}
+                          disabled={drive.driveRestoringId === f.id}
                           className="text-xs text-accent hover:underline disabled:opacity-50"
                         >
-                          {driveRestoringId === f.id
+                          {drive.driveRestoringId === f.id
                             ? "Restaurando..."
                             : "Restaurar"}
                         </button>
