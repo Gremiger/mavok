@@ -14,6 +14,22 @@ export interface DriveFile {
 
 export class DriveAuthError extends Error {}
 
+/**
+ * A standalone-display PWA (added to the home screen) can't reliably use
+ * popup-based OAuth: the popup's postMessage back to the opener breaks, GIS
+ * falls back to a full top-level navigation, and the whole app reloads
+ * fresh mid-flow, silently discarding the in-memory token. Detect this so
+ * the UI can steer the user to a regular browser tab instead of repeating
+ * the same broken flow.
+ */
+export function isRunningAsStandalonePWA(): boolean {
+  if (typeof window === "undefined") return false;
+  const iosStandalone =
+    (window.navigator as Navigator & { standalone?: boolean }).standalone ===
+    true;
+  return window.matchMedia("(display-mode: standalone)").matches || iosStandalone;
+}
+
 const BACKUP_FILENAME_PATTERN =
   /^mavok-backup-(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})\.json$/;
 

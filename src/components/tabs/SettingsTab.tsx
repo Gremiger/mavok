@@ -23,6 +23,7 @@ import {
   listGoogleDriveBackups,
   restoreFromGoogleDrive,
   parseBackupTimestamp,
+  isRunningAsStandalonePWA,
   DriveAuthError,
   type DriveFile,
 } from "@/lib/googleDrive";
@@ -561,17 +562,29 @@ export function SettingsTab() {
               Guardá una copia de tus datos en tu Google Drive, accesible
               desde cualquier dispositivo.
             </p>
-            <button
-              onClick={handleDriveConnect}
-              disabled={driveConnecting}
-              className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm disabled:opacity-50"
-            >
-              {driveConnecting ? "Conectando..." : "Conectar con Google Drive"}
-            </button>
-            {!googleClientId && (
+            {isRunningAsStandalonePWA() ? (
               <p className="text-xs text-danger">
-                Falta configurar NEXT_PUBLIC_GOOGLE_CLIENT_ID.
+                Abrí Mavok en una pestaña normal del navegador (no desde el
+                ícono instalado) para conectar Google Drive — esta acción no
+                funciona de forma confiable en modo app instalada.
               </p>
+            ) : (
+              <>
+                <button
+                  onClick={handleDriveConnect}
+                  disabled={driveConnecting}
+                  className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm disabled:opacity-50"
+                >
+                  {driveConnecting
+                    ? "Conectando..."
+                    : "Conectar con Google Drive"}
+                </button>
+                {!googleClientId && (
+                  <p className="text-xs text-danger">
+                    Falta configurar NEXT_PUBLIC_GOOGLE_CLIENT_ID.
+                  </p>
+                )}
+              </>
             )}
           </div>
         ) : (

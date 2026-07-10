@@ -1,9 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import {
   backupFilename,
   isBackupFilename,
   parseBackupTimestamp,
   selectFilesToDeleteForRotation,
+  isRunningAsStandalonePWA,
   MAX_BACKUPS,
   type DriveFile,
 } from "./googleDrive";
@@ -60,5 +61,39 @@ describe("selectFilesToDeleteForRotation", () => {
   it("respects a custom keep count", () => {
     const files = makeFiles(4);
     expect(selectFilesToDeleteForRotation(files, 2)).toEqual(files.slice(2));
+  });
+});
+
+describe("isRunningAsStandalonePWA", () => {
+  function mockMatchMedia(matches: boolean) {
+    window.matchMedia = vi.fn().mockReturnValue({ matches } as MediaQueryList);
+  }
+
+  afterEach(() => {
+    // @ts-expect-error -- jsdom doesn't define matchMedia; clean up our stub
+    delete window.matchMedia;
+    Object.defineProperty(window.navigator, "standalone", {
+      value: undefined,
+      configurable: true,
+    });
+  });
+
+  it("returns true when display-mode: standalone matches", () => {
+    mockMatchMedia(true);
+    expect(isRunningAsStandalonePWA()).toBe(true);
+  });
+
+  it("returns true when navigator.standalone is set (iOS Safari)", () => {
+    mockMatchMedia(false);
+    Object.defineProperty(window.navigator, "standalone", {
+      value: true,
+      configurable: true,
+    });
+    expect(isRunningAsStandalonePWA()).toBe(true);
+  });
+
+  it("returns false in a regular browser tab", () => {
+    mockMatchMedia(false);
+    expect(isRunningAsStandalonePWA()).toBe(false);
   });
 });
