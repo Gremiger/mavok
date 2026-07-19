@@ -65,6 +65,7 @@ export function CombatTab() {
   const [dadosForceOpenKey, setDadosForceOpenKey] = useState(0);
   const attacksSectionRef = useRef<HTMLDivElement>(null);
   const dadosSectionRef = useRef<HTMLDivElement>(null);
+  const tempHpInputRef = useRef<HTMLInputElement>(null);
   const stoneEnduranceLongPress = useLongPress(() =>
     setStoneEnduranceEditing(true)
   );
@@ -162,6 +163,14 @@ export function CombatTab() {
 
   function toggleInspiration() {
     updateMeta({ inspiration: !meta.inspiration });
+  }
+
+  function applyTempHp() {
+    const val = parseInt(tempHpInputRef.current?.value ?? "");
+    if (!isNaN(val) && val >= 0) {
+      updateCombat({ tempHp: val });
+      setTempHpInput(false);
+    }
   }
 
   const isDying = combat.currentHp === 0;
@@ -675,24 +684,25 @@ export function CombatTab() {
       >
         <div className="space-y-3">
           <input
+            ref={tempHpInputRef}
             type="number"
             inputMode="numeric"
             defaultValue={combat.tempHp}
             className="w-full bg-background border border-border rounded-lg p-3 text-center text-2xl font-heading text-foreground"
             autoFocus
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                const val = parseInt((e.target as HTMLInputElement).value);
-                if (!isNaN(val) && val >= 0) {
-                  updateCombat({ tempHp: val });
-                  setTempHpInput(false);
-                }
-              }
+              if (e.key === "Enter") applyTempHp();
             }}
           />
           <p className="text-xs text-muted text-center">
             Los Temp HP no se acumulan — se usa el valor más alto
           </p>
+          <button
+            onClick={applyTempHp}
+            className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+          >
+            Aplicar
+          </button>
         </div>
       </Modal>
 
@@ -709,7 +719,7 @@ export function CombatTab() {
           <div className="flex items-center justify-center gap-4">
             <button
               onClick={() => setTempAcMod((p) => p - 1)}
-              className="w-12 h-12 rounded-lg bg-card border border-border text-xl font-heading text-foreground active:scale-95 transition-transform"
+              className="w-12 h-12 rounded-full bg-card border border-border text-xl font-heading text-foreground active:scale-95 transition-transform"
             >
               -
             </button>
@@ -718,7 +728,7 @@ export function CombatTab() {
             </span>
             <button
               onClick={() => setTempAcMod((p) => p + 1)}
-              className="w-12 h-12 rounded-lg bg-card border border-border text-xl font-heading text-foreground active:scale-95 transition-transform"
+              className="w-12 h-12 rounded-full bg-card border border-border text-xl font-heading text-foreground active:scale-95 transition-transform"
             >
               +
             </button>
