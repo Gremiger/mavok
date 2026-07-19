@@ -18,13 +18,13 @@
 
 :root,
 [data-theme="piedra-viva"] {
-  --bg: #0f0f0f;
-  --card: #1a1917;
-  --accent: #b87333;
+  --bg: #14100c;
+  --card: #1f1710;
+  --accent: #c98a4b;
   --cord: #a63d2f;
-  --fg: #d4cfc4;
-  --muted: #5c5647;
-  --border-color: #2a2822;
+  --fg: #d9c9a3;
+  --muted: #5c4f3d;
+  --border-color: #4a3520;
 }
 
 [data-theme="dark-fantasy"] {
@@ -38,23 +38,23 @@
 }
 
 [data-theme="pergamino"] {
-  --bg: #d9c9a3;
-  --card: #f0e6cc;
-  --accent: #9c2b2b;
+  --bg: #d9c396;
+  --card: #f3e9cc;
+  --accent: #7a1f1f;
   --cord: #5c3a1f;
-  --fg: #2e2417;
+  --fg: #3a2c14;
   --muted: #8a7554;
-  --border-color: #c4b28e;
+  --border-color: #9c8a54;
 }
 
 [data-theme="furia-de-sangre"] {
-  --bg: #160b0b;
-  --card: #241010;
+  --bg: #0a0a0a;
+  --card: #131313;
   --accent: #c23b2b;
   --cord: #6e1414;
-  --fg: #e8d8ce;
+  --fg: #ece8e4;
   --muted: #6b4444;
-  --border-color: #3a1414;
+  --border-color: #2a2a2a;
 }
 
 /* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
