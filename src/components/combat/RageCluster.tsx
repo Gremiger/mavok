@@ -5,6 +5,8 @@ import { shouldUseRageBadge } from "@/lib/rageDisplay";
 
 const EMBER_WISP_OFFSETS = [25, 55, 75];
 const EMBER_WISP_DELAYS = [0.2, 0.9, 1.6];
+const EMBER_BURST_OFFSETS = [15, 30, 45, 60, 75, 90];
+const EMBER_BURST_DELAYS = [0, 0.05, 0.1, 0.15, 0.2, 0.25];
 
 export interface RageClusterProps {
   slots: boolean[];
@@ -20,6 +22,13 @@ export function RageCluster({
   onToggleActive,
 }: RageClusterProps) {
   const [expanded, setExpanded] = useState(false);
+  const [prevActive, setPrevActive] = useState(active);
+  const [igniteKey, setIgniteKey] = useState(0);
+
+  if (active !== prevActive) {
+    setPrevActive(active);
+    if (active) setIgniteKey((k) => k + 1);
+  }
   const total = slots.length;
   const remaining = slots.filter(Boolean).length;
   const useBadge = shouldUseRageBadge(total);
@@ -66,13 +75,23 @@ export function RageCluster({
         }`}
         aria-label={active ? "Desactivar Rage" : "Activar Rage"}
       >
-        🔥
+        <span key={`flame-${igniteKey}`} className={igniteKey > 0 ? "ignite-flash" : undefined}>
+          🔥
+        </span>
         {active &&
           EMBER_WISP_OFFSETS.map((left, i) => (
             <span
               key={`wisp-${i}`}
               className="ember-wisp"
               style={{ left: `${left}%`, animationDelay: `${EMBER_WISP_DELAYS[i]}s` }}
+            />
+          ))}
+        {igniteKey > 0 &&
+          EMBER_BURST_OFFSETS.map((left, i) => (
+            <span
+              key={`burst-${igniteKey}-${i}`}
+              className="ember-burst"
+              style={{ left: `${left}%`, animationDelay: `${EMBER_BURST_DELAYS[i]}s` }}
             />
           ))}
       </button>

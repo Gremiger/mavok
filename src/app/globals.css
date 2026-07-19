@@ -327,6 +327,32 @@ body {
   100% { opacity: 0; transform: translateY(-22px) scale(1.2); }
 }
 
+/* Ignition flourish — one-time burst on Rage activation */
+.ignite-flash {
+  display: inline-block;
+  animation: rage-ignite-flash 400ms ease-out 1;
+}
+@keyframes rage-ignite-flash {
+  0% { transform: scale(1); filter: brightness(1); }
+  30% { transform: scale(1.35); filter: brightness(1.6); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+.ember-burst {
+  position: absolute;
+  bottom: 40%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--cord) 30%, white);
+  pointer-events: none;
+  animation: rage-ember-burst 400ms ease-out 1;
+}
+@keyframes rage-ember-burst {
+  0% { opacity: 0; transform: translateY(0) scale(0.4); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-30px) scale(1); }
+}
+
 /* Dialog centering */
 dialog {
   margin: auto;
