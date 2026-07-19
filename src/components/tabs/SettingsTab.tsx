@@ -287,44 +287,31 @@ export function SettingsTab() {
       {/* Rest */}
       <CollapsibleSection title="Descanso" defaultOpen>
         <div className="space-y-2">
-          <button
+          <CompactRow
             onClick={() => {
               setShortRestLog([]);
               setShortRestOpen(true);
             }}
-            className="w-full p-3 bg-card rounded-lg border border-border text-left"
-          >
-            <span className="font-heading text-accent text-sm">
-              Descanso corto
-            </span>
-            <span className="text-xs text-muted block mt-0.5">
-              Gastar dados de golpe · Recuperar 1 Rage
-            </span>
-          </button>
-          <button
+            name={<span className="font-heading text-accent">Descanso corto</span>}
+            meta="Gastar dados de golpe · Recuperar 1 Rage"
+            right={null}
+          />
+          <CompactRow
             onClick={() => setLongRestOpen(true)}
-            className="w-full p-3 bg-card rounded-lg border border-border text-left"
-          >
-            <span className="font-heading text-accent text-sm">
-              Descanso largo
-            </span>
-            <span className="text-xs text-muted block mt-0.5">
-              Recuperar HP, rage, dados de golpe
-            </span>
-          </button>
-          <button
+            name={<span className="font-heading text-accent">Descanso largo</span>}
+            meta="Recuperar HP, rage, dados de golpe"
+            right={null}
+          />
+          <CompactRow
             onClick={() => setWeaponMasteryOpen(true)}
-            className="w-full p-3 bg-card rounded-lg border border-border text-left"
-          >
-            <span className="font-heading text-accent text-sm">
-              Practicar con armas
-            </span>
-            <span className="text-xs text-muted block mt-0.5">
-              {character.weaponMasteryUsedThisRest
+            name={<span className="font-heading text-accent">Practicar con armas</span>}
+            meta={
+              character.weaponMasteryUsedThisRest
                 ? "⚠️ Ya practicaste este descanso largo — esto no sigue las reglas"
-                : "Cambiar una maestría de arma (1 por descanso largo)"}
-            </span>
-          </button>
+                : "Cambiar una maestría de arma (1 por descanso largo)"
+            }
+            right={null}
+          />
         </div>
       </CollapsibleSection>
 
