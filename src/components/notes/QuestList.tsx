@@ -5,6 +5,7 @@ import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { Tag } from "@/components/ui/Tag";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { GhostChip } from "@/components/ui/GhostChip";
 import { Plus, ScrollText } from "lucide-react";
 import type { QuestEntry } from "@/lib/types";
 import { toast } from "sonner";
@@ -126,17 +127,9 @@ export function QuestList({
       {/* Filter */}
       <div className="flex gap-1">
         {(["all", "active", "completed", "failed"] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-3 py-1 rounded-full text-xs ${
-              filter === f
-                ? "bg-accent text-white"
-                : "bg-card border border-border text-muted"
-            }`}
-          >
+          <GhostChip key={f} onClick={() => setFilter(f)} solid={filter === f}>
             {f === "all" ? "Todas" : STATUS_CONFIG[f].label}
-          </button>
+          </GhostChip>
         ))}
       </div>
 

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Star, SearchX } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { CompactRow } from "@/components/ui/CompactRow";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useThemeContext } from "@/lib/context";
 import { CONDITIONS } from "@/data/conditions";
@@ -260,30 +261,34 @@ export function EncyclopediaTab() {
   function renderRow(item: EncyclopediaItem, showCategoryBadge: boolean) {
     const isFavorite = encyclopediaFavorites.includes(item.id);
     return (
-      <div
+      <CompactRow
         key={item.id}
         onClick={() => setViewingItem(item)}
-        className="stone-card rounded-lg p-3 cursor-pointer active:scale-[0.99] transition-transform flex items-center gap-2"
-      >
-        {showCategoryBadge && (
-          <span className="text-[0.6rem] px-1.5 py-0.5 bg-accent/20 text-accent rounded shrink-0">
-            {CATEGORIES.find((c) => c.id === item.category)?.label}
+        name={
+          <>
+            {showCategoryBadge && (
+              <span className="text-[0.6rem] px-1.5 py-0.5 bg-accent/20 text-accent rounded mr-1.5">
+                {CATEGORIES.find((c) => c.id === item.category)?.label}
+              </span>
+            )}
+            {item.name}
+          </>
+        }
+        right={
+          <span className="flex items-center gap-2">
+            {item.hint && <span className="text-muted text-xs">{item.hint}</span>}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFavorite(item.id);
+              }}
+              className="text-accent"
+            >
+              <Star size={14} fill={isFavorite ? "currentColor" : "none"} />
+            </button>
           </span>
-        )}
-        <span className="text-sm truncate flex-1">{item.name}</span>
-        {item.hint && (
-          <span className="text-muted text-xs shrink-0">{item.hint}</span>
-        )}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleFavorite(item.id);
-          }}
-          className="shrink-0 text-accent"
-        >
-          <Star size={14} fill={isFavorite ? "currentColor" : "none"} />
-        </button>
-      </div>
+        }
+      />
     );
   }
 

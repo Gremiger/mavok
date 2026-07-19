@@ -10,6 +10,7 @@ import { NoteList } from "@/components/notes/NoteList";
 import { QuestList } from "@/components/notes/QuestList";
 import { JournalList } from "@/components/notes/JournalList";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { CompactRow } from "@/components/ui/CompactRow";
 import type { Notes } from "@/lib/types";
 
 const SUB_TABS = [
@@ -199,16 +200,19 @@ export function NotesTab() {
           results.length > 0 ? (
             <div className="space-y-2">
               {results.map((r) => (
-                <div
+                <CompactRow
                   key={`${r.section}-${r.id}`}
                   onClick={() => handleResultTap(r)}
-                  className="stone-card rounded-lg p-3 cursor-pointer active:scale-[0.99] transition-transform flex items-center gap-2"
-                >
-                  <span className="text-[0.6rem] px-1.5 py-0.5 bg-accent/20 text-accent rounded shrink-0">
-                    {r.typeLabel}
-                  </span>
-                  <span className="text-sm truncate">{r.title}</span>
-                </div>
+                  name={
+                    <>
+                      <span className="text-[0.6rem] px-1.5 py-0.5 bg-accent/20 text-accent rounded mr-1.5">
+                        {r.typeLabel}
+                      </span>
+                      {r.title}
+                    </>
+                  }
+                  right={null}
+                />
               ))}
             </div>
           ) : (
