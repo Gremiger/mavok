@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { shouldUseRageBadge } from "@/lib/rageDisplay";
 
+const EMBER_WISP_OFFSETS = [25, 55, 75];
+const EMBER_WISP_DELAYS = [0.2, 0.9, 1.6];
+
 export interface RageClusterProps {
   slots: boolean[];
   active: boolean;
@@ -54,7 +57,7 @@ export function RageCluster({
       <button
         onClick={onToggleActive}
         disabled={!active && !canActivate}
-        className={`w-6 h-6 rounded-full flex items-center justify-center text-sm border transition-shadow ${
+        className={`relative w-6 h-6 rounded-full flex items-center justify-center text-sm border transition-shadow ${
           active
             ? "border-cord bg-cord shadow-[0_0_8px_rgba(166,61,47,0.6)]"
             : canActivate
@@ -64,6 +67,14 @@ export function RageCluster({
         aria-label={active ? "Desactivar Rage" : "Activar Rage"}
       >
         🔥
+        {active &&
+          EMBER_WISP_OFFSETS.map((left, i) => (
+            <span
+              key={`wisp-${i}`}
+              className="ember-wisp"
+              style={{ left: `${left}%`, animationDelay: `${EMBER_WISP_DELAYS[i]}s` }}
+            />
+          ))}
       </button>
     </div>
   );

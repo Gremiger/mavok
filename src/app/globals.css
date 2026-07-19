@@ -310,6 +310,23 @@ body {
   60% { transform: scale(1); }
 }
 
+/* Ember Wisp — steady particles rising from the flame toggle while raging */
+.ember-wisp {
+  position: absolute;
+  bottom: 40%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--cord) 40%, white);
+  pointer-events: none;
+  animation: rage-ember-rise 2s ease-out infinite;
+}
+@keyframes rage-ember-rise {
+  0% { opacity: 0; transform: translateY(0) scale(0.6); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-22px) scale(1.2); }
+}
+
 /* Dialog centering */
 dialog {
   margin: auto;
