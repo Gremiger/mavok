@@ -201,6 +201,7 @@ export function CombatTab() {
           onToggleSlot: toggleRageSlot,
           onToggleActive: toggleRageActive,
         }}
+        rageDamage={rageDamage}
         deathSaves={combat.deathSaves}
         onOpenHp={() => setHpModalOpen(true)}
         onOpenTempHp={() => setTempHpInput(true)}

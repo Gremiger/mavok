@@ -19,6 +19,7 @@ export interface CombatVitalsProps {
   effectiveSpeed: number;
   speedReduction: number;
   rage: RageClusterProps;
+  rageDamage: number;
   deathSaves: { successes: number; failures: number };
   onOpenHp: () => void;
   onOpenTempHp: () => void;
@@ -42,6 +43,7 @@ export function CombatVitals({
   effectiveSpeed,
   speedReduction,
   rage,
+  rageDamage,
   deathSaves,
   onOpenHp,
   onOpenTempHp,
@@ -67,7 +69,7 @@ export function CombatVitals({
           onRegainConsciousness={onRegainConsciousness}
         />
       ) : (
-        <div className="flex items-center justify-between gap-2">
+        <div className="relative flex items-center justify-between gap-2">
           <button onClick={onOpenHp} className="text-left active:scale-95 transition-transform">
             <span className="block font-heading text-2xl leading-none text-accent">
               {currentHp}/{maxHp}
@@ -98,11 +100,20 @@ export function CombatVitals({
         </div>
       )}
 
-      <div className="mt-2.5">
+      <div className="relative mt-2.5">
         <RageCluster {...rage} />
       </div>
 
-      <div className="flex items-center justify-around gap-1.5 mt-2.5 pt-2 border-t border-border/40">
+      {rage.active && (
+        <div className="relative mt-2.5 pt-2 border-t border-cord/30 text-[0.7rem] leading-relaxed text-foreground/85">
+          <span className="text-accent font-semibold">{rageDamage} daño</span> · Resistencia
+          Bludgeoning/Piercing/Slashing · Ventaja FUE checks/saves
+          <br />
+          Extiende: ataca · fuerza salvación · Bonus Action · No concentración ni hechizos
+        </div>
+      )}
+
+      <div className="relative flex items-center justify-around gap-1.5 mt-2.5 pt-2 border-t border-border/40">
         <StatBadge compact label="Temp" value={`+${tempHp}`} onClick={onOpenTempHp} highlight={tempHp > 0} />
         <StatBadge compact label="Init" value={formatModifier(initiative)} />
         <StatBadge compact label="Insp" value={inspiration ? "★" : "☆"} onClick={onToggleInspiration} highlight={inspiration} />
