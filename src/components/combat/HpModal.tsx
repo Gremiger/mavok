@@ -63,7 +63,7 @@ export function HpModal({
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`flex-1 py-2 rounded-lg text-sm font-heading transition-colors ${
+              className={`flex-1 py-2 rounded-full text-sm font-heading transition-colors ${
                 mode === m
                   ? m === "damage"
                     ? "bg-danger text-white"
@@ -97,7 +97,7 @@ export function HpModal({
                   String((parseInt(prev) || 0) + n)
                 )
               }
-              className="flex-1 py-2 bg-card border border-border rounded-lg text-sm text-foreground active:scale-95 transition-transform"
+              className="flex-1 py-2 bg-card border border-border rounded-full text-sm text-foreground active:scale-95 transition-transform"
             >
               +{n}
             </button>
