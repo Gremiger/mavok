@@ -97,7 +97,7 @@ export function AttackRow({
   return (
     <div className="stone-card rounded-lg mb-2">
       <div
-        className={`flex items-center justify-between cursor-pointer ${density === "compact" ? "p-2" : "p-3"}`}
+        className={`flex items-center justify-between cursor-pointer ${density === "compact" ? "min-h-[40px] p-2" : "min-h-[44px] p-3"}`}
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex-1 min-w-0">
@@ -111,7 +111,7 @@ export function AttackRow({
               </span>
             )}
           </div>
-          <div className="text-xs text-muted mt-0.5">
+          <div className="text-[0.6875rem] text-muted mt-0.5">
             {DamageIcon && (
               <DamageIcon size={11} className="inline-block mb-0.5 mr-1" />
             )}
@@ -136,7 +136,7 @@ export function AttackRow({
               e.stopPropagation();
               handleRollHit();
             }}
-            className="px-2.5 py-1.5 bg-accent/20 text-accent rounded text-xs font-heading active:scale-95 transition-transform"
+            className="px-2.5 py-1 bg-accent/20 text-accent rounded-full text-[0.6875rem] font-heading active:scale-95 transition-transform"
           >
             Hit
           </button>
@@ -145,7 +145,7 @@ export function AttackRow({
               e.stopPropagation();
               handleRollDamage();
             }}
-            className="px-2.5 py-1.5 bg-danger/20 text-danger rounded text-xs font-heading active:scale-95 transition-transform"
+            className="px-2.5 py-1 bg-danger/20 text-danger rounded-full text-[0.6875rem] font-heading active:scale-95 transition-transform"
           >
             Dmg
           </button>
