@@ -40,14 +40,7 @@ const CATEGORIES = [
 
 type Category = (typeof CATEGORIES)[number]["id"];
 
-const FAVORITES_ID = "favorites" as const;
-
-const PILLS: { id: Category | typeof FAVORITES_ID; label: string }[] = [
-  { id: FAVORITES_ID, label: "Favoritos" },
-  ...CATEGORIES,
-];
-
-const PILL_IDS = PILLS.map((p) => p.id);
+const CATEGORY_IDS = CATEGORIES.map((c) => c.id);
 
 const TRANSLATIONS: Partial<Record<Category, Record<string, string>>> = {
   conditions: CONDITIONS_ES,
@@ -220,13 +213,12 @@ export function EncyclopediaTab() {
     encyclopediaLanguage,
     setEncyclopediaLanguage,
   } = useThemeContext();
-  const [activeCategory, setActiveCategory] = useState<
-    Category | typeof FAVORITES_ID
-  >("conditions");
+  const [activeCategory, setActiveCategory] = useState<Category>("conditions");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showingFavorites, setShowingFavorites] = useState(false);
   const [viewingItem, setViewingItem] = useState<EncyclopediaItem | null>(null);
   const { dragX, dragOpacity, handleDragEnd } = useSwipeNavigation(
-    PILL_IDS,
+    CATEGORY_IDS,
     activeCategory,
     setActiveCategory
   );
@@ -236,8 +228,7 @@ export function EncyclopediaTab() {
     []
   );
   const categoryItems = useMemo(
-    () =>
-      activeCategory === FAVORITES_ID ? [] : CATEGORY_ITEMS[activeCategory](),
+    () => CATEGORY_ITEMS[activeCategory](),
     [activeCategory]
   );
   const favoriteItems = useMemo(
@@ -318,15 +309,29 @@ export function EncyclopediaTab() {
             ES
           </button>
         </div>
+        <button
+          onClick={() => setShowingFavorites((v) => !v)}
+          className={`shrink-0 p-2 rounded-lg border ${
+            showingFavorites
+              ? "border-accent bg-accent/20 text-accent"
+              : "border-border text-muted"
+          }`}
+          aria-label={showingFavorites ? "Ver categoría actual" : "Ver favoritos"}
+        >
+          <Star size={16} fill={showingFavorites ? "currentColor" : "none"} />
+        </button>
       </div>
 
-      {/* Category navigation (hidden while searching) */}
-      {!searchQuery && (
+      {/* Category navigation (hidden while searching or viewing favorites) */}
+      {!searchQuery && !showingFavorites && (
         <div className="flex overflow-x-auto border-b border-border bg-card px-2 gap-1 shrink-0">
-          {PILLS.map((tab) => (
+          {CATEGORIES.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveCategory(tab.id)}
+              onClick={() => {
+                setActiveCategory(tab.id);
+                setShowingFavorites(false);
+              }}
               className={`px-3 py-2.5 text-xs whitespace-nowrap transition-colors border-b-2 ${
                 activeCategory === tab.id
                   ? "text-accent border-accent"
@@ -342,7 +347,7 @@ export function EncyclopediaTab() {
       <motion.div
         className="flex-1 overflow-y-auto p-4"
         style={{ x: dragX, opacity: dragOpacity, touchAction: "pan-y pinch-zoom" }}
-        drag={searchQuery ? false : "x"}
+        drag={searchQuery || showingFavorites ? false : "x"}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.2}
         onDragEnd={handleDragEnd}
@@ -358,7 +363,7 @@ export function EncyclopediaTab() {
               message={`Sin resultados para "${searchQuery}".`}
             />
           )
-        ) : activeCategory === FAVORITES_ID ? (
+        ) : showingFavorites ? (
           favoriteItems.length > 0 ? (
             <div className="space-y-2">
               {favoriteItems.map((item) => renderRow(item, true))}
