@@ -70,11 +70,21 @@ function resolveDetail(
   return translated ? `${TRANSLATION_DISCLAIMER}\n\n${translated}` : item.description;
 }
 
+function mapItems<T extends { name: string }>(
+  category: Category,
+  source: T[],
+  build: (item: T) => Omit<EncyclopediaItem, "id" | "category" | "name">
+): EncyclopediaItem[] {
+  return source.map((item) => ({
+    id: `${category}-${item.name}`,
+    category,
+    name: item.name,
+    ...build(item),
+  }));
+}
+
 function buildConditionItems(): EncyclopediaItem[] {
-  return CONDITIONS.map((c) => ({
-    id: `conditions-${c.name}`,
-    category: "conditions",
-    name: c.name,
+  return mapItems("conditions", CONDITIONS, (c) => ({
     hint: "",
     statBlock: [],
     description: c.description,
@@ -82,10 +92,7 @@ function buildConditionItems(): EncyclopediaItem[] {
 }
 
 function buildActionItems(): EncyclopediaItem[] {
-  return ACTIONS.map((a) => ({
-    id: `actions-${a.name}`,
-    category: "actions",
-    name: a.name,
+  return mapItems("actions", ACTIONS, (a) => ({
     hint: "",
     statBlock: [],
     description: a.description,
@@ -93,10 +100,7 @@ function buildActionItems(): EncyclopediaItem[] {
 }
 
 function buildSkillItems(): EncyclopediaItem[] {
-  return SKILLS_REFERENCE.map((s) => ({
-    id: `skills-${s.name}`,
-    category: "skills",
-    name: s.name,
+  return mapItems("skills", SKILLS_REFERENCE, (s) => ({
     hint: abilityLabel(s.ability as AbilityScore),
     statBlock: [],
     description: s.description,
@@ -104,10 +108,7 @@ function buildSkillItems(): EncyclopediaItem[] {
 }
 
 function buildWeaponItems(): EncyclopediaItem[] {
-  return WEAPONS.map((w) => ({
-    id: `weapons-${w.name}`,
-    category: "weapons",
-    name: w.name,
+  return mapItems("weapons", WEAPONS, (w) => ({
     hint: `${w.damage} ${w.damageType}`,
     statBlock: [
       { label: "Tipo", value: `${w.type === "melee" ? "Cuerpo a cuerpo" : "A distancia"} · ${w.category}` },
@@ -122,10 +123,7 @@ function buildWeaponItems(): EncyclopediaItem[] {
 }
 
 function buildArmorItems(): EncyclopediaItem[] {
-  return ARMOR.map((a) => ({
-    id: `armor-${a.name}`,
-    category: "armor",
-    name: a.name,
+  return mapItems("armor", ARMOR, (a) => ({
     hint: `AC ${a.ac}`,
     statBlock: [
       { label: "Tipo", value: a.type },
@@ -139,10 +137,7 @@ function buildArmorItems(): EncyclopediaItem[] {
 }
 
 function buildGearItems(): EncyclopediaItem[] {
-  return GEAR.map((g) => ({
-    id: `gear-${g.name}`,
-    category: "gear",
-    name: g.name,
+  return mapItems("gear", GEAR, (g) => ({
     hint: g.value !== null ? `${g.value} gp` : "",
     statBlock: [],
     description: g.description,
@@ -150,10 +145,7 @@ function buildGearItems(): EncyclopediaItem[] {
 }
 
 function buildMasteryItems(): EncyclopediaItem[] {
-  return MASTERY_PROPERTIES.map((m) => ({
-    id: `mastery-${m.name}`,
-    category: "mastery",
-    name: m.name,
+  return mapItems("mastery", MASTERY_PROPERTIES, (m) => ({
     hint: "",
     statBlock: [],
     description: m.description,
@@ -161,10 +153,7 @@ function buildMasteryItems(): EncyclopediaItem[] {
 }
 
 function buildFeatItems(): EncyclopediaItem[] {
-  return FEATS.map((f) => ({
-    id: `feats-${f.name}`,
-    category: "feats",
-    name: f.name,
+  return mapItems("feats", FEATS, (f) => ({
     hint: f.category,
     statBlock: [
       { label: "Categoría", value: f.category },
@@ -176,10 +165,7 @@ function buildFeatItems(): EncyclopediaItem[] {
 }
 
 function buildSpellItems(): EncyclopediaItem[] {
-  return SPELLS.map((s) => ({
-    id: `spells-${s.name}`,
-    category: "spells",
-    name: s.name,
+  return mapItems("spells", SPELLS, (s) => ({
     hint: `${s.level === 0 ? "Cantrip" : `Nv. ${s.level}`} · ${s.school}`,
     statBlock: [
       { label: "Nivel", value: s.level === 0 ? "Cantrip" : `Nivel ${s.level}` },
