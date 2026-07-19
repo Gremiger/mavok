@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { GhostChip } from "@/components/ui/GhostChip";
 import { AttackFormModal } from "@/components/combat/AttackFormModal";
 import { exportInventoryCSV } from "@/lib/export";
 import { formatModifier, simplifyCurrency } from "@/lib/utils";
@@ -324,9 +325,11 @@ export function InventoryTab() {
         </div>
         <button
           onClick={() => updateCurrency(simplifyCurrency(currency))}
-          className="w-full mt-2 text-xs text-muted hover:text-accent border-t border-border pt-2"
+          className="w-full mt-2 p-2 rounded-lg border border-border/50 bg-card/50 text-center"
         >
-          Simplificar monedas
+          <span className="font-heading text-muted text-xs">
+            Simplificar monedas
+          </span>
         </button>
       </div>
 
@@ -353,17 +356,13 @@ export function InventoryTab() {
           </select>
           <div className="flex gap-1 flex-wrap">
             {CATEGORIES.map((cat) => (
-              <button
+              <GhostChip
                 key={cat.value}
                 onClick={() => toggleCategory(cat.value)}
-                className={`px-2 py-1 rounded-full text-xs transition-colors ${
-                  hiddenCategories.has(cat.value)
-                    ? "bg-card border border-border text-muted opacity-50"
-                    : "bg-accent text-white"
-                }`}
+                solid={!hiddenCategories.has(cat.value)}
               >
                 {cat.label}
-              </button>
+              </GhostChip>
             ))}
           </div>
         </div>
@@ -383,7 +382,7 @@ export function InventoryTab() {
                 className="stone-card rounded-lg overflow-hidden"
               >
                 <div
-                  className={`flex items-center cursor-pointer ${density === "compact" ? "gap-2 p-1.5" : "gap-3 p-3"}`}
+                  className={`flex items-center gap-2 cursor-pointer ${density === "compact" ? "min-h-[40px] p-2" : "min-h-[44px] p-3"}`}
                   onClick={() =>
                     setExpandedItem(
                       expandedItem === item.id ? null : item.id
@@ -404,7 +403,7 @@ export function InventoryTab() {
                     {item.equipped && "✓"}
                   </button>
                   <div className="flex-1 min-w-0">
-                    <span className="text-sm">{item.name}</span>
+                    <span className="font-heading text-sm text-accent">{item.name}</span>
                     {item.quantity > 1 && (
                       <span className="text-muted text-xs ml-1">
                         ×{item.quantity}
