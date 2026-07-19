@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
+import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { WEAPONS } from "@/data/weapons";
 import type { Attack } from "@/lib/types";
 
@@ -133,7 +134,7 @@ export function AttackFormModal({
       onClose={onClose}
       title={existingAttack ? "Editar ataque" : "Nuevo ataque"}
     >
-      <div className="space-y-3">
+      <div className="space-y-4">
         {!existingAttack && (
           <div>
             <label className="text-xs text-muted">Arma rápida</label>
@@ -155,93 +156,106 @@ export function AttackFormModal({
           </div>
         )}
 
-        <input
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="Nombre"
-          className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-        />
-
-        <div className="flex gap-2">
+        <div className="space-y-2">
+          <p className="text-xs text-muted uppercase tracking-wide">Básico</p>
           <input
-            type="number"
-            inputMode="numeric"
-            value={form.attackBonus}
-            onChange={(e) =>
-              setForm({ ...form, attackBonus: e.target.value })
-            }
-            placeholder="Bono de ataque"
-            className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="Nombre"
+            className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
           />
+          <div className="flex gap-2">
+            <input
+              type="number"
+              inputMode="numeric"
+              value={form.attackBonus}
+              onChange={(e) =>
+                setForm({ ...form, attackBonus: e.target.value })
+              }
+              placeholder="Bono de ataque"
+              className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+            />
+            <input
+              value={form.range}
+              onChange={(e) => setForm({ ...form, range: e.target.value })}
+              placeholder="Alcance (ej. 5 ft)"
+              className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2 border-t border-border/30 pt-3">
+          <p className="text-xs text-muted uppercase tracking-wide">Daño</p>
+          <div className="flex gap-2">
+            <input
+              value={form.damage}
+              onChange={(e) => setForm({ ...form, damage: e.target.value })}
+              placeholder="Daño (ej. 1d6+3)"
+              className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+            />
+            <input
+              value={form.damageType}
+              onChange={(e) =>
+                setForm({ ...form, damageType: e.target.value })
+              }
+              placeholder="Tipo de daño"
+              className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+            />
+          </div>
           <input
-            value={form.range}
-            onChange={(e) => setForm({ ...form, range: e.target.value })}
-            placeholder="Alcance (ej. 5 ft)"
-            className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+            value={form.versatileDamage}
+            onChange={(e) =>
+              setForm({ ...form, versatileDamage: e.target.value })
+            }
+            placeholder="Daño versátil (opcional, ej. 1d10)"
+            className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
           />
         </div>
 
-        <div className="flex gap-2">
+        <div className="space-y-2 border-t border-border/30 pt-3">
+          <p className="text-xs text-muted uppercase tracking-wide">Propiedades</p>
           <input
-            value={form.damage}
-            onChange={(e) => setForm({ ...form, damage: e.target.value })}
-            placeholder="Daño (ej. 1d6+3)"
-            className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-          />
-          <input
-            value={form.damageType}
-            onChange={(e) =>
-              setForm({ ...form, damageType: e.target.value })
-            }
-            placeholder="Tipo de daño"
-            className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+            value={form.properties}
+            onChange={(e) => setForm({ ...form, properties: e.target.value })}
+            placeholder="Propiedades (separadas por coma)"
+            className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
           />
         </div>
 
-        <input
-          value={form.versatileDamage}
-          onChange={(e) =>
-            setForm({ ...form, versatileDamage: e.target.value })
-          }
-          placeholder="Daño versátil (opcional, ej. 1d10)"
-          className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-        />
-
-        <input
-          value={form.properties}
-          onChange={(e) => setForm({ ...form, properties: e.target.value })}
-          placeholder="Propiedades (separadas por coma)"
-          className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-        />
-
-        <div className="flex gap-2">
-          <input
-            value={form.mastery}
-            onChange={(e) => setForm({ ...form, mastery: e.target.value })}
-            placeholder="Mastery (opcional)"
-            className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-          />
-          <input
-            type="number"
-            inputMode="numeric"
-            value={form.masterySaveDC}
-            onChange={(e) =>
-              setForm({ ...form, masterySaveDC: e.target.value })
-            }
-            placeholder="Mastery DC (opcional)"
-            className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-          />
-        </div>
-
-        <textarea
-          value={form.masteryEffect}
-          onChange={(e) =>
-            setForm({ ...form, masteryEffect: e.target.value })
-          }
-          placeholder="Efecto de mastery (opcional)"
-          rows={2}
-          className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"
-        />
+        <CollapsibleSection
+          title="Mastery"
+          defaultOpen={!!existingAttack?.mastery}
+        >
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <input
+                value={form.mastery}
+                onChange={(e) => setForm({ ...form, mastery: e.target.value })}
+                placeholder="Mastery (opcional)"
+                className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+              />
+              <input
+                type="number"
+                inputMode="numeric"
+                value={form.masterySaveDC}
+                onChange={(e) =>
+                  setForm({ ...form, masterySaveDC: e.target.value })
+                }
+                placeholder="Mastery DC (opcional)"
+                className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
+              />
+            </div>
+            <textarea
+              value={form.masteryEffect}
+              onChange={(e) =>
+                setForm({ ...form, masteryEffect: e.target.value })
+              }
+              placeholder="Efecto de mastery (opcional)"
+              rows={2}
+              className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"
+            />
+          </div>
+        </CollapsibleSection>
 
         <button
           onClick={handleSave}
