@@ -217,6 +217,12 @@ export function NoteList({
             className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
           />
 
+          <div className="pt-1 border-t border-border">
+            <span className="text-[0.65rem] text-muted uppercase tracking-wide">
+              Detalles
+            </span>
+          </div>
+
           {/* Structured fields */}
           {Object.entries(form.fields).map(([key, val]) => (
             <div key={key} className="flex gap-2">
