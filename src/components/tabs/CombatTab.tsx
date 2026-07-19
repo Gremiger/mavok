@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useLongPress } from "@/hooks/useLongPress";
 import { motion } from "framer-motion";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
@@ -60,6 +60,10 @@ export function CombatTab() {
   const [ragePulseKey, setRagePulseKey] = useState(0);
   const [stoneEndurancePulseKey, setStoneEndurancePulseKey] = useState(0);
   const [healerKitPulseKey, setHealerKitPulseKey] = useState(0);
+  const [attacksForceOpenKey, setAttacksForceOpenKey] = useState(0);
+  const [dadosForceOpenKey, setDadosForceOpenKey] = useState(0);
+  const attacksSectionRef = useRef<HTMLDivElement>(null);
+  const dadosSectionRef = useRef<HTMLDivElement>(null);
   const stoneEnduranceLongPress = useLongPress(() =>
     setStoneEnduranceEditing(true)
   );
@@ -199,6 +203,29 @@ export function CombatTab() {
         }
       />
 
+      {attacks.length > 0 && (
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => {
+              setAttacksForceOpenKey((k) => k + 1);
+              attacksSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            className="stone-card rounded-lg py-2 text-center text-xs font-heading text-accent active:scale-95 transition-transform"
+          >
+            ⚔ Atacar
+          </button>
+          <button
+            onClick={() => {
+              setDadosForceOpenKey((k) => k + 1);
+              dadosSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            className="stone-card rounded-lg py-2 text-center text-xs font-heading text-accent active:scale-95 transition-transform"
+          >
+            🎲 Roll rápido
+          </button>
+        </div>
+      )}
+
       <div className="crack-divider" />
 
       {/* Conditions */}
@@ -268,7 +295,8 @@ export function CombatTab() {
       )}
 
       {/* Actions */}
-      <CollapsibleSection title="Acciones" defaultOpen>
+      <div ref={attacksSectionRef}>
+      <CollapsibleSection title="Acciones" defaultOpen forceOpenKey={attacksForceOpenKey}>
         {attacks.map((a, i) => (
           <AttackRow
             key={a.id}
@@ -419,6 +447,7 @@ export function CombatTab() {
           </p>
         </button>
       </CollapsibleSection>
+      </div>
 
       {/* Bonus Actions */}
       <CollapsibleSection title="Acciones adicionales">
@@ -630,9 +659,11 @@ export function CombatTab() {
       </CollapsibleSection>
 
       {/* Dice Roller */}
-      <CollapsibleSection title="Dados">
+      <div ref={dadosSectionRef}>
+      <CollapsibleSection title="Dados" forceOpenKey={dadosForceOpenKey}>
         <DiceRoller />
       </CollapsibleSection>
+      </div>
 
       {/* HP Modal */}
       <HpModal

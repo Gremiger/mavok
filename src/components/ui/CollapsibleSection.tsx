@@ -5,13 +5,21 @@ import { useState } from "react";
 export function CollapsibleSection({
   title,
   defaultOpen = false,
+  forceOpenKey,
   children,
 }: {
   title: string;
   defaultOpen?: boolean;
+  forceOpenKey?: number;
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  const [prevForceOpenKey, setPrevForceOpenKey] = useState(forceOpenKey);
+
+  if (forceOpenKey !== undefined && forceOpenKey !== prevForceOpenKey) {
+    setPrevForceOpenKey(forceOpenKey);
+    setOpen(true);
+  }
 
   return (
     <section className="cord-line pl-4 mb-4">
