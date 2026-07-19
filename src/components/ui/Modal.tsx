@@ -31,7 +31,7 @@ export function Modal({
       onClick={(e) => {
         if (e.target === dialogRef.current) onClose();
       }}
-      className="fixed inset-0 m-auto bg-card text-foreground rounded-xl p-0 w-[90vw] max-w-md max-h-[85vh] overflow-y-auto border border-border shadow-xl"
+      className="fixed inset-0 m-auto stone-card text-foreground rounded-xl p-0 w-[90vw] max-w-md max-h-[85vh] overflow-y-auto drop-shadow-2xl"
       style={{ zIndex: 100 }}
     >
       <div className="sticky top-0 flex items-center justify-between p-4 border-b border-border bg-card z-10">
