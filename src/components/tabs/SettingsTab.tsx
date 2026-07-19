@@ -6,6 +6,7 @@ import { useCharacterContext, useGoogleDriveContext } from "@/lib/context";
 import { useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
+import { CompactRow } from "@/components/ui/CompactRow";
 import { spendHitDie as computeHitDieSpend } from "@/lib/hitDice";
 import { abilityModifier } from "@/lib/utils";
 import { toast } from "sonner";
@@ -203,35 +204,35 @@ export function SettingsTab() {
       <CollapsibleSection title="Tema" defaultOpen>
         <div className="space-y-2">
           {THEME_META.map((t) => (
-            <button
+            <CompactRow
               key={t.id}
               onClick={() => setTheme(t.id)}
-              className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border"
-            >
-              <span className="flex items-center gap-2 text-sm">
-                <span
-                  className="w-3 h-3 rounded-full border border-border/60 shrink-0"
-                  style={{ backgroundColor: t.swatch }}
-                />
-                {t.label}
-              </span>
-              {theme === t.id ? (
-                <span className="text-xs text-accent">Activo</span>
-              ) : (
-                <span className="text-xs text-muted">Tap para cambiar</span>
-              )}
-            </button>
+              name={
+                <span className="flex items-center gap-2">
+                  <span
+                    className="w-3 h-3 rounded-full border border-border/60 shrink-0"
+                    style={{ backgroundColor: t.swatch }}
+                  />
+                  {t.label}
+                </span>
+              }
+              right={
+                theme === t.id ? (
+                  <span className="w-5 h-5 rounded border-2 border-accent bg-accent text-white flex items-center justify-center text-xs">
+                    ✓
+                  </span>
+                ) : (
+                  <span className="text-xs text-muted">Tap para cambiar</span>
+                )
+              }
+            />
           ))}
-          <button
+          <CompactRow
             onClick={toggleDensity}
-            className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border"
-          >
-            <span className="text-sm">
-              {density === "compact" ? "Compacto" : "Espacioso"}
-            </span>
-            <span className="text-xs text-muted">Tap para cambiar</span>
-          </button>
-          <button
+            name={density === "compact" ? "Compacto" : "Espacioso"}
+            right={<span className="text-xs text-muted">Tap para cambiar</span>}
+          />
+          <CompactRow
             onClick={() =>
               setMagicItemIndicator(
                 magicItemIndicator === "number-only"
@@ -239,16 +240,11 @@ export function SettingsTab() {
                   : "number-only"
               )
             }
-            className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border"
-          >
-            <span className="text-sm">
-              Indicador de bonos mágicos:{" "}
-              {magicItemIndicator === "explicit-tag"
-                ? "Etiqueta explícita"
-                : "Solo número"}
-            </span>
-            <span className="text-xs text-muted">Tap para cambiar</span>
-          </button>
+            name={`Indicador de bonos mágicos: ${
+              magicItemIndicator === "explicit-tag" ? "Etiqueta explícita" : "Solo número"
+            }`}
+            right={<span className="text-xs text-muted">Tap para cambiar</span>}
+          />
         </div>
       </CollapsibleSection>
 
