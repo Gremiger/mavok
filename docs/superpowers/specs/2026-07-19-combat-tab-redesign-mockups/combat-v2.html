@@ -1,0 +1,150 @@
+<h2>Combat tab v2 — deduped, with missing states</h2>
+<p class="subtitle">Rage now lives only in the header (pips = individual slots, flame = activate/deactivate toggle) — the duplicate quick-action and Adicionales row are gone. Healer's Kit stays a single control with a use/hold-to-edit hint. Added: offhand attack, a granted-action (magic item) card pattern, "+ agregar ataque," edit affordance on attacks, and a dying/death-saves header state. Toggle "Normal / Muriendo" to see both header states.</p>
+
+<style>
+  .phone3 { max-width: 360px; margin: 1.25rem auto 0; background: #14100c; border-radius: 24px; padding: 1rem; box-shadow: 0 8px 30px rgba(0,0,0,.5); }
+  .screen3 { background: radial-gradient(circle at 30% 5%, #241d16 0%, #14100c 60%); border-radius: 14px; padding: .8rem; font-family: Georgia, serif; color: #d4cfc4; max-height: 640px; overflow-y: auto; }
+
+  .state-toggle { display:flex; justify-content:center; gap:.5rem; margin-bottom:.6rem; }
+  .state-toggle button { background:#1e1710; border:1px solid #4a3520; color:#c98a4b; border-radius:999px; padding:.3rem .9rem; font-size:.7rem; font-family: Georgia, serif; cursor:pointer; }
+  .state-toggle button.active { background:#a63d2f; color:#f0e6cc; border-color:#a63d2f; }
+
+  .vitals { background: linear-gradient(135deg,#3a2a18,#241a10); border-radius: 10px; padding: .7rem .8rem; border: 1px solid #a63d2f; margin-bottom: .5rem; }
+  .vitals-main { display:flex; align-items:center; justify-content: space-between; }
+  .vitals-main .hp b { font-size: 1.6rem; color:#f0c98a; display:block; line-height:1; }
+  .vitals-main .hp span { font-size:.62rem; opacity:.7; text-transform:uppercase; letter-spacing:.05em; }
+  .ac-ring { width: 46px; height:46px; border-radius:50%; border: 3px solid #a63d2f; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ac-ring b { font-size: 1.1rem; line-height:1; } .ac-ring span { font-size: .55rem; opacity:.7; }
+  .rage-cluster { display:flex; align-items:center; gap:.4rem; }
+  .rage-pips { display:flex; gap:.3rem; }
+  .pip { width:14px; height:14px; border-radius:50%; border:1px solid #a63d2f; }
+  .pip.full { background:#a63d2f; }
+  .flame-btn { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.75rem; border:1px solid #a63d2f; }
+  .flame-btn.active { background:#a63d2f; box-shadow: 0 0 8px rgba(166,61,47,.6); }
+  .vitals-secondary { display:flex; justify-content:space-around; margin-top:.55rem; padding-top:.5rem; border-top:1px solid rgba(166,61,47,.25); font-size:.66rem; }
+  .vitals-secondary div { text-align:center; opacity:.85; }
+  .vitals-secondary b { display:block; font-size:.85rem; color:#d4cfc4; }
+  .vitals-secondary span { text-transform:uppercase; opacity:.6; font-size: .55rem; }
+
+  /* dying state */
+  .dying-row { display:none; }
+  .dying-row.show { display:block; }
+  .vitals-main.dying-hide { display:none; }
+  .dying-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:#e05c48; margin-bottom:.4rem; text-align:center; }
+  .ds-row { display:flex; justify-content:center; gap:1.1rem; margin-bottom:.5rem; }
+  .ds-group { display:flex; gap:.3rem; align-items:center; }
+  .ds-group span { font-size:.6rem; opacity:.65; margin-right:.25rem; text-transform:uppercase; }
+  .ds-dot { width:15px; height:15px; border-radius:50%; border:1px solid #4a7c59; }
+  .ds-dot.success.full { background:#4a7c59; }
+  .ds-dot.fail { border-color:#8b3a3a; }
+  .ds-dot.fail.full { background:#8b3a3a; }
+  .revive-btn { display:block; margin: 0 auto; background:#4a7c59; color:#f0e6cc; border-radius:999px; padding:.35rem 1rem; font-size:.68rem; }
+
+  .quick-row { display:grid; grid-template-columns: repeat(2,1fr); gap:.4rem; margin-bottom:.6rem; }
+  .quick-row div { background:#1e1710; border:1px solid #4a3520; border-radius:8px; text-align:center; padding:.5rem .1rem; font-size:.68rem; color:#c98a4b; }
+
+  .tag-row { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.5rem; align-items:center; }
+  .tag-row .plus { width:22px;height:22px;border-radius:50%;border:1px solid #4a3520;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#6b5c46; }
+  .tag-empty { font-size:.7rem; opacity:.55; font-style: italic; }
+
+  .exh-row { display:flex; justify-content:space-between; align-items:center; background:#1a140e; border:1px solid #3a2c1a; border-radius:8px; padding:.4rem .6rem; margin-bottom:.6rem; font-size:.72rem; }
+
+  .section { margin-bottom: .5rem; }
+  .section-head { display:flex; justify-content:space-between; align-items:center; padding:.4rem .1rem; font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; color:#c98a4b; border-bottom: 1px solid #3a2c1a; margin-bottom:.4rem; }
+  .crow { display:flex; justify-content:space-between; align-items:center; background:#1a140e; border-radius:7px; padding:.45rem .65rem; margin-bottom:.35rem; font-size:.76rem; gap:.5rem; }
+  .crow .name { flex:1; }
+  .crow .meta { font-size:.6rem; opacity:.55; display:block; margin-top:.1rem; }
+  .crow .val { background:#a63d2f; color:#f0e6cc; font-size:.65rem; padding:.15rem .45rem; border-radius:999px; white-space:nowrap; }
+  .crow .val.ghost { background:transparent; border:1px solid #4a3520; color:#c98a4b; }
+  .crow .val.charge { background:transparent; border:1px solid #6b5c9c; color:#a99ce0; }
+  .crow .edit-ic { opacity:.4; font-size:.7rem; }
+  .crow.dim { opacity:.5; }
+  .crow.conditional { border-style:dashed; opacity:.75; }
+  .hint { font-size:.55rem; opacity:.45; margin:-.25rem 0 .35rem 2px; }
+  .link-row { text-align:center; font-size:.65rem; padding:.4rem; opacity:.55; border:1px dashed #3a2c1a; border-radius:7px; margin-bottom:.35rem; }
+  .add-row { text-align:center; font-size:.68rem; padding:.45rem; color:#8a7458; border:1px solid rgba(74,53,32,.5); border-radius:7px; margin-bottom:.35rem; }
+</style>
+
+<div class="phone3">
+  <div class="state-toggle">
+    <button class="active" onclick="document.querySelectorAll('.vitals-main').forEach(e=>e.classList.remove('dying-hide'));document.querySelectorAll('.dying-row').forEach(e=>e.classList.remove('show'));this.classList.add('active');this.nextElementSibling.classList.remove('active');">Normal</button>
+    <button onclick="document.querySelectorAll('.vitals-main').forEach(e=>e.classList.add('dying-hide'));document.querySelectorAll('.dying-row').forEach(e=>e.classList.add('show'));this.classList.add('active');this.previousElementSibling.classList.remove('active');">Muriendo</button>
+  </div>
+  <div class="screen3">
+
+    <div class="vitals">
+      <div class="dying-row">
+        <div class="dying-label">Inconsciente · tirando salvaciones de muerte</div>
+        <div class="ds-row">
+          <div class="ds-group"><span>Éxitos</span><div class="ds-dot success full"></div><div class="ds-dot success full"></div><div class="ds-dot success"></div></div>
+          <div class="ds-group"><span>Fallos</span><div class="ds-dot fail full"></div><div class="ds-dot fail"></div><div class="ds-dot fail"></div></div>
+        </div>
+        <div class="revive-btn">Recobrar consciencia</div>
+      </div>
+      <div class="vitals-main">
+        <div class="hp"><span>HP</span><b>42/58</b></div>
+        <div class="ac-ring"><b>17</b><span>CA</span></div>
+        <div class="rage-cluster">
+          <div class="rage-pips"><div class="pip full"></div><div class="pip full"></div><div class="pip"></div></div>
+          <div class="flame-btn active">🔥</div>
+        </div>
+      </div>
+      <div class="vitals-secondary">
+        <div><b>+0</b><span>Temp</span></div>
+        <div><b>+3</b><span>Init</span></div>
+        <div><b>☆</b><span>Insp</span></div>
+        <div><b>30</b><span>Vel</span></div>
+      </div>
+    </div>
+
+    <div class="quick-row">
+      <div>⚔ Atacar</div><div>🎲 Roll rápido</div>
+    </div>
+
+    <div class="tag-row"><span class="tag-empty">Sin condiciones</span><div class="plus">+</div></div>
+
+    <div class="exh-row"><span>Exhaustion 0/6</span><span>− +</span></div>
+
+    <div class="section">
+      <div class="section-head"><span>Acciones</span><span>▾</span></div>
+      <div class="crow"><span class="name">Hacha Grande<span class="meta">Slashing · versátil</span></span><span class="edit-ic">✎</span><span class="val">+9 · 1d12+5</span></div>
+      <div class="crow"><span class="name">Jabalina<span class="meta">Piercing · arrojadiza</span></span><span class="edit-ic">✎</span><span class="val">+8 · 1d6+5</span></div>
+      <div class="add-row">+ Agregar ataque</div>
+      <div class="crow"><span class="name">Healer&apos;s Kit<span class="meta">Acción · estabiliza / 1d6+4 HP</span></span><span class="val ghost">usar · 3/3</span></div>
+      <div class="hint">mantener pulsado para corregir el conteo</div>
+      <div class="crow conditional"><span class="name">Bufanda de Furia<span class="meta">Objeto mágico · acción</span></span><span class="val charge">⚡ 1/1</span></div>
+      <div class="link-row">Acciones estándar (Dash · Dodge · Help…)</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span>Adicionales</span><span>▾</span></div>
+      <div class="crow"><span class="name">Reckless Attack<span class="meta">ventaja en ataques, das ventaja</span></span><span class="val ghost">activar</span></div>
+      <div class="crow dim"><span class="name">Jabalina (offhand)<span class="meta">Two-Weapon Fighting · sin mod</span></span><span class="val ghost">auto</span></div>
+      <div class="link-row">Bonus Actions estándar</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span>Reacciones</span><span>▾</span></div>
+      <div class="crow"><span class="name">Stone&apos;s Endurance<span class="meta">1d12+CON reduce daño</span></span><span class="val ghost">usar · 2/2</span></div>
+      <div class="hint">mantener pulsado para corregir el conteo</div>
+      <div class="crow dim"><span class="name">Opportunity Attack</span><span class="val ghost">—</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span>Dados</span><span>▾</span></div>
+      <div class="crow"><span class="name">Roll rápido</span><span class="val ghost">d20</span></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="options" style="margin-top:1.5rem;">
+  <div class="option" data-choice="v2-good" onclick="toggleSelect(this)">
+    <div class="letter">✓</div>
+    <div class="content"><h3>This is spec-ready</h3><p>Dedup + missing states look right. Write the spec.</p></div>
+  </div>
+  <div class="option" data-choice="v2-changes" onclick="toggleSelect(this)">
+    <div class="letter">✎</div>
+    <div class="content"><h3>Still needs changes</h3><p>Tell me what in the terminal.</p></div>
+  </div>
+</div>

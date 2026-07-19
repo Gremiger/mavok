@@ -1,0 +1,84 @@
+<h2>Fixing the 4 issues</h2>
+<p class="subtitle">Isolated component states, not the whole tab this time. Carved Stone palette. Font sizes bumped to a readable floor (nothing below ~11px except short uppercase labels like "CA"/"Temp").</p>
+
+<style>
+  .fix-grid { display:grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; margin-top: 1.25rem; }
+  @media (max-width:700px){ .fix-grid{grid-template-columns:1fr;} }
+  .fix-box { background: radial-gradient(circle at 30% 10%,#241d16,#14100c 70%); border-radius: 14px; padding: 1rem; font-family: Georgia, serif; color:#d4cfc4; }
+  .fix-box h4 { margin:0 0 .7rem; font-size:.85rem; color:#c98a4b; font-weight:normal; }
+
+  .vitals { background: linear-gradient(135deg,#3a2a18,#241a10); border-radius: 10px; padding: .7rem .8rem; border: 1px solid #a63d2f; margin-bottom:.6rem; }
+  .vitals-main { display:flex; align-items:center; justify-content: space-between; gap:.5rem; }
+  .hp b { font-size: 1.4rem; color:#f0c98a; display:block; line-height:1; } .hp span{font-size:.62rem;opacity:.7;text-transform:uppercase;}
+
+  /* AC ring with modified state */
+  .ac-ring { width: 46px; height:46px; border-radius:50%; border: 3px solid #4a3520; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; flex-shrink:0; }
+  .ac-ring.modified { border-color:#e0a848; box-shadow: 0 0 0 3px rgba(224,168,72,.15); }
+  .ac-ring b { font-size: 1.05rem; line-height:1; } .ac-ring span{font-size:.5rem;opacity:.7;}
+  .ac-dot { position:absolute; top:-3px; right:-3px; width:12px; height:12px; border-radius:50%; background:#e0a848; color:#241a10; font-size:.5rem; display:flex; align-items:center; justify-content:center; font-weight:bold; }
+
+  /* Rage: overflow + unlimited variants */
+  .rage-cluster { display:flex; align-items:center; gap:.4rem; flex-shrink:0; }
+  .rage-pips { display:flex; gap:.25rem; }
+  .pip { width:12px; height:12px; border-radius:50%; border:1px solid #a63d2f; }
+  .pip.full { background:#a63d2f; }
+  .rage-count { background:#1e1710; border:1px solid #a63d2f; color:#e8b8a8; font-size:.72rem; padding:.15rem .5rem; border-radius:999px; font-weight:bold; }
+  .rage-inf { background:#1e1710; border:1px solid #a63d2f; color:#e8b8a8; font-size:.85rem; padding:.15rem .55rem; border-radius:999px; }
+  .flame-btn { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.75rem; border:1px solid #a63d2f; flex-shrink:0; }
+  .flame-btn.active { background:#a63d2f; box-shadow: 0 0 8px rgba(166,61,47,.6); }
+
+  .label { font-size: .68rem; opacity:.6; margin: .8rem 0 .3rem; text-transform:uppercase; letter-spacing:.05em; }
+
+  /* Fixed charge chip — icon only, no new hue */
+  .crow { display:flex; justify-content:space-between; align-items:center; background:#1a140e; border-radius:7px; padding:.55rem .7rem; font-size: .8rem; gap:.5rem; min-height: 40px; }
+  .crow .name { flex:1; }
+  .crow .meta { font-size:.68rem; opacity:.6; display:block; margin-top:.15rem; }
+  .crow .val.ghost { background:transparent; border:1px solid #4a3520; color:#c98a4b; font-size:.72rem; padding:.2rem .5rem; border-radius:999px; white-space:nowrap; }
+</style>
+
+<div class="fix-grid">
+
+  <div class="fix-box">
+    <h4>1+2 — Rage overflow / unlimited, AC modified</h4>
+    <div class="vitals">
+      <div class="vitals-main">
+        <div class="hp"><span>HP</span><b>42/58</b></div>
+        <div class="ac-ring modified"><b>19</b><span>CA</span><div class="ac-dot">+2</div></div>
+        <div class="rage-cluster"><span class="rage-count">2/6</span><div class="flame-btn active">🔥</div></div>
+      </div>
+    </div>
+    <p class="label">A level-20 Mavok — unlimited rage:</p>
+    <div class="vitals">
+      <div class="vitals-main">
+        <div class="hp"><span>HP</span><b>58/58</b></div>
+        <div class="ac-ring"><b>17</b><span>CA</span></div>
+        <div class="rage-cluster"><span class="rage-inf">∞</span><div class="flame-btn">🔥</div></div>
+      </div>
+    </div>
+    <p style="font-size:.75rem;opacity:.7;margin-top:.6rem;">Pips stay for ≤4 slots (reads at a glance, matches current levels). At 5+ they collapse to a "used/total" numeral badge — still tappable to open the same slot editor. Unlimited shows "∞", flame toggle still works, no editor needed.</p>
+  </div>
+
+  <div class="fix-box">
+    <h4>3 — Charge chip, no new color</h4>
+    <div class="crow"><span class="name">Bufanda de Furia<span class="meta">Objeto mágico · acción</span></span><span class="val ghost">⚡ 1/1</span></div>
+    <p style="font-size:.75rem;opacity:.7;margin-top:.8rem;">Same ghost-chip style as every other resource (Healer's Kit, Stone's Endurance) — the ⚡ icon is what marks it as a granted/magic action, not a color. Holds the "one accent color" rule for the Ink &amp; Blood theme too.</p>
+  </div>
+
+  <div class="fix-box">
+    <h4>4 — Font floor</h4>
+    <div class="crow"><span class="name">Hacha Grande<span class="meta">Slashing · versátil</span></span><span class="val ghost">+9 · 1d12+5</span></div>
+    <p style="font-size:.75rem;opacity:.7;margin-top:.8rem;">Row label ~13px, meta subtext ~11px (was ~9.5px), minimum 40px row height regardless of visual density — padding creates the "compact" feel, not shrinking text below a readable floor. Short caps labels ("CA", "Temp", "Insp") stay small since they're single words, not sentences.</p>
+  </div>
+
+</div>
+
+<div class="options" style="margin-top:1.5rem;">
+  <div class="option" data-choice="fixes-good" onclick="toggleSelect(this)">
+    <div class="letter">✓</div>
+    <div class="content"><h3>Good — write the spec</h3><p>These fixes resolve it. Ready to document and move to implementation planning.</p></div>
+  </div>
+  <div class="option" data-choice="fixes-more" onclick="toggleSelect(this)">
+    <div class="letter">✎</div>
+    <div class="content"><h3>Still not there</h3><p>Tell me what's off in the terminal.</p></div>
+  </div>
+</div>

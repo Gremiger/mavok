@@ -1,0 +1,144 @@
+<h2>Full Combat tab, restructured</h2>
+<p class="subtitle">This is the real content (HP/AC/Rage/Init/Insp/Vel, conditions, exhaustion, Acciones/Adicionales/Reacciones/Dados sections, Healer's Kit, Stone's Endurance) laid out in the new structure, in the "Carved Stone &amp; Cord" palette. Scroll the phone. Below it, the same header + one attack row shown in all 3 approved palettes to check the system holds up.</p>
+
+<style>
+  .phone2 { max-width: 360px; margin: 1.25rem auto 0; background: #14100c; border-radius: 24px; padding: 1rem; box-shadow: 0 8px 30px rgba(0,0,0,.5); }
+  .screen2 { background: radial-gradient(circle at 30% 5%, #241d16 0%, #14100c 60%); border-radius: 14px; padding: .8rem; font-family: Georgia, serif; color: #d4cfc4; max-height: 640px; overflow-y: auto; }
+
+  .vitals { background: linear-gradient(135deg,#3a2a18,#241a10); border-radius: 10px; padding: .7rem .8rem; border: 1px solid #a63d2f; margin-bottom: .5rem; }
+  .vitals-main { display:flex; align-items:center; justify-content: space-between; }
+  .vitals-main .hp b { font-size: 1.6rem; color:#f0c98a; display:block; line-height:1; }
+  .vitals-main .hp span { font-size:.62rem; opacity:.7; text-transform:uppercase; letter-spacing:.05em; }
+  .ac-ring { width: 46px; height:46px; border-radius:50%; border: 3px solid #a63d2f; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ac-ring b { font-size: 1.1rem; line-height:1; } .ac-ring span { font-size: .55rem; opacity:.7; }
+  .rage-pips { display:flex; align-items:center; gap:.3rem; }
+  .pip { width:14px; height:14px; border-radius:50%; border:1px solid #a63d2f; }
+  .pip.full { background:#a63d2f; }
+  .vitals-secondary { display:flex; justify-content:space-around; margin-top:.55rem; padding-top:.5rem; border-top:1px solid rgba(166,61,47,.25); font-size:.66rem; }
+  .vitals-secondary div { text-align:center; opacity:.85; }
+  .vitals-secondary b { display:block; font-size:.85rem; color:#d4cfc4; }
+  .vitals-secondary span { text-transform:uppercase; opacity:.6; font-size: .55rem; }
+
+  .quick-row { display:grid; grid-template-columns: repeat(4,1fr); gap:.4rem; margin-bottom:.6rem; }
+  .quick-row div { background:#1e1710; border:1px solid #4a3520; border-radius:8px; text-align:center; padding:.5rem .1rem; font-size:.66rem; color:#c98a4b; }
+
+  .tag-row { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.5rem; align-items:center; }
+  .tag-row .plus { width:22px;height:22px;border-radius:50%;border:1px solid #4a3520;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#6b5c46; }
+  .tag-empty { font-size:.7rem; opacity:.55; font-style: italic; }
+
+  .exh-row { display:flex; justify-content:space-between; align-items:center; background:#1a140e; border:1px solid #3a2c1a; border-radius:8px; padding:.4rem .6rem; margin-bottom:.6rem; font-size:.72rem; }
+
+  .section { margin-bottom: .5rem; }
+  .section-head { display:flex; justify-content:space-between; align-items:center; padding:.4rem .1rem; font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; color:#c98a4b; border-bottom: 1px solid #3a2c1a; margin-bottom:.4rem; }
+  .crow { display:flex; justify-content:space-between; align-items:center; background:#1a140e; border-radius:7px; padding:.45rem .65rem; margin-bottom:.35rem; font-size:.76rem; }
+  .crow .meta { font-size:.62rem; opacity:.6; display:block; margin-top:.1rem; }
+  .crow .val { background:#a63d2f; color:#f0e6cc; font-size:.65rem; padding:.15rem .45rem; border-radius:999px; white-space:nowrap; }
+  .crow .val.ghost { background:transparent; border:1px solid #4a3520; color:#c98a4b; }
+  .crow.dim { opacity:.5; }
+  .link-row { text-align:center; font-size:.65rem; padding:.4rem; opacity:.55; border:1px dashed #3a2c1a; border-radius:7px; margin-bottom:.35rem; }
+
+  /* palette swap strip */
+  .swatch-strip { display:flex; gap:1rem; margin-top:2rem; flex-wrap: wrap; justify-content:center; }
+  .swatch { width: 220px; border-radius: 12px; padding: .7rem; }
+  .swatch h4 { margin:0 0 .5rem; font-size:.8rem; text-align:center; }
+  .sw-a { background: radial-gradient(circle at 30% 10%,#241d16,#14100c 70%); }
+  .sw-a .vitals, .sw-a .crow { background: linear-gradient(135deg,#3a2a18,#241a10); border:1px solid #a63d2f; }
+  .sw-a .crow { border:1px solid #4a3520; }
+  .sw-a .hp b { color:#f0c98a; } .sw-a { color:#d4cfc4; font-family: Georgia, serif; }
+
+  .sw-b { background: linear-gradient(160deg,#e8dcb8,#d9c396); color:#3a2c14; font-family: Georgia, serif; }
+  .sw-b .vitals { background:#f3e9cc; border:1px solid #b8860b; }
+  .sw-b .hp b { color:#7a1f1f; }
+  .sw-b .crow { background:#f3e9cc; border:1px solid #9c8a54; }
+  .sw-b .crow .val { background:#7a1f1f; color:#f3e9cc; }
+
+  .sw-c { background: #0a0a0a; color:#eee; font-family: 'Times New Roman', serif; }
+  .sw-c .vitals { background:#131313; border:1px solid #c23b2b; }
+  .sw-c .hp b { color:#fff; }
+  .sw-c .crow { background:#131313; border:1px solid #2a2a2a; border-left: 2px solid #c23b2b; }
+  .sw-c .crow .val { background:transparent; border:1px solid #c23b2b; color:#c23b2b; }
+</style>
+
+<div class="phone2">
+  <div class="screen2">
+
+    <div class="vitals">
+      <div class="vitals-main">
+        <div class="hp"><span>HP</span><b>42/58</b></div>
+        <div class="ac-ring"><b>17</b><span>CA</span></div>
+        <div class="rage-pips">
+          <div class="pip full"></div><div class="pip full"></div><div class="pip"></div>
+        </div>
+      </div>
+      <div class="vitals-secondary">
+        <div><b>+0</b><span>Temp</span></div>
+        <div><b>+3</b><span>Init</span></div>
+        <div><b>☆</b><span>Insp</span></div>
+        <div><b>30</b><span>Vel</span></div>
+      </div>
+    </div>
+
+    <div class="quick-row">
+      <div>⚔ Atacar</div><div>🔥 Furia</div><div>✚ Curar</div><div>◐ Condición</div>
+    </div>
+
+    <div class="tag-row"><span class="tag-empty">Sin condiciones</span><div class="plus">+</div></div>
+
+    <div class="exh-row"><span>Exhaustion 0/6</span><span>− +</span></div>
+
+    <div class="section">
+      <div class="section-head"><span>Acciones</span><span>▾</span></div>
+      <div class="crow"><span>Hacha Grande<span class="meta">Slashing · versátil</span></span><span class="val">+9 · 1d12+5</span></div>
+      <div class="crow"><span>Jabalina<span class="meta">Piercing · arrojadiza</span></span><span class="val">+8 · 1d6+5</span></div>
+      <div class="crow"><span>Healer&apos;s Kit<span class="meta">Acción · estabiliza / 1d6+4 HP</span></span><span class="val ghost">3/3</span></div>
+      <div class="link-row">Acciones estándar (Dash · Dodge · Help…)</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span>Adicionales</span><span>▾</span></div>
+      <div class="crow"><span>Rage<span class="meta">2 usos restantes</span></span><span class="val ghost">activar</span></div>
+      <div class="crow"><span>Reckless Attack<span class="meta">ventaja en ataques, das ventaja</span></span><span class="val ghost">activar</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span>Reacciones</span><span>▾</span></div>
+      <div class="crow"><span>Stone&apos;s Endurance<span class="meta">1d12+CON reduce daño</span></span><span class="val ghost">2/2</span></div>
+      <div class="crow dim"><span>Opportunity Attack</span><span class="val ghost">—</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span>Dados</span><span>▾</span></div>
+      <div class="crow"><span>Roll rápido</span><span class="val ghost">d20</span></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="swatch-strip">
+  <div class="swatch sw-a">
+    <h4>A · Carved Stone</h4>
+    <div class="vitals" style="padding:.5rem .6rem;"><div class="vitals-main hp" style="justify-content:space-between;display:flex;"><span>HP</span><b>42/58</b></div></div>
+    <div class="crow"><span>Hacha Grande</span><span class="val">+9</span></div>
+  </div>
+  <div class="swatch sw-b">
+    <h4>B · Illuminated Ms.</h4>
+    <div class="vitals" style="padding:.5rem .6rem;"><div class="vitals-main hp" style="justify-content:space-between;display:flex;"><span>HP</span><b>42/58</b></div></div>
+    <div class="crow"><span>Hacha Grande</span><span class="val">+9</span></div>
+  </div>
+  <div class="swatch sw-c">
+    <h4>C · Ink &amp; Blood</h4>
+    <div class="vitals" style="padding:.5rem .6rem;"><div class="vitals-main hp" style="justify-content:space-between;display:flex;"><span>HP</span><b>42/58</b></div></div>
+    <div class="crow"><span>Hacha Grande</span><span class="val">+9</span></div>
+  </div>
+</div>
+
+<div class="options" style="margin-top:1.5rem;">
+  <div class="option" data-choice="looks-good" onclick="toggleSelect(this)">
+    <div class="letter">✓</div>
+    <div class="content"><h3>This works — lock it in</h3><p>Structure and cross-theme consistency both look right. Ready to write the spec.</p></div>
+  </div>
+  <div class="option" data-choice="needs-changes" onclick="toggleSelect(this)">
+    <div class="letter">✎</div>
+    <div class="content"><h3>Close, but changes needed</h3><p>Tell me what to adjust in the terminal.</p></div>
+  </div>
+</div>

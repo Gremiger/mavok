@@ -1,0 +1,71 @@
+<h2>Skin only, or structure too?</h2>
+<p class="subtitle">Same "Carved Stone &amp; Cord" palette on both mockups of the Combat tab — the difference is layout, not color. Which direction should the redesign include?</p>
+
+<style>
+  .layout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.25rem; }
+  @media (max-width: 760px) { .layout-grid { grid-template-columns: 1fr; } }
+  .phone { background: #14100c; border-radius: 20px; padding: .9rem; border: 2px solid transparent; cursor: pointer; transition: border-color .15s; }
+  .phone.selected { border-color: #7dd3fc; }
+  .phone-screen { background: radial-gradient(circle at 30% 10%, #241d16 0%, #14100c 70%); border-radius: 12px; padding: .75rem; font-family: Georgia, serif; color: #d4cfc4; min-height: 420px; display: flex; flex-direction: column; gap: .5rem; }
+
+  /* Shared card look (style A) */
+  .m-card { background: linear-gradient(135deg,#2a2016,#1a140e); border:1px solid #4a3520; border-radius: 6px; padding: .5rem .65rem; }
+  .m-title { font-size: .68rem; text-transform: uppercase; letter-spacing: .07em; color: #c98a4b; margin: .5rem 0 .15rem; }
+
+  /* --- LEFT: current structure, re-skinned (6 top-level cards stacked) --- */
+  .m-hp { display:flex; justify-content:space-between; align-items:center; }
+  .m-hp b { font-size: 1.3rem; color:#d4cfc4; }
+  .m-hp span { font-size: .65rem; opacity:.7; text-transform:uppercase; }
+  .m-row { display:flex; justify-content:space-between; font-size: .8rem; padding: .35rem 0; border-bottom: 1px solid #2a2216; }
+  .m-row:last-child { border-bottom:none; }
+  .m-nav-bottom { margin-top:auto; display:flex; justify-content:space-around; background:#1a140e; border-radius: 999px; padding:.5rem; border:1px solid #4a3520; font-size:.62rem; }
+
+  /* --- RIGHT: restructured — sticky vitals header, grouped actions, condensed rows --- */
+  .m-header { background: linear-gradient(135deg,#3a2a18,#241a10); border-radius: 8px; padding: .6rem .7rem; display:flex; justify-content:space-between; align-items:center; border: 1px solid #a63d2f; }
+  .m-header .hpblock b { font-size: 1.5rem; color:#f0c98a; }
+  .m-header .hpblock span { font-size:.6rem; opacity:.75; text-transform:uppercase; display:block; }
+  .m-ring { width: 40px; height:40px; border-radius:50%; border: 3px solid #a63d2f; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:bold; }
+  .m-quick { display:grid; grid-template-columns: repeat(4,1fr); gap:.35rem; }
+  .m-quick div { background:#1e1710; border:1px solid #3a2c1a; border-radius:6px; text-align:center; padding:.4rem .1rem; font-size:.62rem; }
+  .m-compact-row { display:flex; justify-content:space-between; align-items:center; background:#1a140e; border-radius:6px; padding:.4rem .6rem; font-size:.78rem; }
+  .m-compact-row .tag { background:#a63d2f; color:#f0e6cc; font-size:.6rem; padding:.1rem .4rem; border-radius:999px; }
+</style>
+
+<div class="layout-grid options">
+
+  <div class="phone option" data-choice="skin-only" onclick="toggleSelect(this)">
+    <div class="phone-screen">
+      <div class="m-card m-hp"><span>HP Actual</span><b>42 / 58</b></div>
+      <div class="m-title">Ataques</div>
+      <div class="m-card">
+        <div class="m-row"><span>Hacha Grande</span><span>+9 / 1d12+5</span></div>
+        <div class="m-row"><span>Jabalina</span><span>+8 / 1d6+5</span></div>
+      </div>
+      <div class="m-title">Furia</div>
+      <div class="m-card"><div class="m-row"><span>Usos restantes</span><span>●●○</span></div></div>
+      <div class="m-title">Condiciones</div>
+      <div class="m-card"><div class="m-row"><span>Ninguna activa</span><span>+</span></div></div>
+      <div class="m-nav-bottom"><span>Ficha</span><span>Combate</span><span>Inv.</span><span>Notas</span></div>
+    </div>
+    <p style="text-align:center;margin-top:.6rem;font-size:.82rem;"><b>Skin only</b><br><span style="opacity:.7">Same stacked-card structure as today, just re-textured. Lower risk, faster to ship.</span></p>
+  </div>
+
+  <div class="phone option" data-choice="restructure" onclick="toggleSelect(this)">
+    <div class="phone-screen">
+      <div class="m-header">
+        <div class="hpblock"><span>HP</span><b>42/58</b></div>
+        <div class="m-ring">17<br>CA</div>
+        <div class="hpblock" style="text-align:right"><span>Furia</span><b>●●○</b></div>
+      </div>
+      <div class="m-quick"><div>Atacar</div><div>Furia</div><div>Descanso</div><div>Condición</div></div>
+      <div class="m-title">Ataques</div>
+      <div class="m-compact-row"><span>Hacha Grande</span><span class="tag">+9</span></div>
+      <div class="m-compact-row"><span>Jabalina</span><span class="tag">+8</span></div>
+      <div class="m-title">Estado</div>
+      <div class="m-compact-row"><span>Sin condiciones</span><span>+</span></div>
+      <div class="m-nav-bottom"><span>Ficha</span><span>Combate</span><span>Inv.</span><span>Notas</span></div>
+    </div>
+    <p style="text-align:center;margin-top:.6rem;font-size:.82rem;"><b>Restructured</b><br><span style="opacity:.7">Vitals pinned in a persistent header, quick-actions promoted to one-tap row, denser compact rows instead of stacked cards. Bigger change, but faster to scan mid-fight.</span></p>
+  </div>
+
+</div>

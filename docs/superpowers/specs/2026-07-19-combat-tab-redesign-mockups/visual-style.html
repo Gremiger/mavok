@@ -1,0 +1,83 @@
+<h2>Which direction feels right for Mavok?</h2>
+<p class="subtitle">Four style directions — two lean into the current fantasy motif, two break away from it. Click the one(s) that grab you (multi-select OK), or none and just tell me in the terminal.</p>
+
+<style>
+  .dir-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; margin-top: 1.5rem; }
+  @media (max-width: 700px) { .dir-grid { grid-template-columns: 1fr; } }
+  .dir-card { border-radius: 14px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color .15s, transform .15s; }
+  .dir-card:hover { transform: translateY(-2px); }
+  .dir-card.selected { border-color: #7dd3fc; }
+  .dir-preview { padding: 1.1rem; min-height: 190px; display: flex; flex-direction: column; gap: .6rem; }
+  .dir-label { padding: .85rem 1.1rem; background: #16161c; }
+  .dir-label h3 { margin: 0 0 .25rem 0; font-size: 1rem; }
+  .dir-label p { margin: 0; font-size: .82rem; opacity: .75; }
+
+  /* --- A: Refined Stone & Cord (fantasy, evolves current) --- */
+  .prev-a { background: radial-gradient(circle at 30% 20%, #241d16 0%, #14100c 70%); }
+  .prev-a .stat { background: linear-gradient(135deg,#2a2016,#1a140e); border:1px solid #4a3520; border-left: 3px solid #a63d2f; border-radius: 6px; padding: .55rem .7rem; color: #d9c9a3; font-family: Georgia, serif; }
+  .prev-a .stat b { color: #c98a4b; display:block; font-size: 1.1rem; }
+  .prev-a .stat span { font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+  .prev-a .btn { align-self: flex-start; background: #a63d2f; color: #f0e6cc; padding: .4rem .9rem; border-radius: 4px; font-size: .78rem; font-family: Georgia, serif; }
+
+  /* --- B: Illuminated Manuscript (fantasy, parchment/gold-leaf) --- */
+  .prev-b { background: linear-gradient(160deg,#e8dcb8,#d9c396); }
+  .prev-b .stat { background: #f3e9cc; border: 1px solid #9c8a54; border-radius: 2px; padding: .55rem .7rem; color: #3a2c14; font-family: Georgia, serif; position: relative; }
+  .prev-b .stat::before { content:'❧'; position:absolute; top:2px; right:6px; color:#9c2b2b; opacity:.5; font-size:.9rem; }
+  .prev-b .stat b { color: #7a1f1f; display:block; font-size: 1.1rem; }
+  .prev-b .stat span { font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; opacity: .65; }
+  .prev-b .btn { align-self: flex-start; background: #7a1f1f; color: #f3e9cc; padding: .4rem .9rem; border-radius: 2px; font-size: .78rem; font-family: Georgia, serif; border: 1px solid #b8860b; }
+
+  /* --- C: Ink & Blood Grimoire (fantasy, darker/gothic, high contrast) --- */
+  .prev-c { background: #0a0a0a; }
+  .prev-c .stat { background: #131313; border: 1px solid #2a2a2a; border-top: 2px solid #c23b2b; padding: .55rem .7rem; color: #eee; font-family: 'Times New Roman', serif; }
+  .prev-c .stat b { color: #fff; display:block; font-size: 1.15rem; letter-spacing: .02em; }
+  .prev-c .stat span { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: #c23b2b; }
+  .prev-c .btn { align-self: flex-start; background: transparent; color: #c23b2b; padding: .4rem .9rem; border: 1px solid #c23b2b; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
+
+  /* --- D: Modern Tactical (non-fantasy, clean app UI) --- */
+  .prev-d { background: #12141a; }
+  .prev-d .stat { background: #1b1f28; border-radius: 10px; padding: .6rem .75rem; color: #e8ecf5; font-family: -apple-system, Inter, sans-serif; display:flex; justify-content:space-between; align-items:center; }
+  .prev-d .stat b { color: #5eead4; font-size: 1.2rem; font-weight: 700; }
+  .prev-d .stat span { font-size: .68rem; letter-spacing: .04em; text-transform: uppercase; opacity: .6; }
+  .prev-d .btn { align-self: flex-start; background: #5eead4; color: #0a0d10; padding: .45rem 1rem; border-radius: 8px; font-size: .78rem; font-weight: 600; font-family: -apple-system, Inter, sans-serif; }
+</style>
+
+<div class="dir-grid options" data-multiselect>
+
+  <div class="dir-card option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="dir-preview prev-a">
+      <div class="stat"><span>HP Actual</span><b>42 / 58</b></div>
+      <div class="stat"><span>Ataque · Hacha</span><b>+9 / 1d12+5</b></div>
+      <div class="btn">Tirar dados</div>
+    </div>
+    <div class="dir-label"><h3>A · Carved Stone &amp; Cord</h3><p>Same soul as today, more refined: deeper texture, better contrast, tighter type. Evolution, not reinvention.</p></div>
+  </div>
+
+  <div class="dir-card option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="dir-preview prev-b">
+      <div class="stat"><span>HP Actual</span><b>42 / 58</b></div>
+      <div class="stat"><span>Ataque · Hacha</span><b>+9 / 1d12+5</b></div>
+      <div class="btn">Tirar dados</div>
+    </div>
+    <div class="dir-label"><h3>B · Illuminated Manuscript</h3><p>Parchment, ink, gold-leaf flourishes. Feels like a hand-kept adventuring journal, warmer and more ornamental.</p></div>
+  </div>
+
+  <div class="dir-card option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="dir-preview prev-c">
+      <div class="stat"><span>HP Actual</span><b>42 / 58</b></div>
+      <div class="stat"><span>Ataque · Hacha</span><b>+9 / 1d12+5</b></div>
+      <div class="btn">Tirar dados</div>
+    </div>
+    <div class="dir-label"><h3>C · Ink &amp; Blood Grimoire</h3><p>Near-black, high contrast, sharp serif type, blood-red accent as the only color. Grim, minimal, dramatic.</p></div>
+  </div>
+
+  <div class="dir-card option" data-choice="d" onclick="toggleSelect(this)">
+    <div class="dir-preview prev-d">
+      <div class="stat"><span>HP Actual</span><b>42 / 58</b></div>
+      <div class="stat"><span>Ataque · Hacha</span><b>+9 / 1d12+5</b></div>
+      <div class="btn">Tirar dados</div>
+    </div>
+    <div class="dir-label"><h3>D · Modern Tactical</h3><p>Drops the medieval motif entirely: flat cards, rounded corners, sans-serif, a single bright accent. Reads like a modern companion app, optimized for fast scanning mid-combat.</p></div>
+  </div>
+
+</div>
