@@ -1,0 +1,73 @@
+<h2>Combined: Ember Wisp + Molten Crack + Beast Within</h2>
+<p class="subtitle">Full-size mockup this time (closer to real dimensions), all three layered together. Embers from the flame, a slow light-sheen across the border, HP pulsing like a heartbeat. Watch it for a few seconds — the timings are deliberately offset so they don't all "beat" in sync and fight each other.</p>
+
+<style>
+  .phone-full { max-width: 380px; margin: 1.5rem auto 0; background: #14100c; border-radius: 24px; padding: 1rem; box-shadow: 0 8px 30px rgba(0,0,0,.5); }
+  .screen-full { background: radial-gradient(circle at 30% 5%, #241d16 0%, #14100c 60%); border-radius: 14px; padding: .8rem; font-family: Georgia, serif; color: #d4cfc4; }
+
+  .vitals-full { position: relative; border-radius: 10px; padding: .8rem .9rem; overflow: hidden;
+    background-image: linear-gradient(135deg,#2a2016,#1a140e), linear-gradient(90deg, #a63d2f, #e0834a, #a63d2f);
+    background-origin: border-box; background-clip: padding-box, border-box; border: 1px solid transparent; }
+  .vitals-full::before { content:''; position:absolute; inset:0; background: linear-gradient(120deg, transparent 30%, rgba(224,131,74,.32) 50%, transparent 70%); background-size: 250% 250%; animation: crackSheen 3.4s ease-in-out infinite; z-index:1; pointer-events:none; }
+  @keyframes crackSheen { 0%{ background-position: 0% 0%; } 100%{ background-position: 100% 100%; } }
+
+  .vmain-full { display:flex; align-items:center; justify-content:space-between; position: relative; z-index: 2; }
+  .hp-full { position: relative; }
+  .hp-full b { font-size: 1.7rem; color:#f0c98a; display:block; line-height:1; animation: heartbeat 1.15s ease-in-out infinite; transform-origin: left center; }
+  .hp-full span { font-size:.62rem; opacity:.7; text-transform:uppercase; }
+  @keyframes heartbeat { 0%,100%{ transform: scale(1); } 14%{ transform: scale(1.07); } 28%{ transform: scale(1); } 42%{ transform: scale(1.04); } 60%{ transform: scale(1); } }
+
+  .ac-ring-full { width: 48px; height:48px; border-radius:50%; border: 3px solid #4a3520; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; z-index:2; }
+  .ac-ring-full b { font-size: 1.05rem; } .ac-ring-full span { font-size: .52rem; opacity:.7; }
+
+  .rage-row-full { display:flex; align-items:center; gap:.5rem; position: relative; z-index: 2; }
+  .pip-full { width:14px; height:14px; border-radius:50%; }
+  .flame-full { position: relative; width: 28px; height: 28px; border-radius: 50%; background: #a63d2f; box-shadow: 0 0 10px rgba(166,61,47,.7); display:flex; align-items:center; justify-content:center; font-size: .85rem; }
+  .ember-full { position:absolute; width:3px; height:3px; border-radius:50%; background:#ffb27a; bottom: 40%; animation: emberRise 2s ease-out infinite; }
+  .ember-full:nth-child(1){ left: 25%; animation-delay: .2s; }
+  .ember-full:nth-child(2){ left: 55%; animation-delay: .9s; }
+  .ember-full:nth-child(3){ left: 75%; animation-delay: 1.6s; }
+  @keyframes emberRise { 0%{ opacity:0; transform: translateY(0) scale(.6); } 20%{opacity:1;} 100%{ opacity:0; transform: translateY(-28px) scale(1.2); } }
+
+  .desc-full { font-size: .72rem; opacity: .85; margin-top: .65rem; padding-top: .55rem; border-top: 1px solid rgba(166,61,47,.3); line-height: 1.55; position: relative; z-index: 2; }
+  .desc-full b { color: #e8b8a8; }
+
+  .secondary-full { display:flex; justify-content:space-around; margin-top:.65rem; padding-top:.55rem; border-top:1px solid rgba(166,61,47,.2); font-size:.68rem; position:relative; z-index:2; }
+  .secondary-full div { text-align:center; opacity:.85; }
+  .secondary-full b { display:block; font-size:.85rem; color:#d4cfc4; }
+  .secondary-full span { text-transform:uppercase; opacity:.6; font-size: .55rem; }
+</style>
+
+<div class="phone-full">
+  <div class="screen-full">
+    <div class="vitals-full">
+      <div class="vmain-full">
+        <div class="hp-full"><span>HP</span><b>42/58</b></div>
+        <div class="ac-ring-full"><b>17</b><span>CA</span></div>
+        <div class="rage-row-full">
+          <div class="pip-full" style="background:#a63d2f;"></div>
+          <div class="pip-full" style="border:1px solid #a63d2f77;"></div>
+          <div class="flame-full">🔥<div class="ember-full"></div><div class="ember-full"></div><div class="ember-full"></div></div>
+        </div>
+      </div>
+      <div class="desc-full"><b>+2 daño</b> · Resistencia Bludgeoning/Piercing/Slashing · Ventaja FUE checks/saves<br>Extiende: ataca · fuerza salvación · Bonus Action · No concentración ni hechizos</div>
+      <div class="secondary-full">
+        <div><b>+0</b><span>Temp</span></div>
+        <div><b>+3</b><span>Init</span></div>
+        <div><b>☆</b><span>Insp</span></div>
+        <div><b>30</b><span>Vel</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="options" style="margin-top:1.5rem;">
+  <div class="option" data-choice="combined-good" onclick="toggleSelect(this)">
+    <div class="letter">✓</div>
+    <div class="content"><h3>This works — lock it in</h3><p>The three effects read as one cohesive "raging" feeling, not competing gimmicks.</p></div>
+  </div>
+  <div class="option" data-choice="combined-toned-down" onclick="toggleSelect(this)">
+    <div class="letter">−</div>
+    <div class="content"><h3>Good direction, tone one down</h3><p>Tell me which one feels like too much in the terminal.</p></div>
+  </div>
+</div>

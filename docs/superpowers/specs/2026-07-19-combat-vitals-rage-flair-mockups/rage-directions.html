@@ -1,0 +1,129 @@
+<h2>Rage-active header: 4 directions</h2>
+<p class="subtitle">Each card shows the vitals header <b>while Rage is active</b> — real motion, not static mockups (these are live CSS animations, so what you see is close to what it'd actually feel like). All include the rules description text that's coming back regardless of which direction you pick. Click whichever resonates — multi-select is on, pick as many as you like.</p>
+
+<style>
+  .rage-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 1.5rem; }
+  @media (max-width: 760px) { .rage-grid { grid-template-columns: 1fr; } }
+
+  .rage-card { border-radius: 14px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color .15s; background: #16161c; }
+  .rage-card.selected { border-color: #7dd3fc; }
+  .rage-label { padding: .8rem 1.1rem; }
+  .rage-label h3 { margin: 0 0 .3rem 0; font-size: .95rem; }
+  .rage-label p { margin: 0; font-size: .8rem; opacity: .75; line-height: 1.4; }
+
+  .phone-mini { padding: 1.1rem; background: radial-gradient(circle at 30% 10%, #241d16 0%, #14100c 70%); font-family: Georgia, serif; color: #d4cfc4; position: relative; }
+
+  .vitals-mini { position: relative; background: linear-gradient(135deg,#2a2016,#1a140e); border-radius: 10px; padding: .7rem .8rem; overflow: hidden; }
+  .vmain { display:flex; align-items:center; justify-content:space-between; position: relative; z-index: 2; }
+  .hp b { font-size: 1.4rem; color:#f0c98a; display:block; line-height:1; } .hp span{font-size:.6rem;opacity:.7;text-transform:uppercase;}
+  .ac-ring-mini { width: 40px; height:40px; border-radius:50%; border: 3px solid #4a3520; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ac-ring-mini b { font-size: .9rem; } .ac-ring-mini span { font-size: .48rem; opacity:.7; }
+  .rage-row { display:flex; align-items:center; gap:.4rem; position: relative; z-index: 2; }
+  .pip-mini { width:12px; height:12px; border-radius:50%; }
+  .desc { font-size: .68rem; opacity: .85; margin-top: .55rem; padding-top: .5rem; border-top: 1px solid rgba(166,61,47,.3); line-height: 1.5; position: relative; z-index: 2; }
+  .desc b { color: #e8b8a8; }
+
+  /* ===== A: Ember Wisp — embers rise from the flame icon only ===== */
+  .flame-a { position: relative; width: 26px; height: 26px; border-radius: 50%; background: #a63d2f; box-shadow: 0 0 10px rgba(166,61,47,.7); display:flex; align-items:center; justify-content:center; font-size: .8rem; }
+  .ember { position:absolute; width:3px; height:3px; border-radius:50%; background:#ffb27a; bottom: 40%; animation: emberRise 1.8s ease-out infinite; }
+  .ember:nth-child(1){ left: 30%; animation-delay: 0s; }
+  .ember:nth-child(2){ left: 55%; animation-delay: .6s; }
+  .ember:nth-child(3){ left: 70%; animation-delay: 1.1s; }
+  @keyframes emberRise { 0%{ opacity:0; transform: translateY(0) scale(.6); } 20%{opacity:1;} 100%{ opacity:0; transform: translateY(-26px) scale(1.2); } }
+  .vitals-a { border: 1px solid #a63d2f; }
+
+  /* ===== B: Molten Crack — animated crack-glow along the border ===== */
+  .vitals-b { border: 1px solid transparent; background-image: linear-gradient(135deg,#2a2016,#1a140e), linear-gradient(90deg, #a63d2f, #e0834a, #a63d2f); background-origin: border-box; background-clip: padding-box, border-box; }
+  .vitals-b::before { content:''; position:absolute; inset:0; background: linear-gradient(120deg, transparent 30%, rgba(224,131,74,.35) 50%, transparent 70%); background-size: 250% 250%; animation: crackSheen 3s ease-in-out infinite; z-index:1; }
+  @keyframes crackSheen { 0%{ background-position: 0% 0%; } 100%{ background-position: 100% 100%; } }
+  .flame-b { width: 26px; height: 26px; border-radius: 50%; background: #a63d2f; display:flex; align-items:center; justify-content:center; font-size:.8rem; }
+
+  /* ===== C: Beast Within — heartbeat pulse on HP, claw glyph ===== */
+  .hp-c b { animation: heartbeat 1.1s ease-in-out infinite; display:block; }
+  @keyframes heartbeat { 0%,100%{ transform: scale(1); } 15%{ transform: scale(1.08); } 30%{ transform: scale(1); } 45%{ transform: scale(1.05); } }
+  .claw-mark { position:absolute; top:-4px; right:-6px; font-size: .9rem; color:#e05c48; transform: rotate(15deg); animation: clawPulse 1.6s ease-in-out infinite; }
+  @keyframes clawPulse { 0%,100%{ opacity:.6; } 50%{ opacity:1; } }
+  .vitals-c { border: 1px solid #a63d2f; }
+  .flame-c { width: 26px; height: 26px; border-radius: 50%; background: #a63d2f; display:flex; align-items:center; justify-content:center; font-size:.8rem; }
+
+  /* ===== D: Battle Roar — steady ember glow border, no per-frame gimmicks ===== */
+  .vitals-d { border: 1px solid #a63d2f; animation: roarGlow 2.2s ease-in-out infinite; }
+  @keyframes roarGlow { 0%,100%{ box-shadow: 0 0 10px rgba(166,61,47,.35); } 50%{ box-shadow: 0 0 22px rgba(166,61,47,.65); } }
+  .flame-d { width: 26px; height: 26px; border-radius: 50%; background: #a63d2f; box-shadow: 0 0 8px rgba(166,61,47,.6); display:flex; align-items:center; justify-content:center; font-size:.8rem; }
+</style>
+
+<div class="rage-grid options" data-multiselect>
+
+  <div class="rage-card option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="phone-mini">
+      <div class="vitals-mini vitals-a">
+        <div class="vmain">
+          <div class="hp"><span>HP</span><b>42/58</b></div>
+          <div class="ac-ring-mini"><b>17</b><span>CA</span></div>
+          <div class="rage-row">
+            <div class="pip-mini" style="background:#a63d2f;"></div>
+            <div class="pip-mini" style="border:1px solid #a63d2f77;"></div>
+            <div class="flame-a">🔥<div class="ember"></div><div class="ember"></div><div class="ember"></div></div>
+          </div>
+        </div>
+        <div class="desc"><b>+2 daño</b> · Resistencia Bludgeoning/Piercing/Slashing · Ventaja FUE<br>Extiende: ataca · fuerza salvación · Bonus Action · No concentración/hechizos</div>
+      </div>
+    </div>
+    <div class="rage-label"><h3>A · Ember Wisp</h3><p>Tiny embers drift up from just the flame toggle — contained, doesn't touch the rest of the card. Whimsical without being loud.</p></div>
+  </div>
+
+  <div class="rage-card option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="phone-mini">
+      <div class="vitals-mini vitals-b" style="position:relative;">
+        <div class="vmain">
+          <div class="hp"><span>HP</span><b>42/58</b></div>
+          <div class="ac-ring-mini"><b>17</b><span>CA</span></div>
+          <div class="rage-row">
+            <div class="pip-mini" style="background:#a63d2f;"></div>
+            <div class="pip-mini" style="border:1px solid #a63d2f77;"></div>
+            <div class="flame-b">🔥</div>
+          </div>
+        </div>
+        <div class="desc"><b>+2 daño</b> · Resistencia Bludgeoning/Piercing/Slashing · Ventaja FUE<br>Extiende: ataca · fuerza salvación · Bonus Action · No concentración/hechizos</div>
+      </div>
+    </div>
+    <div class="rage-label"><h3>B · Molten Crack</h3><p>A slow sheen of light travels across the card border, like lava glowing under stone. Fits "Piedra Viva" (Living Stone) thematically. Reads as ambient, not attention-grabbing.</p></div>
+  </div>
+
+  <div class="rage-card option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="phone-mini">
+      <div class="vitals-mini vitals-c" style="position:relative;">
+        <div class="vmain">
+          <div class="hp hp-c" style="position:relative;"><span>HP</span><b>42/58</b><span class="claw-mark">⚡</span></div>
+          <div class="ac-ring-mini"><b>17</b><span>CA</span></div>
+          <div class="rage-row">
+            <div class="pip-mini" style="background:#a63d2f;"></div>
+            <div class="pip-mini" style="border:1px solid #a63d2f77;"></div>
+            <div class="flame-c">🔥</div>
+          </div>
+        </div>
+        <div class="desc"><b>+2 daño</b> · Resistencia Bludgeoning/Piercing/Slashing · Ventaja FUE<br>Extiende: ataca · fuerza salvación · Bonus Action · No concentración/hechizos</div>
+      </div>
+    </div>
+    <div class="rage-label"><h3>C · Beast Within</h3><p>HP number pulses like a heartbeat, small mark flickers by it. Most primal/whimsical of the four — leans into "barbarian" more than "stone."</p></div>
+  </div>
+
+  <div class="rage-card option" data-choice="d" onclick="toggleSelect(this)">
+    <div class="phone-mini">
+      <div class="vitals-mini vitals-d">
+        <div class="vmain">
+          <div class="hp"><span>HP</span><b>42/58</b></div>
+          <div class="ac-ring-mini"><b>17</b><span>CA</span></div>
+          <div class="rage-row">
+            <div class="pip-mini" style="background:#a63d2f;"></div>
+            <div class="pip-mini" style="border:1px solid #a63d2f77;"></div>
+            <div class="flame-d">🔥</div>
+          </div>
+        </div>
+        <div class="desc"><b>+2 daño</b> · Resistencia Bludgeoning/Piercing/Slashing · Ventaja FUE<br>Extiende: ataca · fuerza salvación · Bonus Action · No concentración/hechizos</div>
+      </div>
+    </div>
+    <div class="rage-label"><h3>D · Battle Roar</h3><p>Steady breathing glow on the whole card border, flame icon glows too. Calmest/most "slick" of the four — no moving particles, just a pulse.</p></div>
+  </div>
+
+</div>

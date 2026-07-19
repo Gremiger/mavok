@@ -10,7 +10,7 @@ This also fixes a real, pre-existing bug: the old `RageTracker`'s description te
 
 ## 1. Rage description text
 
-Rendered only when `rage.active` is true, directly below the primary HP/AC/rage row, above the secondary stat row:
+`CombatVitals.tsx` currently renders three stacked sections inside the card: the HP/AC row (`isDying ? <DeathSaves/> : <div>HP button + AC ring</div>`), then a separate `<div className="mt-2.5"><RageCluster/></div>` row, then the secondary stat row (Temp/Init/Insp/Vel). The description is a **new fourth block**, rendered only when `rage.active` is true, inserted immediately after the `RageCluster` row's closing `</div>` and before the secondary stat row's `<div>` — i.e. between the two existing `mt-2.5` divs, not between HP/AC and Rage:
 
 ```
 {rageDamage} daño · Resistencia Bludgeoning/Piercing/Slashing · Ventaja FUE checks/saves
@@ -19,13 +19,17 @@ Extiende: ataca · fuerza salvación · Bonus Action · No concentración ni hec
 
 Condensed from the real Rage feature text in `barbarian-progression.ts` (checked against source, not assumed) — same content the old `RageTracker` showed, corrected for the level-scaling bug. `rageDamage` becomes a new required prop on `CombatVitals`, passed straight through from `CombatTab.tsx` (which already computes it correctly — this is a wiring fix, not new logic).
 
+This block renders regardless of `isDying`, matching the existing convention on this component: the `RageCluster` row and the root-div active-glow already render unconditionally today, `isDying` only swaps out the HP/AC row for `DeathSaves`. No new behavior is being introduced here, just following the pattern already on the file.
+
 ## 2. Steady-state "raging" treatment — three effects, layered
 
 All three fire together whenever `rage.active` is true, deliberately offset in timing so they don't sync into one distracting pulse. This treatment **replaces** the current static `rage.active` glow on `CombatVitals`'s root div (`!border-cord/50 shadow-[0_0_16px_rgba(166,61,47,0.3)]` from the Phase 1 redesign) — the two would look redundant layered together, and the new treatment is a strict superset of what the old one was going for.
 
 - **Ember Wisp**: 3 small particles rise and fade from the flame toggle specifically (not the whole card), staggered ~0.7s apart on a ~2s loop each.
 - **Molten Crack**: a soft diagonal light-sheen sweeps across the vitals card's border on a slow ~3.4s loop. Implemented as a dual-background-layer gradient border (the card's own fill plus an animated gradient, clipped separately) rather than fighting over `box-shadow` the way an earlier mistake in this same redesign series already did once (Combat modals' `Modal.tsx` — see that spec's Task 1) — worth naming explicitly since it's the same category of CSS pitfall.
-- **Beast Within**: the HP number pulses on a ~1.15s heartbeat rhythm (quick-scale, settle, smaller second beat, rest) — doubles as reinforcing "this is your life total," not pure decoration.
+- **Beast Within**: the HP number pulses on a ~1.15s heartbeat rhythm (quick-scale, settle, smaller second beat, rest) — doubles as reinforcing "this is your life total," not pure decoration. This one only makes sense when the HP number is actually on screen, i.e. `!isDying`; when `isDying` is true the HP row is replaced by `DeathSaves` and there's nothing to pulse, so Beast Within simply doesn't render in that state while Ember Wisp and Molten Crack continue as normal (they don't depend on the HP row).
+
+The exact validated values (particle color/size `#ffb27a`, 3px, ember rise ~26-28px with a slight scale-up; sheen gradient stops and angle; heartbeat scale keyframes `1 → 1.07 → 1 → 1.04 → 1`) are captured in the approved animated mockup at `docs/superpowers/specs/2026-07-19-combat-vitals-rage-flair-mockups/rage-combined.html` — use that file as the source of truth for concrete CSS values rather than re-deriving them, so the shipped result matches what was actually approved.
 
 Given the CSS complexity (multi-layer gradient border + `::before` sheen overlay + keyframes), this lives as a new named class in `globals.css` (matching how `stone-card`/`cord-line`/`crack-divider` are already implemented there) rather than as inline Tailwind arbitrary values — consistent with existing codebase convention for decorative treatments.
 
@@ -54,4 +58,5 @@ No haptic/vibration feedback — confirmed out of scope per the iOS limitation a
 - Confirm the ignition flourish plays exactly once on activation, does not replay on unrelated re-renders while still active (e.g. tapping a rage slot pip while raging), and does not play on deactivation.
 - Reload the page while Rage is already active (or simulate via localStorage) — confirm the ignition flourish does **not** fire on mount, only on an actual false→true transition.
 - Confirm the three steady-state effects (embers, border sheen, heartbeat) all run simultaneously without visually fighting each other, and that deactivating Rage cleanly removes all of them (including the border/glow treatment reverting to the normal non-active `stone-card` look).
+- Reduce a raging character to 0 HP (`isDying` true) — confirm the description text, Ember Wisp, and Molten Crack still render normally alongside `DeathSaves`, and that Beast Within simply doesn't appear (no error, no pulsing empty element) since there's no HP number on screen in that state.
 - Confirm the old static `!border-cord/50 shadow-[...]` treatment is gone, not layered underneath the new one.
