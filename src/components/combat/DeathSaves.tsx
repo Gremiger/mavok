@@ -15,7 +15,7 @@ export function DeathSaves({
   const isDead = failures >= 3;
 
   return (
-    <div className="bg-danger/10 border border-danger/30 rounded-lg p-3">
+    <div>
       <h3 className="font-heading text-danger text-center text-sm mb-3">
         Salvaciones de muerte
       </h3>
@@ -62,7 +62,7 @@ export function DeathSaves({
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap justify-center gap-1.5 mt-3">
+      <div className="grid grid-cols-2 gap-1.5 mt-3">
         <button
           onClick={() => onChange(successes, Math.min(3, failures + 2))}
           className="text-xs px-2 py-0.5 border border-border rounded hover:border-accent hover:text-accent"
