@@ -408,30 +408,10 @@ export function SettingsTab() {
       {/* Import / Export */}
       <CollapsibleSection title="Datos">
         <div className="space-y-2">
-          <button
-            onClick={() => exportCharacterJSON(character)}
-            className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm"
-          >
-            Exportar datos (JSON)
-          </button>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm"
-          >
-            Importar datos (JSON)
-          </button>
-          <button
-            onClick={() => exportInventoryCSV(character.inventory)}
-            className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm"
-          >
-            Exportar inventario (CSV)
-          </button>
-          <button
-            onClick={() => exportQuickNotes(character.notes.quick)}
-            className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm"
-          >
-            Exportar notas rápidas (TXT)
-          </button>
+          <CompactRow onClick={() => exportCharacterJSON(character)} name="Exportar datos (JSON)" right={null} />
+          <CompactRow onClick={() => fileInputRef.current?.click()} name="Importar datos (JSON)" right={null} />
+          <CompactRow onClick={() => exportInventoryCSV(character.inventory)} name="Exportar inventario (CSV)" right={null} />
+          <CompactRow onClick={() => exportQuickNotes(character.notes.quick)} name="Exportar notas rápidas (TXT)" right={null} />
           <Link
             href="/print"
             className="block w-full p-3 bg-card rounded-lg border border-border text-left text-sm"
