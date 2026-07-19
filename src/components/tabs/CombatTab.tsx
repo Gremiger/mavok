@@ -4,15 +4,13 @@ import { useState } from "react";
 import { useLongPress } from "@/hooks/useLongPress";
 import { motion } from "framer-motion";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
-import { StatBadge } from "@/components/ui/StatBadge";
 import { Tag } from "@/components/ui/Tag";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { Modal } from "@/components/ui/Modal";
+import { CombatVitals } from "@/components/combat/CombatVitals";
 import { HpModal } from "@/components/combat/HpModal";
-import { DeathSaves } from "@/components/combat/DeathSaves";
 import { AttackRow } from "@/components/combat/AttackRow";
 import { DiceRoller } from "@/components/combat/DiceRoller";
-import { RageTracker } from "@/components/combat/RageTracker";
 import { StandardActionsModal } from "@/components/combat/StandardActionsModal";
 import { AttackFormModal } from "@/components/combat/AttackFormModal";
 import { GrantedActionCard } from "@/components/combat/GrantedActionCard";
@@ -171,73 +169,35 @@ export function CombatTab() {
   return (
     <div className="p-4 space-y-3">
       {/* Top Bar */}
-      <div
-        className={`stone-card rounded-lg p-3 transition-all ${
-          rageActive
-            ? "!border-cord/50 shadow-[0_0_16px_rgba(166,61,47,0.3)]"
-            : ""
-        }`}
-      >
-        {isDying ? (
-          <DeathSaves
-            successes={combat.deathSaves.successes}
-            failures={combat.deathSaves.failures}
-            onChange={(s, f) =>
-              updateCombat({ deathSaves: { successes: s, failures: f } })
-            }
-            onRegainConsciousness={() =>
-              updateCombat({
-                currentHp: 1,
-                deathSaves: { successes: 0, failures: 0 },
-              })
-            }
-          />
-        ) : (
-          <div className="flex items-center justify-around flex-wrap gap-2">
-            <StatBadge
-              label="HP"
-              value={`${combat.currentHp}/${combat.maxHp}`}
-              onClick={() => setHpModalOpen(true)}
-              highlight={combat.currentHp < combat.maxHp}
-            />
-            <StatBadge
-              label="Temp"
-              value={`+${combat.tempHp}`}
-              onClick={() => setTempHpInput(true)}
-              highlight={combat.tempHp > 0}
-            />
-            <StatBadge
-              label="AC"
-              value={`${tempAcMod !== 0 ? `${displayAc} (${formatModifier(tempAcMod)})` : displayAc}${magicItemIndicator === "explicit-tag" && magicAcBonus !== 0 ? ` ✦${formatModifier(magicAcBonus)}` : ""}`}
-              onClick={() => setAcModalOpen(true)}
-              highlight={tempAcMod !== 0}
-            />
-            <StatBadge
-              label="Init"
-              value={formatModifier(combat.initiative)}
-            />
-            <StatBadge
-              label="Insp"
-              value={meta.inspiration ? "★" : "☆"}
-              onClick={toggleInspiration}
-              highlight={meta.inspiration}
-            />
-            <StatBadge
-              label="Vel"
-              value={speedReduction > 0 ? `${effectiveSpeed} (-${speedReduction})` : combat.speed}
-              highlight={speedReduction > 0}
-            />
-          </div>
-        )}
-
-        {/* Rage */}
-        <RageTracker
-          slots={slots}
-          active={rageActive}
-          onToggleSlot={toggleRageSlot}
-          onToggleActive={toggleRageActive}
-        />
-      </div>
+      <CombatVitals
+        isDying={isDying}
+        currentHp={combat.currentHp}
+        maxHp={combat.maxHp}
+        tempHp={combat.tempHp}
+        displayAc={displayAc}
+        tempAcMod={tempAcMod}
+        magicAcBonus={magicAcBonus}
+        showExplicitMagicTag={magicItemIndicator === "explicit-tag"}
+        initiative={combat.initiative}
+        inspiration={meta.inspiration}
+        effectiveSpeed={effectiveSpeed}
+        speedReduction={speedReduction}
+        rage={{
+          slots,
+          active: rageActive,
+          onToggleSlot: toggleRageSlot,
+          onToggleActive: toggleRageActive,
+        }}
+        deathSaves={combat.deathSaves}
+        onOpenHp={() => setHpModalOpen(true)}
+        onOpenTempHp={() => setTempHpInput(true)}
+        onOpenAc={() => setAcModalOpen(true)}
+        onToggleInspiration={toggleInspiration}
+        onDeathSavesChange={(s, f) => updateCombat({ deathSaves: { successes: s, failures: f } })}
+        onRegainConsciousness={() =>
+          updateCombat({ currentHp: 1, deathSaves: { successes: 0, failures: 0 } })
+        }
+      />
 
       <div className="crack-divider" />
 
