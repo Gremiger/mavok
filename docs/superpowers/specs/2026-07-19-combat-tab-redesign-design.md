@@ -20,7 +20,17 @@ All mockups referenced below are preserved in `.superpowers/brainstorm/6015-1784
 
 ## 1. Design tokens (shared system, all 3 themes)
 
-No new CSS custom properties are needed — every pattern below is built from the 7 tokens `globals.css` already defines per theme (`--bg`, `--card`, `--accent`, `--cord`, `--fg`, `--muted`, `--border-color`) plus the existing `--color-danger`/`--color-success` semantic colors. Two rules govern how new components use them, both discovered by catching my own mistakes during mockup review:
+No new custom property *names* are needed — every pattern below is built from the 7 tokens `globals.css` already defines per theme (`--bg`, `--card`, `--accent`, `--cord`, `--fg`, `--muted`, `--border-color`) plus the existing `--color-danger`/`--color-success` semantic colors.
+
+**The token *values* do change, though** — this needs to be explicit, since an earlier draft of this section implied otherwise while the Context table above it already said "deeper texture, better contrast" for direction A. Those aren't compatible unless the underlying hex values move. The three approved mockup files are the literal source of truth for the new values (not this prose — don't re-derive colors from a text description):
+
+- `piedra-viva` ← `.superpowers/brainstorm/6015-1784431225/content/combat-fixes.html`, `.prev-a`/`.fix-box` rules (background `#14100c`→`#241d16`, card gradient `#1a140e`→`#2a2016`, border `#4a3520`, accent-as-value-text `#c98a4b`, cord unchanged at `#a63d2f`).
+- `pergamino` ← `visual-style.html`, `.prev-b` rules (background `#d9c396`→`#e8dcb8`, card `#f3e9cc`, border `#9c8a54`, accent `#7a1f1f`).
+- `furia-de-sangre` ← `visual-style.html`, `.prev-c` rules (background `#0a0a0a`, card `#131313`, border `#2a2a2a`, single accent `#c23b2b`).
+
+Implementation should extract exact values from those files' `<style>` blocks and update the corresponding `[data-theme="..."]` blocks in `src/app/globals.css` — treat this the same way `2026-07-04-new-themes-design.md` treated its palette table, just sourced from HTML instead of restated in Markdown, to avoid transcription drift between this doc and the approved mockups. **Verify text contrast** (`--fg`/`--muted` against `--bg`/`--card`) still holds at roughly WCAG AA (4.5:1 for body text) once the real values land, especially for `--muted` text at the §1 11px floor below — mockups were checked visually, not measured, and darker/richer tones can quietly fail contrast where the current flatter tones didn't.
+
+Two rules govern how new components use these tokens, both discovered by catching my own mistakes during mockup review:
 
 - **"Modified state" (a stat isn't at its default value — AC has a temp modifier, a resource has non-default charges) reuses the existing `StatBadge` convention: `border-accent`/`!border-accent/50`.** Do not invent a new hue (an earlier mockup pass used a hardcoded amber for this and it broke theme C's one-accent rule — caught and reverted). `--accent` *is* theme C's one allowed accent, so this is compliant by construction, not by exception.
 - **"Active/urgent state" (Rage is currently active) keeps the existing distinct treatment**: `border-cord/50` + `shadow-[0_0_16px_rgba(...cord...)]`, exactly as `CombatTab.tsx`'s top bar already does today for `rageActive`. Cord and accent are deliberately different tokens for different meanings (ambient "this is non-default" vs. urgent "this is on right now") — don't collapse them.
@@ -50,7 +60,7 @@ Verified against `src/data/barbarian-progression.ts` (the actual XPHB progressio
 
 Two items only, directly below the vitals header:
 
-- **⚔ Atacar** triggers the same roll as tapping the value chip of `attacks[0]` (the first attack in display order — the same ordering `moveAttack` already controls) — not a picker, not "open the Acciones section." This saves a scroll past conditions/exhaustion for the single highest-frequency roll in combat.
+- **⚔ Atacar** triggers the same roll as tapping the value chip of `attacks[0]` (the first attack in display order — the same ordering `moveAttack` already controls) — not a picker, not "open the Acciones section." This saves a scroll past conditions/exhaustion for the single highest-frequency roll in combat. **When `attacks.length === 0`, this quick action is hidden**, not shown disabled — a character with no attacks defined yet is already served by the "+ Agregar ataque" row in Acciones, and a dead/disabled shortcut adds visual noise without a path forward.
 - **🎲 Roll rápido** does not open a modal (the dice roller has never been a modal in this app). It auto-expands the "Dados" `CollapsibleSection` if collapsed and scrolls it into view — the same underlying `DiceRoller` component, just brought to the user instead of making them scroll to the last section in the tab.
 
 The original 4-item version also included Furia and Curar; both were cut as redundant once Rage moved fully into the header and Healer's Kit (positioned first in the Acciones section, right below the fold) didn't need a duplicate entry point.
@@ -99,7 +109,7 @@ The four `CollapsibleSection`s stay — the "segmented sub-nav instead of scroll
 - AC ring shows the modified-state treatment when a temp AC modifier is active, and the `✦` magic-bonus mark when applicable, in all 3 themes (confirm theme C doesn't pick up a second accent hue anywhere).
 - **Glow/shadow treatments** (rage-active card glow, flame-toggle active glow) were only visually tuned against dark backgrounds during brainstorming. Check specifically on `pergamino` (the one light theme) — a colored `box-shadow` blur that reads as a glow on dark backgrounds can read as muddy or invisible on light ones; it may need a darker/harder shadow instead of a colored glow for that theme specifically, not just a token swap.
 - Rage cluster: pip mode at a low level (2-4 rages) and badge mode at a high level (5-6 rages) both toggle slots and activate/deactivate correctly, with no leftover "Furia" quick-action or Adicionales row.
-- Quick-actions row triggers the correct primary-attack roll and dice-roller open.
+- Quick-actions row triggers the correct primary-attack roll and dice-roller open; "Atacar" is absent (not disabled) on a character with zero attacks defined.
 - Attack edit icon opens `AttackFormModal`; value chip rolls; "+ Agregar ataque" adds a new attack.
 - Healer's Kit and Stone's Endurance: tap spends a charge, long-press enters edit mode, in all 3 themes.
 - Granted-action rows render for at least one equipped magic item with charges.
