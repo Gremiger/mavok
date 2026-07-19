@@ -10,10 +10,10 @@ The six modals in scope, all reachable from `CombatTab.tsx`: `HpModal.tsx`, `Att
 
 ## 1. Modal chrome (`Modal.tsx`)
 
-The dialog wrapper moves from flat `bg-card` to the `stone-card` texture used everywhere else, but not as a drop-in class swap — two real conflicts need resolving, not just applying the class:
+The dialog body moves from flat `bg-card` to the `stone-card` texture used everywhere else. Two things this is *not*, both caught by checking the real markup and `stone-card`'s actual CSS before assuming a drop-in class swap:
 
-- **Header seam**: the sticky header (`bg-card`, opaque, stays fixed while content scrolls) currently sits on a flat background. Against a `stone-card` gradient body, that opaque rectangle would show a visible seam at the header/content boundary. The header's background becomes `stone-card` too (same gradient), so it reads as one continuous surface rather than a flat panel bolted onto a textured one.
-- **Shadow collision**: the dialog already carries Tailwind's `shadow-xl` utility. `stone-card` sets its own `box-shadow` (inset highlight/shadow pair + outer shadow). Two `box-shadow` declarations on the same element don't merge — one silently wins. Drop `shadow-xl` and let `stone-card`'s own shadow stack apply; don't stack both.
+- **The header does not need to change.** It already has `border-b border-border` separating it from the scrollable content below — that's a normal, intentional sticky-toolbar pattern, not a bug. Giving the header its own `stone-card` background (an earlier draft of this spec proposed exactly that) would actively break something: `stone-card` declares its own `border` and `box-shadow`, so applying the full class to a header nested inside an already-`stone-card` dialog doubles both. The header stays flat `bg-card`, unchanged.
+- **`shadow-xl` doesn't just get dropped.** `stone-card`'s own `box-shadow` (`inset 0 1px 0 rgba(255,255,255,.04), inset 0 -1px 0 rgba(0,0,0,.2), 0 1px 3px rgba(0,0,0,.2)`) is a subtle inset pairing meant for a card sitting flush in a page's flow — not enough elevation for a dialog floating over a 70%-opacity backdrop (`dialog::backdrop` in `globals.css`). Replacing `shadow-xl` with that subtle shadow would make every modal read flatter than it does today. Instead, write an explicit combined `box-shadow` on the dialog: `stone-card`'s two inset lines (for the same textured-surface feel as every other card) plus a strong outer shadow for elevation (e.g. `0 20px 25px -5px rgba(0,0,0,.35)`, in the same weight class as the `shadow-xl` being replaced) — both together, not one replacing the other.
 
 Border and text-color tokens (`border-border`, `text-foreground`, `text-accent` on the title) are already correct and unchanged.
 
@@ -27,13 +27,11 @@ Border and text-color tokens (`border-border`, `text-foreground`, `text-accent` 
 
 ## 3. AttackFormModal restructure
 
-The current 11-field flat list groups into labeled sections, using the existing `CollapsibleSection` component (already built, already used throughout Combat tab — no new component needed):
+The current 11-field flat list groups into labeled sections — but not all groups are the same kind of thing, and treating them identically was a mistake in an earlier draft of this spec:
 
 - **Arma rápida** — the weapon quick-select dropdown, add-mode only (`!existingAttack`), unchanged placement above the grouped sections.
-- **Básico** — nombre, bono de ataque, alcance.
-- **Daño** — daño, tipo de daño, daño versátil.
-- **Propiedades** — the properties comma-list field.
-- **Mastery** (optional) — mastery, DC, efecto. Uses `CollapsibleSection`'s existing `defaultOpen` prop: `defaultOpen={!!existingAttack?.mastery}` — editing an attack that already has a mastery shows the section open; adding a new attack or editing one without mastery starts it collapsed, since real Mavok data shows most attacks (Javelin, Sickle) have none.
+- **Básico** (nombre, bono de ataque, alcance), **Daño** (daño, tipo de daño, daño versátil), and **Propiedades** (the properties comma-list field) are fields every attack needs, every time. These get a **plain, non-interactive labeled divider** — a small uppercase label (matching the existing `text-xs text-muted uppercase` convention already used for e.g. "Arma rápida") above each group, no expand/collapse chrome. Making required fields tap-to-reveal would slow down the one thing this modal exists to do. They also skip `CollapsibleSection`'s `cord-line`/knot decoration — that motif was designed for Combat tab's few, wide, full-viewport sections, and repeating it 5 times in a ~448px-wide modal is a different visual density than it was built for.
+- **Mastery** (mastery, DC, efecto) is genuinely optional — real Mavok data shows most attacks (Javelin, Sickle) have none — so this is the one group that uses `CollapsibleSection`, with `defaultOpen={!!existingAttack?.mastery}`: editing an attack that already has a mastery shows it open, everything else starts collapsed.
 
 Field behavior, validation, and the `onSave`/`prefillFromWeapon` logic are unchanged — this is a layout regrouping of existing fields, not a form redesign.
 
@@ -47,10 +45,10 @@ Field behavior, validation, and the `onSave`/`prefillFromWeapon` logic are uncha
 
 `npx tsc --noEmit && npm run build && npm run lint && npm test` must pass. Manually verify in the dev server across all three redesigned themes (`piedra-viva`, `pergamino`, `furia-de-sangre`):
 
-- Every modal opens with the `stone-card` chrome, no visible seam at the header, no doubled/broken shadow.
+- Every modal opens with the `stone-card` texture on its body, the header unchanged (flat, still separated by its existing `border-b`), and a visibly strong elevation shadow against the dark backdrop — not the flatter look a plain `stone-card`-only shadow would produce.
 - HpModal: mode switcher still shows three distinct colors when active, +1/+5/+10 still adjust the amount, Aplicar still applies correctly for damage/heal/temp.
 - AC modal: ± stepper still adjusts the modifier, Resetear still resets to 0.
 - **Temp HP modal: confirm the new Aplicar button actually applies the value** (this is the bug fix — verify it works via tap, not just Enter key, ideally on an actual phone viewport where the missing-submit-button bug would have been most visible).
 - Condition picker: adding/removing conditions still works, already-added conditions still show disabled/dimmed.
 - StandardActionsModal: all three filters (actions/bonus/reactions) still render correctly, nothing needed changing.
-- AttackFormModal: adding a new attack starts with Mastery collapsed; editing an attack that has a mastery (e.g. Maul, which has Topple) opens with Mastery already expanded; saving/editing still produces the correct `Attack` object.
+- AttackFormModal: Básico/Daño/Propiedades are always visible (no expand/collapse); adding a new attack starts with Mastery collapsed; editing an attack that has a mastery (e.g. Maul, which has Topple) opens with Mastery already expanded; saving/editing still produces the correct `Attack` object.
