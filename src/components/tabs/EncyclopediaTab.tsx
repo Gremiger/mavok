@@ -64,7 +64,7 @@ interface EncyclopediaItem {
   category: Category;
   name: string;
   hint: string;
-  header: string;
+  statBlock: { label: string; value: string }[];
   description: string;
 }
 
@@ -74,10 +74,7 @@ function resolveDetail(
 ): string {
   const translations = TRANSLATIONS[item.category];
   const translated = language === "es" ? translations?.[item.name] : undefined;
-  const body = translated
-    ? `${TRANSLATION_DISCLAIMER}\n\n${translated}`
-    : item.description;
-  return [item.header, body].filter(Boolean).join("\n\n");
+  return translated ? `${TRANSLATION_DISCLAIMER}\n\n${translated}` : item.description;
 }
 
 function buildConditionItems(): EncyclopediaItem[] {
@@ -86,7 +83,7 @@ function buildConditionItems(): EncyclopediaItem[] {
     category: "conditions",
     name: c.name,
     hint: "",
-    header: "",
+    statBlock: [],
     description: c.description,
   }));
 }
@@ -97,7 +94,7 @@ function buildActionItems(): EncyclopediaItem[] {
     category: "actions",
     name: a.name,
     hint: "",
-    header: "",
+    statBlock: [],
     description: a.description,
   }));
 }
@@ -108,7 +105,7 @@ function buildSkillItems(): EncyclopediaItem[] {
     category: "skills",
     name: s.name,
     hint: abilityLabel(s.ability as AbilityScore),
-    header: "",
+    statBlock: [],
     description: s.description,
   }));
 }
@@ -119,16 +116,14 @@ function buildWeaponItems(): EncyclopediaItem[] {
     category: "weapons",
     name: w.name,
     hint: `${w.damage} ${w.damageType}`,
-    header: [
-      `${w.type === "melee" ? "Cuerpo a cuerpo" : "A distancia"} · ${w.category}`,
-      `Daño: ${w.damage} ${w.damageType}`,
-      w.range ? `Alcance: ${w.range}` : null,
-      `Peso: ${w.weight} lb${w.value !== null ? ` · Valor: ${w.value} gp` : ""}`,
-      `Propiedades: ${w.properties.length ? w.properties.join(", ") : "Ninguna"}`,
-      w.mastery ? `Maestría: ${w.mastery}` : null,
-    ]
-      .filter(Boolean)
-      .join("\n"),
+    statBlock: [
+      { label: "Tipo", value: `${w.type === "melee" ? "Cuerpo a cuerpo" : "A distancia"} · ${w.category}` },
+      { label: "Daño", value: `${w.damage} ${w.damageType}` },
+      w.range ? { label: "Alcance", value: w.range } : null,
+      { label: "Peso", value: `${w.weight} lb${w.value !== null ? ` · Valor: ${w.value} gp` : ""}` },
+      { label: "Propiedades", value: w.properties.length ? w.properties.join(", ") : "Ninguna" },
+      w.mastery ? { label: "Maestría", value: w.mastery } : null,
+    ].filter((row): row is { label: string; value: string } => row !== null),
     description: "",
   }));
 }
@@ -139,15 +134,13 @@ function buildArmorItems(): EncyclopediaItem[] {
     category: "armor",
     name: a.name,
     hint: `AC ${a.ac}`,
-    header: [
-      `Tipo: ${a.type}`,
-      `CA: ${a.ac}`,
-      `Peso: ${a.weight} lb${a.value !== null ? ` · Valor: ${a.value} gp` : ""}`,
-      a.stealthDisadvantage ? "Desventaja en Sigilo" : null,
-      a.strengthRequirement ? `Requiere FUE ${a.strengthRequirement}` : null,
-    ]
-      .filter(Boolean)
-      .join("\n"),
+    statBlock: [
+      { label: "Tipo", value: a.type },
+      { label: "CA", value: String(a.ac) },
+      { label: "Peso", value: `${a.weight} lb${a.value !== null ? ` · Valor: ${a.value} gp` : ""}` },
+      a.stealthDisadvantage ? { label: "Sigilo", value: "Desventaja" } : null,
+      a.strengthRequirement ? { label: "Requiere FUE", value: String(a.strengthRequirement) } : null,
+    ].filter((row): row is { label: string; value: string } => row !== null),
     description: "",
   }));
 }
@@ -158,7 +151,7 @@ function buildGearItems(): EncyclopediaItem[] {
     category: "gear",
     name: g.name,
     hint: g.value !== null ? `${g.value} gp` : "",
-    header: "",
+    statBlock: [],
     description: g.description,
   }));
 }
@@ -169,7 +162,7 @@ function buildMasteryItems(): EncyclopediaItem[] {
     category: "mastery",
     name: m.name,
     hint: "",
-    header: "",
+    statBlock: [],
     description: m.description,
   }));
 }
@@ -180,13 +173,11 @@ function buildFeatItems(): EncyclopediaItem[] {
     category: "feats",
     name: f.name,
     hint: f.category,
-    header: [
-      f.category,
-      f.levelRequired ? `Nivel ${f.levelRequired}` : null,
-      f.repeatable ? "Repetible" : null,
-    ]
-      .filter(Boolean)
-      .join(" · "),
+    statBlock: [
+      { label: "Categoría", value: f.category },
+      f.levelRequired ? { label: "Nivel", value: String(f.levelRequired) } : null,
+      f.repeatable ? { label: "Repetible", value: "Sí" } : null,
+    ].filter((row): row is { label: string; value: string } => row !== null),
     description: f.description,
   }));
 }
@@ -197,13 +188,15 @@ function buildSpellItems(): EncyclopediaItem[] {
     category: "spells",
     name: s.name,
     hint: `${s.level === 0 ? "Cantrip" : `Nv. ${s.level}`} · ${s.school}`,
-    header: [
-      `${s.level === 0 ? "Cantrip" : `Nivel ${s.level}`} · ${s.school}${s.ritual ? " (Ritual)" : ""}`,
-      `Tiempo de lanzamiento: ${s.castingTime}`,
-      `Alcance: ${s.range}`,
-      `Componentes: ${s.components}`,
-      `Duración: ${s.duration}${s.concentration ? " (Concentración)" : ""}`,
-    ].join("\n"),
+    statBlock: [
+      { label: "Nivel", value: s.level === 0 ? "Cantrip" : `Nivel ${s.level}` },
+      { label: "Escuela", value: s.school },
+      s.ritual ? { label: "Ritual", value: "Sí" } : null,
+      { label: "Lanzamiento", value: s.castingTime },
+      { label: "Alcance", value: s.range },
+      { label: "Componentes", value: s.components },
+      { label: "Duración", value: `${s.duration}${s.concentration ? " (Concentración)" : ""}` },
+    ].filter((row): row is { label: string; value: string } => row !== null),
     description: s.description,
   }));
 }
@@ -406,6 +399,16 @@ export function EncyclopediaTab() {
                 ? "En favoritos"
                 : "Agregar a favoritos"}
             </button>
+            {viewingItem.statBlock.length > 0 && (
+              <div className="mb-3 space-y-1 text-xs border-b border-border pb-3">
+                {viewingItem.statBlock.map((row) => (
+                  <div key={row.label} className="flex justify-between gap-3">
+                    <span className="text-muted">{row.label}</span>
+                    <span className="text-foreground text-right">{row.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
             <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
               {resolveDetail(viewingItem, encyclopediaLanguage)}
             </p>
