@@ -320,12 +320,11 @@ export function SettingsTab() {
         <p className="text-sm text-muted mb-3">
           Elegí qué acciones aparecen en el botón flotante de Ficha y Combate.
         </p>
-        <button
+        <CompactRow
           onClick={() => setQuickActionsPickerOpen(true)}
-          className="w-full py-2 bg-card border border-border rounded-lg text-sm text-foreground hover:border-accent"
-        >
-          Configurar ({character.quickActions.length}/5)
-        </button>
+          name="Configurar"
+          right={<span className="text-xs text-muted">{character.quickActions.length}/5</span>}
+        />
       </CollapsibleSection>
 
       {/* Level Up */}
@@ -399,12 +398,11 @@ export function SettingsTab() {
 
       {/* Level-up History */}
       <CollapsibleSection title="Historial de niveles">
-        <button
+        <CompactRow
           onClick={() => setLevelUpHistoryOpen(true)}
-          className="w-full py-2 bg-card border border-border rounded-lg text-sm text-foreground hover:border-accent"
-        >
-          Ver historial completo
-        </button>
+          name="Ver historial completo"
+          right={null}
+        />
       </CollapsibleSection>
 
       {/* Import / Export */}
