@@ -30,8 +30,10 @@ export function RageCluster({
           {slots.map((available, i) => (
             <button
               key={i}
-              onClick={() => (useBadge ? setExpanded(false) : onToggleSlot(i))}
-              onDoubleClick={() => useBadge && onToggleSlot(i)}
+              onClick={() => {
+                onToggleSlot(i);
+                if (useBadge) setExpanded(false);
+              }}
               className={`w-3.5 h-3.5 rounded-full border transition-colors ${
                 available
                   ? "bg-cord border-cord"
