@@ -33,7 +33,7 @@ No new CSS custom properties are needed — every pattern below is built from th
 Persistent card at the top of the tab (`stone-card`-equivalent styling per theme) containing:
 
 - **HP** (large, primary) — tap opens the existing `HpModal`, unchanged behavior.
-- **AC ring** — a circular badge instead of a `StatBadge`. Shows the AC number only; when `tempAcMod !== 0`, the ring gets the modified-state border treatment (§1) plus a small corner badge showing the signed modifier (e.g. `+2`). Tap still opens the existing AC modal — the ring's job is to signal "this is modified" at a glance, not to fit the full `17 (+2) ✦+1` string that `StatBadge` currently renders as text.
+- **AC ring** — a circular badge instead of a `StatBadge`. Shows the AC number only; when `tempAcMod !== 0`, the ring gets the modified-state border treatment (§1) plus a small corner badge showing the signed modifier (e.g. `+2`). When `magicItemIndicator === "explicit-tag"` and `sumMagicBonus(character, "ac") !== 0` (today's `✦+N` suffix on the AC `StatBadge`), the ring shows a small `✦` mark in its other corner — same rule as today, just repositioned from inline text to a corner mark so it survives the ring shape. Tap still opens the existing AC modal — the ring's job is to signal "this is modified" at a glance, not to fit the full `17 (+2) ✦+1` string that `StatBadge` currently renders as text.
 - **Rage cluster** — see §3, replaces the current always-visible `RageTracker` component's role but keeps its underlying `onToggleSlot`/`onToggleActive` handlers.
 - **Secondary row**: Temp, Init, Insp, Vel as small stat chips below the primary row — same data as today's `StatBadge` row, condensed. Vel keeps its existing reduced-speed display (`20 (-10)`) when `exhaustionLevel > 0`; that state gets the modified-state border treatment too.
 - **Dying state**: when `combat.currentHp === 0`, the header swaps its primary row (not the whole card) for a death-saves layout — a "Muriendo" label, 3 success dots + 3 failure dots (reusing `--color-success`/`--color-danger`, both already-defined tokens), and a "Recobrar consciencia" action wired to the existing `onRegainConsciousness` handler. The secondary row and rage cluster stay visible underneath, matching current behavior where `RageTracker` always renders regardless of dying state.
@@ -48,7 +48,12 @@ Verified against `src/data/barbarian-progression.ts` (the actual XPHB progressio
 
 ## 4. Quick-actions row
 
-Two items only, directly below the vitals header: **⚔ Atacar** (rolls/opens the primary attack — saves a scroll past conditions/exhaustion to reach the Acciones section) and **🎲 Roll rápido** (opens the dice roller — the "Dados" section is the last one in the tab, furthest from a scroll-saving shortcut). The original 4-item version also included Furia and Curar; both were cut as redundant once Rage moved fully into the header and Healer's Kit (positioned first in the Acciones section, right below the fold) didn't need a duplicate entry point.
+Two items only, directly below the vitals header:
+
+- **⚔ Atacar** triggers the same roll as tapping the value chip of `attacks[0]` (the first attack in display order — the same ordering `moveAttack` already controls) — not a picker, not "open the Acciones section." This saves a scroll past conditions/exhaustion for the single highest-frequency roll in combat.
+- **🎲 Roll rápido** does not open a modal (the dice roller has never been a modal in this app). It auto-expands the "Dados" `CollapsibleSection` if collapsed and scrolls it into view — the same underlying `DiceRoller` component, just brought to the user instead of making them scroll to the last section in the tab.
+
+The original 4-item version also included Furia and Curar; both were cut as redundant once Rage moved fully into the header and Healer's Kit (positioned first in the Acciones section, right below the fold) didn't need a duplicate entry point.
 
 ## 5. Conditions & exhaustion
 
@@ -59,12 +64,23 @@ Unchanged from current behavior/data flow (`combat.conditions`, tag list with a 
 The four `CollapsibleSection`s stay — the "segmented sub-nav instead of scrolling" alternative was raised and declined. Each section's rows become a denser "compact row" pattern (`crow`) instead of today's individually-styled cards, sized to the §1 minimums:
 
 - **Attack rows** (Acciones): name + edit icon (✎, opens `AttackFormModal`) on the left, `+N · dice+mod` value chip (rolls) on the right. A dashed "+ Agregar ataque" row follows the list, same placement/behavior as today.
-- **Resource rows** (Healer's Kit in Acciones; Stone's Endurance in Reacciones): single ghost-style chip reading `usar · remaining/total`. Tap uses a charge (existing `spendHealerKit`/`spendStoneEndurance`); long-press enters the existing manual-edit mode (`healerKitEditing`/`stoneEnduranceEditing`) — both interactions already exist in `CombatTab.tsx`, this only restyles them. A small hint line ("mantener pulsado para corregir el conteo") sits under each on first use of the pattern so the long-press affordance isn't hidden.
+- **Resource rows** (Healer's Kit in Acciones; Stone's Endurance in Reacciones): single ghost-style chip reading `usar · remaining/total`. Tap uses a charge (existing `spendHealerKit`/`spendStoneEndurance`); long-press enters the existing manual-edit mode (`healerKitEditing`/`stoneEnduranceEditing`) via the existing `useLongPress` hook (`stoneEnduranceLongPress`/`healerKitLongPress`) and its `wasLongPress()` guard — both interactions already exist in `CombatTab.tsx`, this only restyles them. The existing `framer-motion` scale-pulse on successful use (`ragePulseKey`/`stoneEndurancePulseKey`/`healerKitPulseKey`) carries over onto the restyled row — it's a small but deliberate piece of feedback polish, not something to drop in the restructure. A small hint line ("mantener pulsado para corregir el conteo") sits under each on first use of the pattern so the long-press affordance isn't hidden.
 - **Granted-action rows** (equipped magic items via `getEquippedGrantedActions`): same ghost-chip pattern, `⚡` prefix per §1, charge count when the item has one.
 - **Offhand attack card**: stays in "Adicionales" (matches current placement under Bonus Actions), rendered as a dimmed/informational row since it applies automatically rather than being tapped.
 - **Reckless Attack, Opportunity Attack**: same compact-row treatment, unchanged toggle/informational behavior.
 - **"Acciones estándar" / "Bonus Actions estándar" / "Reacciones estándar" links**: unchanged dashed link-row pattern, opening the existing `StandardActionsModal`.
 - **Dados section**: unchanged `DiceRoller` component, restyled container only.
+
+## 7. Component boundaries
+
+- **Vitals header, quick-actions row, and rage cluster are new components** (e.g. `CombatVitals.tsx`, `RageCluster.tsx` — exact naming is the implementation plan's call), since they combine data/behavior currently spread across the top-bar JSX and `RageTracker.tsx` into one persistent unit. `RageTracker.tsx` itself is superseded by the new rage cluster rather than reused underneath it — the pip/badge-mode switch at 5+ slots (§3) is new behavior `RageTracker` doesn't have today.
+- **`StatBadge.tsx` stays** for the secondary row (Temp/Init/Insp/Vel) — "condensed" in §2 means smaller padding/min-width via props or a variant, not a new component, since its `highlight` prop already maps directly onto the §1 modified-state convention.
+- **`DeathSaves.tsx` stays**, restyled to fit inside the vitals header's primary-row slot instead of the whole top bar — its `successes`/`failures`/`onChange`/`onRegainConsciousness` interface is unchanged.
+- **`AttackRow.tsx`, `GrantedActionCard.tsx`, `CollapsibleSection.tsx`, `Tag.tsx`, `DiceRoller.tsx` all stay**, restyled in place to the compact-row/§1 tokens — none of them change props or behavior, only markup/classes.
+
+## 8. Implementation risk: hook ordering
+
+`CombatTab.tsx` currently declares roughly 15 `useState` calls (plus two `useLongPress` calls) before its `if (!character) return null` guard. This spec restructures a large fraction of that component's render tree, which is exactly the situation this project's own `CLAUDE.md` calls out as a recurring real bug: it's tempting to add a new hook (e.g. state for the rage-badge popover mentioned in §3, or for scroll-to-Dados in §4) further down near the JSX that uses it, after the guard — that violates React's Rules of Hooks, and neither `tsc` nor `npm run build` catches it, only `npm run lint` (`react-hooks/rules-of-hooks`). Any new local state introduced by this redesign must be declared alongside the existing ones, before the guard. **Running `npm run lint` is not optional for this spec** the way it might be for a lower-risk change.
 
 ## Out of scope (this spec)
 
@@ -80,7 +96,8 @@ The four `CollapsibleSection`s stay — the "segmented sub-nav instead of scroll
 `npx tsc --noEmit && npm run build && npm run lint && npm test` must pass. Since there's no component/UI test coverage for `CombatTab.tsx`, manually verify in the dev server across all three affected themes (`piedra-viva`, `pergamino`, `furia-de-sangre`):
 
 - Vitals header renders correctly at HP full / HP partial / HP 0 (dying → death-saves layout swap, including reviving via "Recobrar consciencia").
-- AC ring shows the modified-state treatment when a temp AC modifier is active, in all 3 themes (confirm theme C doesn't pick up a second accent hue anywhere).
+- AC ring shows the modified-state treatment when a temp AC modifier is active, and the `✦` magic-bonus mark when applicable, in all 3 themes (confirm theme C doesn't pick up a second accent hue anywhere).
+- **Glow/shadow treatments** (rage-active card glow, flame-toggle active glow) were only visually tuned against dark backgrounds during brainstorming. Check specifically on `pergamino` (the one light theme) — a colored `box-shadow` blur that reads as a glow on dark backgrounds can read as muddy or invisible on light ones; it may need a darker/harder shadow instead of a colored glow for that theme specifically, not just a token swap.
 - Rage cluster: pip mode at a low level (2-4 rages) and badge mode at a high level (5-6 rages) both toggle slots and activate/deactivate correctly, with no leftover "Furia" quick-action or Adicionales row.
 - Quick-actions row triggers the correct primary-attack roll and dice-roller open.
 - Attack edit icon opens `AttackFormModal`; value chip rolls; "+ Agregar ataque" adds a new attack.
