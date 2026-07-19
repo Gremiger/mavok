@@ -59,7 +59,6 @@ export function CombatTab() {
   const [attackModalState, setAttackModalState] = useState<
     "add" | Attack | null
   >(null);
-  const [ragePulseKey, setRagePulseKey] = useState(0);
   const [stoneEndurancePulseKey, setStoneEndurancePulseKey] = useState(0);
   const [healerKitPulseKey, setHealerKitPulseKey] = useState(0);
   const [attacksForceOpenKey, setAttacksForceOpenKey] = useState(0);
@@ -136,7 +135,6 @@ export function CombatTab() {
     });
     if (next) {
       toast("Rage activado", { icon: "🔥" });
-      setRagePulseKey((k) => k + 1);
     } else {
       toast("Rage desactivado", { icon: "💨" });
     }
@@ -424,81 +422,42 @@ export function CombatTab() {
             />
           </div>
         ))}
-        <button
+        <CompactRow
+          conditional
+          name="Acciones estándar"
+          meta="Attack (Grapple · Shove) · Dash · Disengage · Dodge · Help · Hide · Influence · Ready · Search · Study · Utilize"
           onClick={() => setStandardActionsOpen("actions")}
-          className="w-full mt-2 p-2 rounded-lg border border-border/50 bg-card/50 text-left"
-        >
-          <span className="font-heading text-muted text-xs">Acciones estándar</span>
-          <p className="text-muted/60 text-[0.6rem] mt-0.5 leading-relaxed">
-            Attack (Grapple · Shove) · Dash · Disengage · Dodge · Help · Hide · Influence · Ready · Search · Study · Utilize
-          </p>
-        </button>
+          right={<span className="text-muted text-xs">›</span>}
+        />
       </CollapsibleSection>
       </div>
 
       {/* Bonus Actions */}
       <CollapsibleSection title="Acciones adicionales">
         <div className="space-y-2 text-sm">
-          <motion.button
-            key={ragePulseKey}
-            initial={{ scale: 1.06 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.25 }}
-            onClick={toggleRageActive}
-            className={`w-full p-3 rounded-lg border text-left ${
-              rageActive
-                ? "border-rage bg-rage/10 text-rage"
-                : resources.rpiRages.remaining > 0
-                  ? "border-border bg-card text-foreground"
-                  : "border-border bg-card text-muted opacity-50"
-            }`}
-          >
-            <span className="font-heading text-accent">Rage</span>
-            <span className="text-muted ml-2">
-              {rageActive
-                ? "(activo — tap para desactivar)"
-                : `(${resources.rpiRages.remaining} usos restantes)`}
-            </span>
-            {rageActive && (
-              <p className="text-muted/60 text-[0.6rem] mt-0.5">
-                Termina si no atacas a un enemigo ni recibes daño desde tu último turno (o si quedas inconsciente).
-              </p>
-            )}
-          </motion.button>
           {hasRecklessAttack && (
-            <button
-              onClick={() =>
-                updateCombat({ recklessActive: !combat.recklessActive })
-              }
-              className={`w-full p-3 rounded-lg border text-left ${
+            <CompactRow
+              name="Reckless Attack"
+              meta={
                 combat.recklessActive
-                  ? "border-danger bg-danger/10 text-danger"
-                  : "border-border bg-card text-foreground"
-              }`}
-            >
-              <span className="font-heading text-accent">
-                Reckless Attack
-              </span>
-              <span className="text-muted ml-2">
-                {combat.recklessActive
-                  ? "(activo — tap para desactivar)"
-                  : "(tap para activar)"}
-              </span>
-              <p className="text-muted/60 text-[0.6rem] mt-0.5">
-                Atacantes contra ti tienen ventaja hasta tu próximo turno.
-              </p>
-            </button>
+                  ? "Atacantes contra ti tienen ventaja hasta tu próximo turno."
+                  : "ventaja en ataques, das ventaja"
+              }
+              onClick={() => updateCombat({ recklessActive: !combat.recklessActive })}
+              right={
+                <GhostChip solid={combat.recklessActive}>
+                  {combat.recklessActive ? "desactivar" : "activar"}
+                </GhostChip>
+              }
+            />
           )}
           {offhandAttack && (
-            <div className="p-3 rounded-lg border border-border bg-card">
-              <span className="font-heading text-accent text-sm">
-                Offhand Attack
-              </span>
-              <span className="text-muted text-xs ml-2">
-                {offhandAttack.name} · {baseDice(offhandAttack.damage)}{" "}
-                {offhandAttack.damageType} (sin mod de característica)
-              </span>
-            </div>
+            <CompactRow
+              dim
+              name="Offhand Attack"
+              meta={`${offhandAttack.name} · ${baseDice(offhandAttack.damage)} ${offhandAttack.damageType} (sin mod de característica)`}
+              right={<span className="text-[0.6875rem] text-muted">auto</span>}
+            />
           )}
           {getEquippedGrantedActions(character, "bonus").map((item) => (
             <GrantedActionCard
@@ -514,13 +473,13 @@ export function CombatTab() {
               onAdjust={(remaining) => adjustGrantedActionCharges(item, remaining)}
             />
           ))}
-          <button
+          <CompactRow
+            conditional
+            name="Bonus Actions estándar"
+            meta="Two-Weapon Fighting"
             onClick={() => setStandardActionsOpen("bonus")}
-            className="w-full mt-1 p-2 rounded-lg border border-border/50 bg-card/50 text-left"
-          >
-            <span className="font-heading text-muted text-xs">Bonus Actions estándar</span>
-            <span className="text-muted/60 text-[0.6rem] ml-2">Two-Weapon Fighting</span>
-          </button>
+            right={<span className="text-muted text-xs">›</span>}
+          />
         </div>
       </CollapsibleSection>
 
@@ -602,12 +561,12 @@ export function CombatTab() {
           </motion.div>
 
           {/* Opportunity Attack */}
-          <div className="p-3 rounded-lg border border-border bg-card">
-            <span className="font-heading text-accent">Opportunity Attack</span>
-            <span className="text-muted text-xs ml-2">
-              Mismas armas que Acciones
-            </span>
-          </div>
+          <CompactRow
+            dim
+            name="Opportunity Attack"
+            meta="Mismas armas que Acciones"
+            right={<span className="text-[0.6875rem] text-muted">—</span>}
+          />
 
           {getEquippedGrantedActions(character, "reaction").map((item) => (
             <GrantedActionCard
@@ -625,13 +584,13 @@ export function CombatTab() {
           ))}
 
           {/* Standard reactions compact card */}
-          <button
+          <CompactRow
+            conditional
+            name="Reacciones estándar"
+            meta="Opportunity Attack"
             onClick={() => setStandardActionsOpen("reactions")}
-            className="w-full p-2 rounded-lg border border-border/50 bg-card/50 text-left"
-          >
-            <span className="font-heading text-muted text-xs">Reacciones estándar</span>
-            <span className="text-muted/60 text-[0.6rem] ml-2">Opportunity Attack</span>
-          </button>
+            right={<span className="text-muted text-xs">›</span>}
+          />
         </div>
       </CollapsibleSection>
 
