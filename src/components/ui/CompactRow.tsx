@@ -20,16 +20,31 @@ export function CompactRow({
   onClick,
 }: CompactRowProps) {
   const { density } = useThemeContext();
-  const Component = onClick ? "button" : "div";
 
+  // Always a <div>, never a <button> — `right` frequently contains its own
+  // buttons (GhostChip, +/- controls), and a <button> can't validly contain
+  // another <button> in HTML. Clickable rows get button semantics via
+  // role/tabIndex/onKeyDown instead of the element type.
   return (
-    <Component
+    <div
       onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
       className={`w-full flex items-center justify-between gap-2 rounded-lg bg-card/60 border ${
         conditional ? "border-dashed border-border/70" : "border-border/50"
       } ${density === "compact" ? "min-h-[40px] px-2.5 py-1.5" : "min-h-[44px] px-3 py-2"} ${
         dim ? "opacity-50" : ""
-      } ${onClick ? "text-left active:scale-[0.99] transition-transform" : ""} mb-1.5`}
+      } ${onClick ? "text-left cursor-pointer active:scale-[0.99] transition-transform" : ""} mb-1.5`}
     >
       <span className="flex-1 min-w-0">
         <span className="block text-[0.8125rem] text-foreground truncate">{name}</span>
@@ -40,6 +55,6 @@ export function CompactRow({
         )}
       </span>
       <span className="shrink-0">{right}</span>
-    </Component>
+    </div>
   );
 }

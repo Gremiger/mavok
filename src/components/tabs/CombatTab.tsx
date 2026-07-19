@@ -5,6 +5,7 @@ import { useLongPress } from "@/hooks/useLongPress";
 import { motion } from "framer-motion";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Tag } from "@/components/ui/Tag";
+import { CompactRow } from "@/components/ui/CompactRow";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { Modal } from "@/components/ui/Modal";
 import { CombatVitals } from "@/components/combat/CombatVitals";
@@ -266,28 +267,26 @@ export function CombatTab() {
         )}
       </div>
 
-      <div className="flex items-center justify-between stone-card rounded-lg p-2">
-        <button
-          onClick={() => setExhaustionExpanded((e) => !e)}
-          className="text-sm font-heading text-accent"
-        >
-          Exhaustion: {combat.exhaustionLevel}/6
-        </button>
-        <div className="flex gap-1.5">
-          <button
-            onClick={() => setExhaustionLevel(combat.exhaustionLevel - 1)}
-            className="w-7 h-7 rounded-full border border-border text-muted flex items-center justify-center hover:border-accent hover:text-accent"
-          >
-            −
-          </button>
-          <button
-            onClick={() => setExhaustionLevel(combat.exhaustionLevel + 1)}
-            className="w-7 h-7 rounded-full border border-border text-muted flex items-center justify-center hover:border-accent hover:text-accent"
-          >
-            +
-          </button>
-        </div>
-      </div>
+      <CompactRow
+        name={`Exhaustion ${combat.exhaustionLevel}/6`}
+        onClick={() => setExhaustionExpanded((e) => !e)}
+        right={
+          <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setExhaustionLevel(combat.exhaustionLevel - 1)}
+              className="w-7 h-7 rounded-full border border-border text-muted flex items-center justify-center hover:border-accent hover:text-accent"
+            >
+              −
+            </button>
+            <button
+              onClick={() => setExhaustionLevel(combat.exhaustionLevel + 1)}
+              className="w-7 h-7 rounded-full border border-border text-muted flex items-center justify-center hover:border-accent hover:text-accent"
+            >
+              +
+            </button>
+          </div>
+        }
+      />
       {exhaustionExpanded && (
         <div className="text-xs text-foreground/80 leading-relaxed bg-card/50 border border-border rounded-lg p-2">
           {CONDITIONS.find((c) => c.name === "Exhaustion")?.description}
