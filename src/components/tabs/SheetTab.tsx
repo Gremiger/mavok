@@ -3,6 +3,8 @@
 import { useState, useCallback } from "react";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
+import { CompactRow } from "@/components/ui/CompactRow";
+import { GhostChip } from "@/components/ui/GhostChip";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { FeatsBrowserModal } from "@/components/sheet/FeatsBrowserModal";
 import { User } from "lucide-react";
@@ -173,11 +175,8 @@ export function SheetTab() {
 
       {/* Atributos */}
       <div className="relative">
-        <div
-          className="absolute right-0 top-0 z-10 text-[0.6rem] text-muted border border-border rounded px-1.5 py-0.5 uppercase tracking-wider"
-          style={{ marginTop: "0.9rem" }}
-        >
-          PB {formatModifier(meta.proficiencyBonus)}
+        <div className="absolute right-0 top-0 z-10" style={{ marginTop: "0.9rem" }}>
+          <GhostChip>PB {formatModifier(meta.proficiencyBonus)}</GhostChip>
         </div>
         <CollapsibleSection title="Atributos" defaultOpen>
         <div className="grid grid-cols-3 gap-2">
@@ -258,13 +257,11 @@ export function SheetTab() {
 
       {/* Habilidades */}
       <div className="relative">
-        <button
-          onClick={() => setGroupByAbility(g => !g)}
-          className="absolute right-0 top-0 z-10 text-[0.6rem] text-muted border border-border rounded px-1.5 py-0.5 uppercase tracking-wider hover:border-accent hover:text-accent"
-          style={{ marginTop: '0.9rem' }}
-        >
-          {groupByAbility ? "A–Z" : "Grupo"}
-        </button>
+        <div className="absolute right-0 top-0 z-10" style={{ marginTop: "0.9rem" }}>
+          <GhostChip onClick={() => setGroupByAbility((g) => !g)}>
+            {groupByAbility ? "A–Z" : "Grupo"}
+          </GhostChip>
+        </div>
         <CollapsibleSection title="Habilidades">
           <div className="flex gap-2 flex-wrap mb-3">
             {[
@@ -378,14 +375,12 @@ export function SheetTab() {
           {features.filter(f => f.source === "Dote" && f.level <= meta.level).length === 0 && (
             <p className="text-muted text-sm text-center py-4">Sin dotes todavía.</p>
           )}
-          <button
+          <CompactRow
+            conditional
+            name="Ver todas las dotes disponibles"
             onClick={() => setFeatsBrowserOpen(true)}
-            className="w-full p-2 rounded-lg border border-border/50 bg-card/50 text-left"
-          >
-            <span className="font-heading text-muted text-xs">
-              Ver todas las dotes disponibles
-            </span>
-          </button>
+            right={<span className="text-muted text-xs">›</span>}
+          />
         </div>
       </CollapsibleSection>
 
