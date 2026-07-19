@@ -15,7 +15,7 @@ export function DeathSaves({
   const isDead = failures >= 3;
 
   return (
-    <div>
+    <div className="relative">
       <h3 className="font-heading text-danger text-center text-sm mb-3">
         Salvaciones de muerte
       </h3>

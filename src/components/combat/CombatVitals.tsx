@@ -57,9 +57,7 @@ export function CombatVitals({
 
   return (
     <div
-      className={`stone-card rounded-lg p-3 transition-all ${
-        rage.active ? "!border-cord/50 shadow-[0_0_16px_rgba(166,61,47,0.3)]" : ""
-      }`}
+      className={`${rage.active ? "stone-card-raging" : "stone-card"} rounded-lg p-3 transition-all`}
     >
       {isDying ? (
         <DeathSaves
@@ -71,7 +69,11 @@ export function CombatVitals({
       ) : (
         <div className="relative flex items-center justify-between gap-2">
           <button onClick={onOpenHp} className="text-left active:scale-95 transition-transform">
-            <span className="block font-heading text-2xl leading-none text-accent">
+            <span
+              className={`block font-heading text-2xl leading-none text-accent ${
+                rage.active ? "hp-heartbeat" : ""
+              }`}
+            >
               {currentHp}/{maxHp}
             </span>
             <span className="block text-[0.625rem] text-muted uppercase tracking-wider mt-0.5">
