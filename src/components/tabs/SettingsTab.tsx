@@ -62,6 +62,7 @@ export function SettingsTab() {
   const [weaponMasteryOpen, setWeaponMasteryOpen] = useState(false);
   const [quickActionsPickerOpen, setQuickActionsPickerOpen] = useState(false);
   const [levelUpHistoryOpen, setLevelUpHistoryOpen] = useState(false);
+  const [restoringBackupKey, setRestoringBackupKey] = useState<string | null>(null);
   const [expandedChangelogEntry, setExpandedChangelogEntry] = useState<
     string | null
   >(null);
@@ -527,33 +528,23 @@ export function SettingsTab() {
             </p>
           ) : (
             getBackups().map((b) => (
-              <div
+              <CompactRow
                 key={b.key}
-                className="flex items-center justify-between p-2 bg-card rounded-lg border border-border"
-              >
-                <div>
-                  <span className="text-xs text-foreground">v{b.version}</span>
-                  <span className="text-xs text-muted ml-2">
-                    {b.date.toLocaleString("es")}
-                  </span>
-                </div>
-                <button
-                  onClick={() => {
-                    if (confirm("¿Restaurar este backup? Se reemplazarán los datos actuales.")) {
-                      const key = getCharacterStorageKey(character.id);
-                      if (restoreBackup(b.key, key)) {
-                        toast.success("Backup restaurado — recargando...");
-                        setTimeout(() => window.location.reload(), 500);
-                      } else {
-                        toast.error("Error al restaurar backup");
-                      }
-                    }
-                  }}
-                  className="text-xs text-accent hover:underline"
-                >
-                  Restaurar
-                </button>
-              </div>
+                name={
+                  <>
+                    <span>v{b.version}</span>
+                    <span className="text-muted ml-2">{b.date.toLocaleString("es")}</span>
+                  </>
+                }
+                right={
+                  <button
+                    onClick={() => setRestoringBackupKey(b.key)}
+                    className="text-xs text-accent hover:underline"
+                  >
+                    Restaurar
+                  </button>
+                }
+              />
             ))
           )}
         </div>
@@ -777,6 +768,43 @@ export function SettingsTab() {
         open={levelUpHistoryOpen}
         onClose={() => setLevelUpHistoryOpen(false)}
       />
+
+      {/* Restore Local Backup Confirmation */}
+      <Modal
+        open={restoringBackupKey !== null}
+        onClose={() => setRestoringBackupKey(null)}
+        title="Restaurar backup"
+      >
+        <div className="space-y-3">
+          <p className="text-sm">
+            ¿Restaurar este backup? Se reemplazarán los datos actuales.
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setRestoringBackupKey(null)}
+              className="flex-1 py-2 text-sm border border-border rounded-lg text-muted"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => {
+                if (!restoringBackupKey) return;
+                const key = getCharacterStorageKey(character.id);
+                if (restoreBackup(restoringBackupKey, key)) {
+                  toast.success("Backup restaurado — recargando...");
+                  setTimeout(() => window.location.reload(), 500);
+                } else {
+                  toast.error("Error al restaurar backup");
+                }
+                setRestoringBackupKey(null);
+              }}
+              className="flex-1 py-2 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Import Preview Modal */}
       <Modal
