@@ -7,6 +7,7 @@ import { useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { CompactRow } from "@/components/ui/CompactRow";
+import { Tag } from "@/components/ui/Tag";
 import { spendHitDie as computeHitDieSpend } from "@/lib/hitDice";
 import { abilityModifier } from "@/lib/utils";
 import { toast } from "sonner";
@@ -448,15 +449,12 @@ export function SettingsTab() {
               </p>
             ) : (
               <>
-                <button
-                  onClick={() => drive.connect(googleClientId)}
-                  disabled={drive.driveConnecting}
-                  className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm disabled:opacity-50"
-                >
-                  {drive.driveConnecting
-                    ? "Conectando..."
-                    : "Conectar con Google Drive"}
-                </button>
+                <CompactRow
+                  onClick={drive.driveConnecting ? undefined : () => drive.connect(googleClientId)}
+                  dim={drive.driveConnecting}
+                  name={drive.driveConnecting ? "Conectando..." : "Conectar con Google Drive"}
+                  right={null}
+                />
                 {!googleClientId && (
                   <p className="text-xs text-danger">
                     Falta configurar NEXT_PUBLIC_GOOGLE_CLIENT_ID.
@@ -467,22 +465,20 @@ export function SettingsTab() {
           </div>
         ) : (
           <div className="space-y-2">
-            <p className="text-xs text-success">Google Drive conectado</p>
-            <button
-              onClick={() => drive.backup(character)}
-              disabled={drive.driveBackingUp}
-              className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm disabled:opacity-50"
-            >
-              {drive.driveBackingUp ? "Subiendo..." : "Subir a Google Drive"}
-            </button>
-            <button
+            <Tag label="Google Drive conectado" variant="success" />
+            <CompactRow
+              onClick={drive.driveBackingUp ? undefined : () => drive.backup(character)}
+              dim={drive.driveBackingUp}
+              name={drive.driveBackingUp ? "Subiendo..." : "Subir a Google Drive"}
+              right={null}
+            />
+            <CompactRow
               onClick={() => {
                 if (drive.driveBackups === null) drive.loadBackups();
               }}
-              className="w-full p-3 bg-card rounded-lg border border-border text-left text-sm"
-            >
-              Restaurar desde Google Drive
-            </button>
+              name="Restaurar desde Google Drive"
+              right={null}
+            />
             {drive.driveBackupsLoading && (
               <p className="text-xs text-muted text-center py-2">
                 Cargando...
@@ -499,23 +495,21 @@ export function SettingsTab() {
                   {drive.driveBackups.map((f) => {
                     const ts = parseBackupTimestamp(f.name);
                     return (
-                      <div
+                      <CompactRow
                         key={f.id}
-                        className="flex items-center justify-between p-2 bg-card rounded-lg border border-border"
-                      >
-                        <span className="text-xs text-foreground">
-                          {ts ? ts.toLocaleString("es") : f.name}
-                        </span>
-                        <button
-                          onClick={() => handleDriveRestore(f)}
-                          disabled={drive.driveRestoringId === f.id}
-                          className="text-xs text-accent hover:underline disabled:opacity-50"
-                        >
-                          {drive.driveRestoringId === f.id
-                            ? "Restaurando..."
-                            : "Restaurar"}
-                        </button>
-                      </div>
+                        name={ts ? ts.toLocaleString("es") : f.name}
+                        right={
+                          <button
+                            onClick={() => handleDriveRestore(f)}
+                            disabled={drive.driveRestoringId === f.id}
+                            className="text-xs text-accent hover:underline disabled:opacity-50"
+                          >
+                            {drive.driveRestoringId === f.id
+                              ? "Restaurando..."
+                              : "Restaurar"}
+                          </button>
+                        }
+                      />
                     );
                   })}
                 </div>
