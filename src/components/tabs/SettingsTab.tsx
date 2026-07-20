@@ -63,6 +63,7 @@ export function SettingsTab() {
   const [quickActionsPickerOpen, setQuickActionsPickerOpen] = useState(false);
   const [levelUpHistoryOpen, setLevelUpHistoryOpen] = useState(false);
   const [restoringBackupKey, setRestoringBackupKey] = useState<string | null>(null);
+  const [levelDownConfirmOpen, setLevelDownConfirmOpen] = useState(false);
   const [expandedChangelogEntry, setExpandedChangelogEntry] = useState<
     string | null
   >(null);
@@ -365,31 +366,7 @@ export function SettingsTab() {
           )}
           {character.meta.level > 1 && (
             <button
-              onClick={() => {
-                if (confirm(`¿Bajar a nivel ${character.meta.level - 1}? Esto revertirá los cambios del último nivel.`)) {
-                  update((c) => {
-                    const prev = structuredClone(c);
-                    prev.meta.level -= 1;
-                    const PROF_BY_LEVEL = [2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6];
-                    prev.meta.proficiencyBonus = PROF_BY_LEVEL[prev.meta.level - 1];
-                    prev.resources.stoneEndurance.total = PROF_BY_LEVEL[prev.meta.level - 1];
-                    prev.resources.stoneEndurance.remaining = Math.min(
-                      prev.resources.stoneEndurance.remaining,
-                      PROF_BY_LEVEL[prev.meta.level - 1]
-                    );
-                    const RAGES_BY_LEVEL = [2,2,3,3,3,4,4,4,4,4,4,5,5,5,5,5,6,6,6,6];
-                    prev.resources.rpiRages.total = RAGES_BY_LEVEL[prev.meta.level - 1];
-                    prev.resources.rpiRages.remaining = Math.min(prev.resources.rpiRages.remaining, prev.resources.rpiRages.total);
-                    prev.resources.rpiRages.slots = Array(prev.resources.rpiRages.total).fill(false).map((_, i) => i < prev.resources.rpiRages.remaining);
-                    prev.combat.hitDice.total = prev.meta.level;
-                    prev.combat.hitDice.remaining = Math.min(prev.combat.hitDice.remaining, prev.combat.hitDice.total);
-                    prev.features = prev.features.filter(f => f.level <= prev.meta.level);
-                    if (prev.meta.level < 3) prev.meta.subclass = null;
-                    prev.levelUpHistory = prev.levelUpHistory.slice(0, -1);
-                    return prev;
-                  });
-                }
-              }}
+              onClick={() => setLevelDownConfirmOpen(true)}
               className="mt-2 text-xs text-muted hover:text-danger"
             >
               Bajar de nivel
@@ -768,6 +745,57 @@ export function SettingsTab() {
         open={levelUpHistoryOpen}
         onClose={() => setLevelUpHistoryOpen(false)}
       />
+
+      {/* Level Down Confirmation */}
+      <Modal
+        open={levelDownConfirmOpen}
+        onClose={() => setLevelDownConfirmOpen(false)}
+        title="Bajar de nivel"
+      >
+        <div className="space-y-3">
+          <p className="text-sm">
+            ¿Bajar a nivel {character.meta.level - 1}? Esto revertirá los
+            cambios del último nivel.
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setLevelDownConfirmOpen(false)}
+              className="flex-1 py-2 text-sm border border-border rounded-lg text-muted"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => {
+                update((c) => {
+                  const prev = structuredClone(c);
+                  prev.meta.level -= 1;
+                  const PROF_BY_LEVEL = [2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6];
+                  prev.meta.proficiencyBonus = PROF_BY_LEVEL[prev.meta.level - 1];
+                  prev.resources.stoneEndurance.total = PROF_BY_LEVEL[prev.meta.level - 1];
+                  prev.resources.stoneEndurance.remaining = Math.min(
+                    prev.resources.stoneEndurance.remaining,
+                    PROF_BY_LEVEL[prev.meta.level - 1]
+                  );
+                  const RAGES_BY_LEVEL = [2,2,3,3,3,4,4,4,4,4,4,5,5,5,5,5,6,6,6,6];
+                  prev.resources.rpiRages.total = RAGES_BY_LEVEL[prev.meta.level - 1];
+                  prev.resources.rpiRages.remaining = Math.min(prev.resources.rpiRages.remaining, prev.resources.rpiRages.total);
+                  prev.resources.rpiRages.slots = Array(prev.resources.rpiRages.total).fill(false).map((_, i) => i < prev.resources.rpiRages.remaining);
+                  prev.combat.hitDice.total = prev.meta.level;
+                  prev.combat.hitDice.remaining = Math.min(prev.combat.hitDice.remaining, prev.combat.hitDice.total);
+                  prev.features = prev.features.filter(f => f.level <= prev.meta.level);
+                  if (prev.meta.level < 3) prev.meta.subclass = null;
+                  prev.levelUpHistory = prev.levelUpHistory.slice(0, -1);
+                  return prev;
+                });
+                setLevelDownConfirmOpen(false);
+              }}
+              className="flex-1 py-2 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Restore Local Backup Confirmation */}
       <Modal
