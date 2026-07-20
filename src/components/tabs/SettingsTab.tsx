@@ -160,7 +160,7 @@ export function SettingsTab() {
         data,
       });
     } catch {
-      alert("Error al leer el archivo JSON");
+      toast.error("Error al leer el archivo JSON");
     }
   }
 
