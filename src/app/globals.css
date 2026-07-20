@@ -27,14 +27,14 @@
   --border-color: #4a3520;
 }
 
-[data-theme="dark-fantasy"] {
-  --bg: #1a1a2e;
-  --card: #16213e;
-  --accent: #8b6d2d;
-  --cord: #8b2d2d;
-  --fg: #e8e0d4;
-  --muted: #7a7568;
-  --border-color: #2a2a4a;
+[data-theme="cumbre-helada"] {
+  --bg: #e9f1f5;
+  --card: #f8fbfc;
+  --accent: #2f6690;
+  --cord: #7a1f2b;
+  --fg: #1f2e38;
+  --muted: #6c7f8a;
+  --border-color: #b7c8d1;
 }
 
 [data-theme="pergamino"] {
