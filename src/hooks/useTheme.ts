@@ -10,7 +10,7 @@ export const THEME_META: {
   swatch: string;
 }[] = [
   { id: "piedra-viva", label: "Piedra Viva", swatch: "#b87333" },
-  { id: "dark-fantasy", label: "Dark Fantasy", swatch: "#8b6d2d" },
+  { id: "cumbre-helada", label: "Cumbre Helada", swatch: "#2f6690" },
   { id: "pergamino", label: "Pergamino", swatch: "#9c2b2b" },
   { id: "furia-de-sangre", label: "Furia de Sangre", swatch: "#c23b2b" },
 ];

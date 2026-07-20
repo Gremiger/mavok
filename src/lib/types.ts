@@ -185,7 +185,7 @@ export interface QuickNote {
 }
 
 export interface AppSettings {
-  theme: "piedra-viva" | "dark-fantasy" | "pergamino" | "furia-de-sangre";
+  theme: "piedra-viva" | "cumbre-helada" | "pergamino" | "furia-de-sangre";
   lastCharacterId: string;
   density: "compact" | "spacious";
   encyclopediaFavorites: string[];
