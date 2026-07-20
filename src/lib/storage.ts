@@ -52,7 +52,11 @@ export function loadSettings(): AppSettings {
   if (typeof window === "undefined") return defaults;
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    return raw ? { ...defaults, ...JSON.parse(raw) } : defaults;
+    const settings = raw ? { ...defaults, ...JSON.parse(raw) } : defaults;
+    if ((settings.theme as string) === "dark-fantasy") {
+      settings.theme = "cumbre-helada";
+    }
+    return settings;
   } catch {
     return defaults;
   }
