@@ -61,17 +61,24 @@ Replace the raw `{description}` (or equivalent) render with `<Markdown>` in:
   description (2 sites)
 - `src/components/settings/LevelUpHistoryModal.tsx` — feature description
 - `src/components/combat/AttackRow.tsx` — weapon mastery description
-- `src/components/combat/GrantedActionCard.tsx` — granted action description
-  (currently interpolated into a `meta` string with an emoji prefix; needs
-  restructuring so the description renders as `<Markdown>` rather than being
-  concatenated into a plain string)
+- `src/components/combat/GrantedActionCard.tsx` — granted action description,
+  currently interpolated into a plain `meta` string (`⚡ ${description} —
+  ${itemName}`) passed to `CompactRow`. `CompactRow` renders `meta` inside a
+  `<span>` (phrasing content), so it's not a safe place for `<Markdown>`'s
+  block-level `<div>/<p>` output — same reasoning as the list-row card
+  previews above. Uses `stripMarkdown(grantedAction.description)` in the
+  template string instead; stays a plain string, no `CompactRow` changes
+  needed.
 
 ## Call sites: truncated previews
 
-`src/components/levelup/LevelUpFlow.tsx` has two `f.description.slice(0, 200)`
-previews (lines ~439, ~456) — these switch to
-`stripMarkdown(f.description).slice(0, 200)`. The untruncated full description at
-line ~694 uses `<Markdown>`.
+`src/components/levelup/LevelUpFlow.tsx` has three preview sites, none of them a
+full untruncated view — two `f.description.slice(0, 200)` character-truncated
+previews (lines ~439, ~456), and one `line-clamp-2` feat-picker list item (line
+~694). All three switch to `stripMarkdown(f.description)` (the two truncated
+ones as `stripMarkdown(f.description).slice(0, 200)`); none of them use
+`<Markdown>` — this file has no site where a feature/feat description is shown
+in full.
 
 ## Call sites: user-authored content (Notes / Quests / Journal)
 
