@@ -1,35 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
+import { stripMarkup, flattenEntries } from "./extract-helpers";
 
 const TOOLS_DIR = path.resolve(__dirname, "../../dnd/5etools-src/data");
 const OUT_DIR = path.resolve(__dirname, "../src/data");
-
-function stripMarkup(text: string): string {
-  let prev: string;
-  do {
-    prev = text;
-    text = text
-      .replace(/\{@\w+\s+([^|}]+?)(?:\|[^}]*)?\}/g, "$1")
-      .replace(/\{@dc\s+(\d+)\}/g, "DC $1");
-  } while (text !== prev);
-  return text;
-}
-
-function flattenEntries(entries: unknown[]): string {
-  const parts: string[] = [];
-  for (const e of entries) {
-    if (typeof e === "string") {
-      parts.push(stripMarkup(e));
-    } else if (typeof e === "object" && e !== null) {
-      const obj = e as Record<string, unknown>;
-      if (obj.name) parts.push(`**${obj.name}:** `);
-      if (Array.isArray(obj.entries)) {
-        parts.push(flattenEntries(obj.entries));
-      }
-    }
-  }
-  return parts.join(" ").replace(/\s+/g, " ").trim();
-}
 
 // --- Conditions ---
 // Condition UI groupings (Combat tab picker) live in src/data/condition-groups.ts,
