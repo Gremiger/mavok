@@ -9,6 +9,7 @@ import { formatModifier } from "@/lib/utils";
 import { linkifyConditions } from "@/lib/linkifyConditions";
 import { CONDITIONS } from "@/data/conditions";
 import { DiceResult } from "@/components/ui/DiceResult";
+import { Markdown } from "@/components/ui/Markdown";
 import { Sword, Target, Hammer } from "lucide-react";
 import { useThemeContext } from "@/lib/context";
 
@@ -264,15 +265,16 @@ export function AttackRow({
                 )}
               </span>
               {viewingMasteryCondition && (
-                <p className="text-foreground/70 mt-1 pl-2 border-l border-border">
+                <div className="text-foreground/70 mt-1 pl-2 border-l border-border">
                   <span className="text-accent font-heading">
                     {viewingMasteryCondition}:
                   </span>{" "}
-                  {
-                    CONDITIONS.find((c) => c.name === viewingMasteryCondition)
-                      ?.description
-                  }
-                </p>
+                  <Markdown className="inline">
+                    {CONDITIONS.find(
+                      (c) => c.name === viewingMasteryCondition
+                    )?.description ?? ""}
+                  </Markdown>
+                </div>
               )}
             </div>
           )}

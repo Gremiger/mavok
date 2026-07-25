@@ -9,6 +9,7 @@ import { CompactRow } from "@/components/ui/CompactRow";
 import { GhostChip } from "@/components/ui/GhostChip";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { Modal } from "@/components/ui/Modal";
+import { Markdown } from "@/components/ui/Markdown";
 import { CombatVitals } from "@/components/combat/CombatVitals";
 import { HpModal } from "@/components/combat/HpModal";
 import { AttackRow } from "@/components/combat/AttackRow";
@@ -267,11 +268,14 @@ export function CombatTab() {
           </button>
         </div>
         {viewingCondition && combat.conditions.includes(viewingCondition) && (
-          <div className="text-xs text-foreground/80 leading-relaxed bg-card/50 border border-border rounded-lg p-2">
+          <div className="text-xs text-foreground/80 bg-card/50 border border-border rounded-lg p-2">
             <span className="font-heading text-accent">
               {viewingCondition}:
             </span>{" "}
-            {CONDITIONS.find((c) => c.name === viewingCondition)?.description}
+            <Markdown className="inline">
+              {CONDITIONS.find((c) => c.name === viewingCondition)
+                ?.description ?? ""}
+            </Markdown>
           </div>
         )}
       </div>
@@ -297,8 +301,11 @@ export function CombatTab() {
         }
       />
       {exhaustionExpanded && (
-        <div className="text-xs text-foreground/80 leading-relaxed bg-card/50 border border-border rounded-lg p-2">
-          {CONDITIONS.find((c) => c.name === "Exhaustion")?.description}
+        <div className="text-xs text-foreground/80 bg-card/50 border border-border rounded-lg p-2">
+          <Markdown>
+            {CONDITIONS.find((c) => c.name === "Exhaustion")?.description ??
+              ""}
+          </Markdown>
         </div>
       )}
 
