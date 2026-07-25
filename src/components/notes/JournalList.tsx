@@ -5,6 +5,7 @@ import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Markdown } from "@/components/ui/Markdown";
+import { stripMarkdown } from "@/lib/markdown";
 import { Plus, BookOpen } from "lucide-react";
 import type { JournalEntry } from "@/lib/types";
 import { toast } from "sonner";
@@ -125,7 +126,7 @@ export function JournalList({
                 <p
                   className={`text-xs text-foreground/80 mt-2 ${expandedPreviews.has(entry.id) ? "" : "line-clamp-3"}`}
                 >
-                  {entry.content}
+                  {stripMarkdown(entry.content)}
                 </p>
                 <button
                   onClick={(e) => {

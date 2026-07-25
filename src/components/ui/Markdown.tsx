@@ -2,6 +2,7 @@
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 
 export function Markdown({
   children,
@@ -11,9 +12,9 @@ export function Markdown({
   className?: string;
 }) {
   return (
-    <div className={className}>
+    <div className={`space-y-2 ${className ?? ""}`}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkBreaks]}
         components={{
           p: ({ children }) => <p className="leading-relaxed">{children}</p>,
           strong: ({ children }) => (
@@ -28,7 +29,6 @@ export function Markdown({
           ol: ({ children }) => (
             <ol className="list-decimal pl-4 space-y-0.5">{children}</ol>
           ),
-          li: ({ children }) => <li>{children}</li>,
         }}
       >
         {children}
