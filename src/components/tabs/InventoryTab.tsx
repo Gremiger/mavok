@@ -12,12 +12,12 @@ import { formatModifier, simplifyCurrency } from "@/lib/utils";
 import { resolveItemDescription } from "@/lib/inventory";
 import { toast } from "sonner";
 import { Sword, Shield, Wrench, FlaskConical, Heart, Plus, SearchX } from "lucide-react";
-import type { InventoryItem, GrantedAction } from "@/lib/types";
+import type { InventoryItem } from "@/lib/types";
 import type { ReactNode } from "react";
 import { WEAPONS } from "@/data/weapons";
-import { ARMOR } from "@/data/armor";
 import { GEAR } from "@/data/gear";
 import { recalculateDerived } from "@/lib/recalculate";
+import { ItemFormModal } from "@/components/inventory/ItemFormModal";
 
 const CURRENCY_LABELS = [
   { key: "cp" as const, label: "CP" },
@@ -60,32 +60,13 @@ export function InventoryTab() {
   const [unpackingItem, setUnpackingItem] = useState<InventoryItem | null>(
     null
   );
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [attackPrefillWeapon, setAttackPrefillWeapon] = useState<string | null>(
     null
   );
   const [attackPrefillDisplayName, setAttackPrefillDisplayName] = useState<
     string | undefined
   >(undefined);
-  const [newItem, setNewItem] = useState({
-    name: "",
-    quantity: 1,
-    weight: "",
-    value: "",
-    category: "gear" as InventoryItem["category"],
-    description: "",
-    magicBonus: "",
-    magicBonusTargets: [] as ("ac" | "save")[],
-    magicAttackBonus: "",
-    magicDamageBonus: "",
-    baseWeaponName: "",
-    grantsAction: false,
-    actionName: "",
-    actionType: "action" as GrantedAction["actionType"],
-    actionDescription: "",
-    actionLimitedUses: false,
-    actionTotalUses: "",
-    actionRecharge: "long" as NonNullable<GrantedAction["charges"]>["recharge"],
-  });
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "weight" | "equipped">("name");
@@ -227,126 +208,6 @@ export function InventoryTab() {
       ),
     }))
     .filter((g) => g.items.length > 0);
-
-  function handleAddItem() {
-    if (!newItem.name.trim()) return;
-    const magicBonus = newItem.magicBonus ? parseInt(newItem.magicBonus) : 0;
-    const magicAttackBonus = newItem.magicAttackBonus
-      ? parseInt(newItem.magicAttackBonus)
-      : 0;
-    const magicDamageBonus = newItem.magicDamageBonus
-      ? parseInt(newItem.magicDamageBonus)
-      : 0;
-    const totalUses = newItem.actionTotalUses
-      ? parseInt(newItem.actionTotalUses)
-      : 0;
-    const grantedAction: GrantedAction | null =
-      newItem.grantsAction && newItem.actionName.trim()
-        ? {
-            name: newItem.actionName.trim(),
-            actionType: newItem.actionType,
-            description: newItem.actionDescription,
-            charges:
-              newItem.actionLimitedUses && totalUses > 0
-                ? {
-                    total: totalUses,
-                    remaining: totalUses,
-                    recharge: newItem.actionRecharge,
-                  }
-                : null,
-          }
-        : null;
-    const item: InventoryItem = {
-      id: `inv-${Date.now()}`,
-      name: newItem.name.trim(),
-      quantity: newItem.quantity,
-      weight: newItem.weight ? parseFloat(newItem.weight) : null,
-      value: newItem.value ? parseFloat(newItem.value) : null,
-      category: newItem.category,
-      equipped: false,
-      description: newItem.description,
-      magicBonus: magicBonus ? magicBonus : null,
-      magicBonusTargets: magicBonus ? newItem.magicBonusTargets : [],
-      magicAttackBonus: magicAttackBonus ? magicAttackBonus : null,
-      magicDamageBonus: magicDamageBonus ? magicDamageBonus : null,
-      baseWeaponName: newItem.baseWeaponName.trim() || null,
-      grantedAction,
-    };
-    addInventoryItem(item);
-    toast(`${item.name} agregado`, { icon: "📦" });
-    setNewItem({
-      name: "",
-      quantity: 1,
-      weight: "",
-      value: "",
-      category: "gear",
-      description: "",
-      magicBonus: "",
-      magicBonusTargets: [],
-      magicAttackBonus: "",
-      magicDamageBonus: "",
-      baseWeaponName: "",
-      grantsAction: false,
-      actionName: "",
-      actionType: "action",
-      actionDescription: "",
-      actionLimitedUses: false,
-      actionTotalUses: "",
-      actionRecharge: "long",
-    });
-    setAddModalOpen(false);
-  }
-
-  function toggleMagicBonusTarget(target: "ac" | "save") {
-    setNewItem((prev) => ({
-      ...prev,
-      magicBonusTargets: prev.magicBonusTargets.includes(target)
-        ? prev.magicBonusTargets.filter((t) => t !== target)
-        : [...prev.magicBonusTargets, target],
-    }));
-  }
-
-  function prefillFromWeapon(weaponName: string) {
-    const w = WEAPONS.find((wp) => wp.name === weaponName);
-    if (w) {
-      setNewItem({
-        ...newItem,
-        name: w.name,
-        weight: String(w.weight),
-        value: w.value !== null ? String(w.value) : "",
-        category: "weapon",
-        description: `${w.damage} ${w.damageType} · ${w.properties.join(", ")}${w.mastery ? ` · Mastery: ${w.mastery}` : ""}`,
-      });
-    }
-  }
-
-  function prefillFromArmor(armorName: string) {
-    const a = ARMOR.find((ar) => ar.name === armorName);
-    if (a) {
-      setNewItem({
-        ...newItem,
-        name: a.name,
-        weight: String(a.weight),
-        value: a.value !== null ? String(a.value) : "",
-        category: "armor",
-        description: `AC ${a.ac}${a.stealthDisadvantage ? " · Desventaja en Sigilo" : ""}${a.strengthRequirement ? ` · Requiere FUE ${a.strengthRequirement}` : ""}`,
-      });
-    }
-  }
-
-  function prefillFromGear(gearName: string) {
-    const g = GEAR.find((ge) => ge.name === gearName);
-    if (g) {
-      setNewItem({
-        ...newItem,
-        name: g.name,
-        weight: g.weight !== null ? String(g.weight) : "",
-        value: g.value !== null ? String(g.value) : "",
-        category: "gear",
-        description: g.description,
-      });
-    }
-  }
 
   return (
     <div className="p-4 space-y-4">
@@ -578,6 +439,12 @@ export function InventoryTab() {
                         </button>
                       </div>
                       <button
+                        onClick={() => setEditingItem(item)}
+                        className="ml-auto px-3 py-1 text-xs text-accent border border-accent/30 rounded hover:bg-accent/10"
+                      >
+                        Editar
+                      </button>
+                      <button
                         onClick={() => {
                           removeInventoryItem(item.id);
                           toast(`${item.name} eliminado`, {
@@ -587,7 +454,7 @@ export function InventoryTab() {
                             },
                           });
                         }}
-                        className="ml-auto px-3 py-1 text-xs text-danger border border-danger/30 rounded hover:bg-danger/10"
+                        className="px-3 py-1 text-xs text-danger border border-danger/30 rounded hover:bg-danger/10"
                       >
                         Eliminar
                       </button>
@@ -629,320 +496,21 @@ export function InventoryTab() {
         <Plus size={24} />
       </button>
 
-      {/* Add Item Modal */}
-      <Modal
+      <ItemFormModal
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
-        title="Agregar objeto"
-      >
-        <div className="space-y-3">
-          <div>
-            <label className="text-xs text-muted">Arma rápida</label>
-            <select
-              onChange={(e) => {
-                if (e.target.value) prefillFromWeapon(e.target.value);
-                e.target.value = "";
-              }}
-              className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground mt-1"
-              defaultValue=""
-            >
-              <option value="">Elegir arma...</option>
-              {WEAPONS.map((w) => (
-                <option key={w.name} value={w.name}>
-                  {w.name} ({w.damage} {w.damageType})
-                </option>
-              ))}
-            </select>
-          </div>
+        onSave={(item) => {
+          addInventoryItem(item);
+          toast(`${item.name} agregado`, { icon: "📦" });
+        }}
+      />
 
-          <div>
-            <label className="text-xs text-muted">Armadura rápida</label>
-            <select
-              onChange={(e) => {
-                if (e.target.value) prefillFromArmor(e.target.value);
-                e.target.value = "";
-              }}
-              className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground mt-1"
-              defaultValue=""
-            >
-              <option value="">Elegir armadura...</option>
-              {ARMOR.map((a) => (
-                <option key={a.name} value={a.name}>
-                  {a.name} (AC {a.ac})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-xs text-muted">Equipo rápido</label>
-            <select
-              onChange={(e) => {
-                if (e.target.value) prefillFromGear(e.target.value);
-                e.target.value = "";
-              }}
-              className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground mt-1"
-              defaultValue=""
-            >
-              <option value="">Elegir equipo...</option>
-              {GEAR.map((g) => (
-                <option key={g.name} value={g.name}>
-                  {g.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <input
-            value={newItem.name}
-            onChange={(e) =>
-              setNewItem({ ...newItem, name: e.target.value })
-            }
-            placeholder="Nombre"
-            className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-          />
-
-          <div className="flex gap-2">
-            <input
-              type="number"
-              inputMode="numeric"
-              value={newItem.quantity}
-              onChange={(e) =>
-                setNewItem({
-                  ...newItem,
-                  quantity: parseInt(e.target.value) || 1,
-                })
-              }
-              placeholder="Cantidad"
-              className="w-1/3 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-            />
-            <input
-              value={newItem.weight}
-              onChange={(e) =>
-                setNewItem({ ...newItem, weight: e.target.value })
-              }
-              placeholder="Peso (lb)"
-              className="w-1/3 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-            />
-            <input
-              value={newItem.value}
-              onChange={(e) =>
-                setNewItem({ ...newItem, value: e.target.value })
-              }
-              placeholder="Valor (gp)"
-              className="w-1/3 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-            />
-          </div>
-
-          <select
-            value={newItem.category}
-            onChange={(e) =>
-              setNewItem({
-                ...newItem,
-                category: e.target.value as InventoryItem["category"],
-              })
-            }
-            className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-
-          <textarea
-            value={newItem.description}
-            onChange={(e) =>
-              setNewItem({ ...newItem, description: e.target.value })
-            }
-            placeholder="Descripción (opcional)"
-            rows={2}
-            className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"
-          />
-
-          <input
-            type="number"
-            value={newItem.magicBonus}
-            onChange={(e) =>
-              setNewItem({ ...newItem, magicBonus: e.target.value })
-            }
-            placeholder="Bono mágico a CA/Salvaciones (opcional, ej. 1 o -1)"
-            className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-          />
-
-          {newItem.magicBonus && parseInt(newItem.magicBonus) !== 0 && (
-            <div>
-              <label className="text-xs text-muted">Aplica a</label>
-              <div className="flex gap-3 mt-1">
-                {(
-                  [
-                    { value: "ac", label: "CA" },
-                    { value: "save", label: "Salvaciones" },
-                  ] as const
-                ).map((t) => (
-                  <label
-                    key={t.value}
-                    className="flex items-center gap-1.5 text-xs text-foreground"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={newItem.magicBonusTargets.includes(t.value)}
-                      onChange={() => toggleMagicBonusTarget(t.value)}
-                    />
-                    {t.label}
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="flex gap-2">
-            <input
-              type="number"
-              value={newItem.magicAttackBonus}
-              onChange={(e) =>
-                setNewItem({ ...newItem, magicAttackBonus: e.target.value })
-              }
-              placeholder="Bono de ataque (opcional)"
-              className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-            />
-            <input
-              type="number"
-              value={newItem.magicDamageBonus}
-              onChange={(e) =>
-                setNewItem({ ...newItem, magicDamageBonus: e.target.value })
-              }
-              placeholder="Bono de daño (opcional)"
-              className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-            />
-          </div>
-          <p className="text-[0.65rem] text-muted -mt-1">
-            {newItem.category === "weapon"
-              ? "En un objeto de categoría Arma, aplica solo a esa arma. En cualquier otra categoría (anillo, capa, etc.), aplica a todos tus ataques."
-              : "Aplica a todos tus ataques (no está atado a un arma específica)."}
-          </p>
-
-          {newItem.category === "weapon" &&
-            (!!newItem.magicAttackBonus || !!newItem.magicDamageBonus) && (
-              <select
-                value={newItem.baseWeaponName}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, baseWeaponName: e.target.value })
-                }
-                className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-              >
-                <option value="">
-                  Vincular a arma del catálogo (si el nombre no coincide)...
-                </option>
-                {WEAPONS.map((w) => (
-                  <option key={w.name} value={w.name}>
-                    {w.name}
-                  </option>
-                ))}
-              </select>
-            )}
-
-          <label className="flex items-center gap-1.5 text-xs text-foreground">
-            <input
-              type="checkbox"
-              checked={newItem.grantsAction}
-              onChange={(e) =>
-                setNewItem({ ...newItem, grantsAction: e.target.checked })
-              }
-            />
-            Otorga una acción especial (opcional)
-          </label>
-
-          {newItem.grantsAction && (
-            <div className="space-y-2 pl-2 border-l border-border">
-              <input
-                value={newItem.actionName}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, actionName: e.target.value })
-                }
-                placeholder="Nombre de la acción"
-                className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-              />
-              <select
-                value={newItem.actionType}
-                onChange={(e) =>
-                  setNewItem({
-                    ...newItem,
-                    actionType: e.target.value as GrantedAction["actionType"],
-                  })
-                }
-                className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-              >
-                <option value="action">Acción</option>
-                <option value="bonus">Bonus Action</option>
-                <option value="reaction">Reacción</option>
-              </select>
-              <textarea
-                value={newItem.actionDescription}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, actionDescription: e.target.value })
-                }
-                placeholder="Descripción del efecto"
-                rows={2}
-                className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"
-              />
-              <label className="flex items-center gap-1.5 text-xs text-foreground">
-                <input
-                  type="checkbox"
-                  checked={newItem.actionLimitedUses}
-                  onChange={(e) =>
-                    setNewItem({
-                      ...newItem,
-                      actionLimitedUses: e.target.checked,
-                    })
-                  }
-                />
-                Usos limitados
-              </label>
-              {newItem.actionLimitedUses && (
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    value={newItem.actionTotalUses}
-                    onChange={(e) =>
-                      setNewItem({
-                        ...newItem,
-                        actionTotalUses: e.target.value,
-                      })
-                    }
-                    placeholder="Total de usos"
-                    className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-                  />
-                  <select
-                    value={newItem.actionRecharge}
-                    onChange={(e) =>
-                      setNewItem({
-                        ...newItem,
-                        actionRecharge: e.target
-                          .value as NonNullable<GrantedAction["charges"]>["recharge"],
-                      })
-                    }
-                    className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
-                  >
-                    <option value="short">Descanso corto</option>
-                    <option value="long">Descanso largo</option>
-                    <option value="none">Sin recarga</option>
-                  </select>
-                </div>
-              )}
-            </div>
-          )}
-
-          <button
-            onClick={handleAddItem}
-            className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
-          >
-            Agregar
-          </button>
-        </div>
-      </Modal>
+      <ItemFormModal
+        open={!!editingItem}
+        onClose={() => setEditingItem(null)}
+        item={editingItem ?? undefined}
+        onSave={(item) => updateInventoryItem(item.id, item)}
+      />
 
       {/* Unpack Confirmation Modal */}
       <Modal
