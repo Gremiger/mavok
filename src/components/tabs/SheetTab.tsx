@@ -7,6 +7,7 @@ import { CompactRow } from "@/components/ui/CompactRow";
 import { GhostChip } from "@/components/ui/GhostChip";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { FeatsBrowserModal } from "@/components/sheet/FeatsBrowserModal";
+import { Markdown } from "@/components/ui/Markdown";
 import { User } from "lucide-react";
 import type { AbilityScore } from "@/lib/types";
 import { rollD20, rollD20WithAdvantage, type DiceRoll } from "@/lib/dice";
@@ -349,9 +350,15 @@ export function SheetTab() {
                   {f.source}
                 </span>
               </div>
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                {f.name === "Weapon Mastery" ? describeWeaponMastery(attacks) : f.description}
-              </p>
+              {f.name === "Weapon Mastery" ? (
+                <p className="text-sm text-foreground/70 leading-relaxed">
+                  {describeWeaponMastery(attacks)}
+                </p>
+              ) : (
+                <Markdown className="text-sm text-foreground/70">
+                  {f.description}
+                </Markdown>
+              )}
             </div>
           ))}
         </div>
@@ -369,7 +376,9 @@ export function SheetTab() {
                     {f.name}
                   </span>
                 </div>
-                <p className="text-sm text-foreground/70 leading-relaxed">{f.description}</p>
+                <Markdown className="text-sm text-foreground/70">
+                  {f.description}
+                </Markdown>
               </div>
             ))}
           {features.filter(f => f.source === "Dote" && f.level <= meta.level).length === 0 && (

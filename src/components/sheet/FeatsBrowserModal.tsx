@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
+import { Markdown } from "@/components/ui/Markdown";
 import { FEATS, type FeatData } from "@/data/feats";
 import { meetsAbilityPrereqs } from "@/lib/feats";
 import { abilityLabel } from "@/lib/utils";
@@ -151,9 +152,9 @@ export function FeatsBrowserModal({
                     {status}
                   </span>
                 </div>
-                <p className="text-xs text-foreground/70 leading-relaxed">
+                <Markdown className="text-xs text-foreground/70">
                   {f.description}
-                </p>
+                </Markdown>
               </div>
             );
           })}
