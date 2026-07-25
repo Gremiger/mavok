@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useCharacterContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
+import { Markdown } from "@/components/ui/Markdown";
 import type { Feature } from "@/lib/types";
 
 function FeatureList({
@@ -30,9 +31,9 @@ function FeatureList({
               • {f.name}
             </button>
             {expandedKey === key && (
-              <p className="text-xs text-foreground/70 leading-relaxed bg-card/50 border border-border rounded-lg p-2 mt-1">
+              <Markdown className="text-xs text-foreground/70 bg-card/50 border border-border rounded-lg p-2 mt-1">
                 {f.description}
-              </p>
+              </Markdown>
             )}
           </div>
         );

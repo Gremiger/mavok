@@ -1,6 +1,7 @@
 "use client";
 
 import { Modal } from "@/components/ui/Modal";
+import { Markdown } from "@/components/ui/Markdown";
 
 type ActionCategory = "actions" | "bonus" | "reactions";
 
@@ -117,15 +118,17 @@ export function StandardActionsModal({ open, onClose, filter }: Props) {
             <p className="font-heading text-accent text-sm font-semibold mb-1">
               {action.name}
             </p>
-            <p className="text-xs text-foreground/70 leading-relaxed">
+            <Markdown className="text-xs text-foreground/70">
               {action.description}
-            </p>
+            </Markdown>
             {action.subItems && (
               <div className="mt-2 space-y-1.5 pl-2 border-l border-border">
                 {action.subItems.map((sub) => (
                   <div key={sub.name}>
                     <p className="text-xs text-accent/80 font-semibold">{sub.name}</p>
-                    <p className="text-xs text-muted leading-relaxed">{sub.description}</p>
+                    <Markdown className="text-xs text-muted">
+                      {sub.description}
+                    </Markdown>
                   </div>
                 ))}
               </div>
