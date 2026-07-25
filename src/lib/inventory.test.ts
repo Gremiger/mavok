@@ -44,6 +44,17 @@ describe("resolveItemDescription", () => {
     );
   });
 
+  it("falls back to a MAGIC_ITEMS description when description is empty", () => {
+    const item = {
+      ...BASE_ITEM,
+      name: "Axe of the Dwarvish Lords",
+      description: "",
+    };
+    expect(resolveItemDescription(item)).toContain(
+      "grants a +3 bonus to attack rolls and damage rolls"
+    );
+  });
+
   it("returns an empty string when nothing matches", () => {
     const item = {
       ...BASE_ITEM,
