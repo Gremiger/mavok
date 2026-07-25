@@ -509,7 +509,14 @@ export function InventoryTab() {
         open={!!editingItem}
         onClose={() => setEditingItem(null)}
         item={editingItem ?? undefined}
-        onSave={(item) => updateInventoryItem(item.id, item)}
+        onSave={(item) =>
+          update((c) => {
+            const nextInventory = c.inventory.map((i) =>
+              i.id === item.id ? item : i
+            );
+            return recalculateDerived({ ...c, inventory: nextInventory });
+          })
+        }
       />
 
       {/* Unpack Confirmation Modal */}
