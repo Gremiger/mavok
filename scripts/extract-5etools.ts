@@ -5,9 +5,14 @@ const TOOLS_DIR = path.resolve(__dirname, "../../dnd/5etools-src/data");
 const OUT_DIR = path.resolve(__dirname, "../src/data");
 
 function stripMarkup(text: string): string {
-  return text
-    .replace(/\{@\w+\s+([^|}]+?)(?:\|[^}]*)?\}/g, "$1")
-    .replace(/\{@dc\s+(\d+)\}/g, "DC $1");
+  let prev: string;
+  do {
+    prev = text;
+    text = text
+      .replace(/\{@\w+\s+([^|}]+?)(?:\|[^}]*)?\}/g, "$1")
+      .replace(/\{@dc\s+(\d+)\}/g, "DC $1");
+  } while (text !== prev);
+  return text;
 }
 
 function flattenEntries(entries: unknown[]): string {
@@ -266,7 +271,7 @@ function extractSpells() {
     const plural =
       t.number > 1 && (t.unit === "minute" || t.unit === "hour") ? "s" : "";
     const base = `${t.number} ${label}${plural}`;
-    return t.condition ? `${base}, ${t.condition}` : base;
+    return stripMarkup(t.condition ? `${base}, ${t.condition}` : base);
   }
 
   function formatRange(range: Record<string, unknown>): string {
