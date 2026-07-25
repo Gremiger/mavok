@@ -6,6 +6,7 @@ import { Star, SearchX } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { CompactRow } from "@/components/ui/CompactRow";
+import { Markdown } from "@/components/ui/Markdown";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useThemeContext } from "@/lib/context";
 import { CONDITIONS } from "@/data/conditions";
@@ -400,9 +401,9 @@ export function EncyclopediaTab() {
                 ))}
               </div>
             )}
-            <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
+            <Markdown className="text-sm text-foreground/80">
               {resolveDetail(viewingItem, encyclopediaLanguage)}
-            </p>
+            </Markdown>
           </>
         )}
       </Modal>
