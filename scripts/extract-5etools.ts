@@ -208,6 +208,74 @@ export const GEAR: GearData[] = ${JSON.stringify(gear, null, 2)};
   console.log(`Gear: ${gear.length}`);
 }
 
+// --- Named Magic Items (XDMG) ---
+function extractMagicItems() {
+  const raw = JSON.parse(
+    fs.readFileSync(path.join(TOOLS_DIR, "items.json"), "utf-8")
+  );
+
+  function classifyItemType(
+    type: string | undefined
+  ): "weapon" | "armor" | "wondrous" {
+    const typeKey = type ? type.split("|")[0] : "";
+    if (typeKey === "M" || typeKey === "R") return "weapon";
+    if (["LA", "MA", "HA", "S"].includes(typeKey)) return "armor";
+    return "wondrous";
+  }
+
+  const magicItems = raw.item
+    .filter(
+      (i: Record<string, unknown>) =>
+        i.source === "XDMG" &&
+        typeof i.rarity === "string" &&
+        i.rarity !== "none" &&
+        i.rarity !== "unknown"
+    )
+    .map((i: Record<string, unknown>) => ({
+      name: i.name as string,
+      rarity: i.rarity as string,
+      itemType: classifyItemType(i.type as string | undefined),
+      requiresAttunement: !!i.reqAttune,
+      description: flattenEntries((i.entries as unknown[]) || []),
+    }));
+
+  const ts = `export interface MagicItemData {
+  name: string;
+  rarity: string;
+  itemType: "weapon" | "armor" | "wondrous";
+  requiresAttunement: boolean;
+  description: string;
+}
+
+export const MAGIC_ITEMS: MagicItemData[] = ${JSON.stringify(magicItems, null, 2)};
+`;
+  fs.writeFileSync(path.join(OUT_DIR, "magic-items.ts"), ts);
+  console.log(`Magic items: ${magicItems.length}`);
+}
+
+// --- Rules Glossary (XPHB) ---
+function extractVariantRules() {
+  const raw = JSON.parse(
+    fs.readFileSync(path.join(TOOLS_DIR, "variantrules.json"), "utf-8")
+  );
+  const rules = raw.variantrule
+    .filter((v: Record<string, unknown>) => v.source === "XPHB")
+    .map((v: Record<string, unknown>) => ({
+      name: v.name as string,
+      description: flattenEntries(v.entries as unknown[]),
+    }));
+
+  const ts = `export interface VariantRuleData {
+  name: string;
+  description: string;
+}
+
+export const VARIANT_RULES: VariantRuleData[] = ${JSON.stringify(rules, null, 2)};
+`;
+  fs.writeFileSync(path.join(OUT_DIR, "variant-rules.ts"), ts);
+  console.log(`Variant rules: ${rules.length}`);
+}
+
 // --- Actions ---
 function extractActions() {
   const raw = JSON.parse(
@@ -649,6 +717,8 @@ extractSkills();
 extractSpells();
 extractMastery();
 extractFeats();
+extractMagicItems();
+extractVariantRules();
 extractBarbarianProgression();
 extractSubclasses();
 console.log("\nDone!");
