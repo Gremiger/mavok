@@ -6,6 +6,8 @@ import { Modal } from "@/components/ui/Modal";
 import { Tag } from "@/components/ui/Tag";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { GhostChip } from "@/components/ui/GhostChip";
+import { Markdown } from "@/components/ui/Markdown";
+import { stripMarkdown } from "@/lib/markdown";
 import { Plus, ScrollText } from "lucide-react";
 import type { QuestEntry } from "@/lib/types";
 import { toast } from "sonner";
@@ -27,20 +29,9 @@ export function QuestList({
     useCharacterContext();
   const { density } = useThemeContext();
   const [filter, setFilter] = useState<StatusFilter>("all");
-  const [expandedPreviews, setExpandedPreviews] = useState<Set<string>>(
-    new Set()
-  );
-
-  function togglePreview(id: string) {
-    setExpandedPreviews((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [viewingId, setViewingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "",
     content: "",
@@ -137,7 +128,7 @@ export function QuestList({
       {quests.map((quest) => (
         <div
           key={quest.id}
-          onClick={() => openEdit(quest)}
+          onClick={() => setViewingId(quest.id)}
           className={`stone-card rounded-lg cursor-pointer active:scale-[0.99] transition-transform ${density === "compact" ? "p-2" : "p-3"}`}
         >
           <div className="flex items-center gap-2">
@@ -160,22 +151,9 @@ export function QuestList({
             <p className="text-xs text-muted mt-1">De: {quest.givenBy}</p>
           )}
           {quest.content && (
-            <>
-              <p
-                className={`text-xs text-foreground/80 mt-1 ${expandedPreviews.has(quest.id) ? "" : "line-clamp-2"}`}
-              >
-                {quest.content}
-              </p>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  togglePreview(quest.id);
-                }}
-                className="text-[0.65rem] text-accent mt-0.5"
-              >
-                {expandedPreviews.has(quest.id) ? "ver menos" : "ver más"}
-              </button>
-            </>
+            <p className="text-xs text-foreground/80 mt-1 line-clamp-2">
+              {stripMarkdown(quest.content)}
+            </p>
           )}
           {quest.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
@@ -290,6 +268,60 @@ export function QuestList({
             </button>
           </div>
         </div>
+      </Modal>
+
+      {/* Quest View Modal */}
+      <Modal
+        open={!!viewingId && !formOpen}
+        onClose={() => setViewingId(null)}
+        title={character.notes.quests.find((q) => q.id === viewingId)?.title ?? ""}
+      >
+        {(() => {
+          const quest = character.notes.quests.find((q) => q.id === viewingId);
+          if (!quest) return null;
+          return (
+            <div className="space-y-3">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  cycleStatus(quest.id, quest.status);
+                }}
+              >
+                <Tag
+                  label={STATUS_CONFIG[quest.status].label}
+                  variant={STATUS_CONFIG[quest.status].variant}
+                />
+              </button>
+              {quest.givenBy && (
+                <p className="text-xs text-muted">De: {quest.givenBy}</p>
+              )}
+              {quest.content && (
+                <Markdown className="text-sm">{quest.content}</Markdown>
+              )}
+              {quest.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {quest.tags.map((t) => (
+                    <span
+                      key={t}
+                      className="text-[0.6rem] px-1.5 py-0.5 bg-background text-muted rounded"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <button
+                onClick={() => {
+                  openEdit(quest);
+                  setViewingId(null);
+                }}
+                className="text-xs text-accent hover:underline"
+              >
+                Editar
+              </button>
+            </div>
+          );
+        })()}
       </Modal>
     </div>
   );
