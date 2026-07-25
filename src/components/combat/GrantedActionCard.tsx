@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useLongPress } from "@/hooks/useLongPress";
 import { CompactRow } from "@/components/ui/CompactRow";
 import { GhostChip } from "@/components/ui/GhostChip";
+import { stripMarkdown } from "@/lib/markdown";
 import type { GrantedAction } from "@/lib/types";
 
 export function GrantedActionCard({
@@ -26,7 +27,7 @@ export function GrantedActionCard({
     onUse();
   }
 
-  const meta = `⚡ ${grantedAction.description} — ${itemName}`;
+  const meta = `⚡ ${stripMarkdown(grantedAction.description)} — ${itemName}`;
 
   if (!charges) {
     return <CompactRow name={grantedAction.name} meta={meta} right={null} />;

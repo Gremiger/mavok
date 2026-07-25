@@ -12,6 +12,7 @@ import {
   skillLabel,
 } from "@/lib/utils";
 import { recalculateDerived } from "@/lib/recalculate";
+import { stripMarkdown } from "@/lib/markdown";
 import {
   BARBARIAN_LEVELS,
   BARBARIAN_FEATURES,
@@ -436,7 +437,7 @@ export function LevelUpFlow({
                 {f.name}
               </span>
               <p className="text-xs text-foreground/80 mt-1">
-                {f.description.slice(0, 200)}
+                {stripMarkdown(f.description).slice(0, 200)}
                 {f.description.length > 200 ? "..." : ""}
               </p>
             </div>
@@ -453,7 +454,7 @@ export function LevelUpFlow({
                 ({character.meta.subclass})
               </span>
               <p className="text-xs text-foreground/80 mt-1">
-                {f.description.slice(0, 200)}
+                {stripMarkdown(f.description).slice(0, 200)}
                 {f.description.length > 200 ? "..." : ""}
               </p>
             </div>
@@ -691,7 +692,7 @@ function ASIStep({
                   </span>
                 </div>
                 <p className="text-[0.65rem] text-foreground/70 mt-0.5 line-clamp-2">
-                  {f.description}
+                  {stripMarkdown(f.description)}
                 </p>
               </button>
             ))}
