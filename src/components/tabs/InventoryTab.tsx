@@ -57,6 +57,9 @@ export function InventoryTab() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editingCurrency, setEditingCurrency] = useState<string | null>(null);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [unpackingItem, setUnpackingItem] = useState<InventoryItem | null>(
+    null
+  );
   const [attackPrefillWeapon, setAttackPrefillWeapon] = useState<string | null>(
     null
   );
@@ -148,6 +151,63 @@ export function InventoryTab() {
         });
       }
     }
+  }
+
+  function packContentsFor(
+    item: InventoryItem
+  ): { name: string; quantity: number }[] | null {
+    return GEAR.find((g) => g.name === item.name)?.packContents ?? null;
+  }
+
+  function handleUnpack(item: InventoryItem) {
+    const contents = packContentsFor(item);
+    if (!contents) return;
+    update((c) => {
+      let nextInventory = c.inventory.map((i) =>
+        i.id === item.id && i.quantity > 1
+          ? { ...i, quantity: i.quantity - 1 }
+          : i
+      );
+      if (item.quantity <= 1) {
+        nextInventory = nextInventory.filter((i) => i.id !== item.id);
+      }
+      for (const content of contents) {
+        const existingIndex = nextInventory.findIndex(
+          (i) => i.name === content.name
+        );
+        if (existingIndex !== -1) {
+          nextInventory = nextInventory.map((i, idx) =>
+            idx === existingIndex
+              ? { ...i, quantity: i.quantity + content.quantity }
+              : i
+          );
+        } else {
+          const catalogEntry = GEAR.find((g) => g.name === content.name);
+          nextInventory = [
+            ...nextInventory,
+            {
+              id: crypto.randomUUID(),
+              name: content.name,
+              quantity: content.quantity,
+              weight: catalogEntry?.weight ?? null,
+              value: catalogEntry?.value ?? null,
+              category: "gear",
+              equipped: false,
+              description: "",
+              magicBonus: null,
+              magicBonusTargets: [],
+              magicAttackBonus: null,
+              magicDamageBonus: null,
+              baseWeaponName: null,
+              grantedAction: null,
+            },
+          ];
+        }
+      }
+      return { ...c, inventory: nextInventory };
+    });
+    toast(`${item.name} abierto`, { icon: "📦" });
+    setUnpackingItem(null);
   }
 
   function toggleCategory(cat: InventoryItem["category"]) {
@@ -482,6 +542,14 @@ export function InventoryTab() {
                           : ""}
                         )
                       </p>
+                    )}
+                    {packContentsFor(item) && (
+                      <button
+                        onClick={() => setUnpackingItem(item)}
+                        className="text-xs text-accent border border-accent/30 rounded-lg px-3 py-1.5 hover:bg-accent/10"
+                      >
+                        Abrir {item.name}
+                      </button>
                     )}
                     <div className="flex gap-2">
                       <div className="flex items-center gap-1">
@@ -874,6 +942,51 @@ export function InventoryTab() {
             Agregar
           </button>
         </div>
+      </Modal>
+
+      {/* Unpack Confirmation Modal */}
+      <Modal
+        open={!!unpackingItem}
+        onClose={() => setUnpackingItem(null)}
+        title={`Abrir ${unpackingItem?.name ?? ""}`}
+      >
+        {unpackingItem &&
+          (() => {
+            const contents = packContentsFor(unpackingItem);
+            if (!contents) return null;
+            return (
+              <div className="space-y-3">
+                <p className="text-sm text-foreground/80">Se agregará:</p>
+                <ul className="text-sm text-foreground/80 list-disc pl-4 space-y-0.5">
+                  {contents.map((c) => (
+                    <li key={c.name}>
+                      {c.quantity > 1 ? `${c.quantity}× ` : ""}
+                      {c.name}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-muted">
+                  {unpackingItem.quantity > 1
+                    ? `${unpackingItem.name} bajará a ${unpackingItem.quantity - 1}.`
+                    : `${unpackingItem.name} se eliminará del inventario.`}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setUnpackingItem(null)}
+                    className="flex-1 py-2 text-sm border border-border rounded-lg text-muted"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => handleUnpack(unpackingItem)}
+                    className="flex-1 py-2 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+                  >
+                    Abrir
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
       </Modal>
 
       <AttackFormModal
