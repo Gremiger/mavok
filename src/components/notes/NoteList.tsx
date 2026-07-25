@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Markdown } from "@/components/ui/Markdown";
+import { stripMarkdown } from "@/lib/markdown";
 import { Plus, Map, Users } from "lucide-react";
 import type { NoteEntry } from "@/lib/types";
 import { toast } from "sonner";
@@ -29,18 +31,7 @@ export function NoteList({
     fields: {} as Record<string, string>,
   });
   const [newFieldKey, setNewFieldKey] = useState("");
-  const [expandedPreviews, setExpandedPreviews] = useState<Set<string>>(
-    new Set()
-  );
-
-  function togglePreview(id: string) {
-    setExpandedPreviews((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
+  const [viewingId, setViewingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!character || !initialOpenId) return;
@@ -122,27 +113,14 @@ export function NoteList({
       {notes.map((note) => (
         <div
           key={note.id}
-          onClick={() => openEdit(note)}
+          onClick={() => setViewingId(note.id)}
           className={`stone-card rounded-lg cursor-pointer active:scale-[0.99] transition-transform ${density === "compact" ? "p-2" : "p-3"}`}
         >
           <h4 className="font-heading text-accent text-sm">{note.title}</h4>
           {note.content && (
-            <>
-              <p
-                className={`text-xs text-foreground/80 mt-1 ${expandedPreviews.has(note.id) ? "" : "line-clamp-2"}`}
-              >
-                {note.content}
-              </p>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  togglePreview(note.id);
-                }}
-                className="text-[0.65rem] text-accent mt-0.5"
-              >
-                {expandedPreviews.has(note.id) ? "ver menos" : "ver más"}
-              </button>
-            </>
+            <p className="text-xs text-foreground/80 mt-1 line-clamp-2">
+              {stripMarkdown(note.content)}
+            </p>
           )}
           {note.fields &&
             Object.entries(note.fields).some(([, v]) => v) && (
@@ -309,6 +287,61 @@ export function NoteList({
             </button>
           </div>
         </div>
+      </Modal>
+
+      {/* Note View Modal */}
+      <Modal
+        open={!!viewingId && !formOpen}
+        onClose={() => setViewingId(null)}
+        title={notes.find((n) => n.id === viewingId)?.title ?? ""}
+      >
+        {(() => {
+          const note = notes.find((n) => n.id === viewingId);
+          if (!note) return null;
+          return (
+            <div className="space-y-3">
+              {note.content && (
+                <Markdown className="text-sm">{note.content}</Markdown>
+              )}
+              {note.fields &&
+                Object.entries(note.fields).some(([, v]) => v) && (
+                  <div className="flex flex-wrap gap-1">
+                    {Object.entries(note.fields)
+                      .filter(([, v]) => v)
+                      .map(([k, v]) => (
+                        <span
+                          key={k}
+                          className="text-[0.6rem] px-1.5 py-0.5 bg-accent/10 text-accent rounded"
+                        >
+                          {k}: {v}
+                        </span>
+                      ))}
+                  </div>
+                )}
+              {note.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {note.tags.map((t) => (
+                    <span
+                      key={t}
+                      className="text-[0.6rem] px-1.5 py-0.5 bg-background text-muted rounded"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <button
+                onClick={() => {
+                  openEdit(note);
+                  setViewingId(null);
+                }}
+                className="text-xs text-accent hover:underline"
+              >
+                Editar
+              </button>
+            </div>
+          );
+        })()}
       </Modal>
     </div>
   );
