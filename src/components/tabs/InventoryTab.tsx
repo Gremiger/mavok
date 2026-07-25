@@ -5,9 +5,11 @@ import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { GhostChip } from "@/components/ui/GhostChip";
+import { Markdown } from "@/components/ui/Markdown";
 import { AttackFormModal } from "@/components/combat/AttackFormModal";
 import { exportInventoryCSV } from "@/lib/export";
 import { formatModifier, simplifyCurrency } from "@/lib/utils";
+import { resolveItemDescription } from "@/lib/inventory";
 import { toast } from "sonner";
 import { Sword, Shield, Wrench, FlaskConical, Heart, Plus, SearchX } from "lucide-react";
 import type { InventoryItem, GrantedAction } from "@/lib/types";
@@ -437,10 +439,10 @@ export function InventoryTab() {
 
                 {expandedItem === item.id && (
                   <div className="px-3 pb-3 border-t border-border pt-2 space-y-2">
-                    {item.description && (
-                      <p className="text-xs text-foreground/80">
-                        {item.description}
-                      </p>
+                    {resolveItemDescription(item) && (
+                      <Markdown className="text-xs text-foreground/80">
+                        {resolveItemDescription(item)}
+                      </Markdown>
                     )}
                     {!!item.magicBonus && (
                       <p className="text-xs text-accent">
