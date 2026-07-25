@@ -7,7 +7,6 @@ import { Tag } from "@/components/ui/Tag";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { GhostChip } from "@/components/ui/GhostChip";
 import { Markdown } from "@/components/ui/Markdown";
-import { stripMarkdown } from "@/lib/markdown";
 import { Plus, ScrollText } from "lucide-react";
 import type { QuestEntry } from "@/lib/types";
 import { toast } from "sonner";
@@ -151,9 +150,9 @@ export function QuestList({
             <p className="text-xs text-muted mt-1">De: {quest.givenBy}</p>
           )}
           {quest.content && (
-            <p className="text-xs text-foreground/80 mt-1 line-clamp-2">
-              {stripMarkdown(quest.content)}
-            </p>
+            <Markdown className="text-xs text-foreground/80 mt-1 line-clamp-2">
+              {quest.content}
+            </Markdown>
           )}
           {quest.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">

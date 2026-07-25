@@ -5,7 +5,6 @@ import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Markdown } from "@/components/ui/Markdown";
-import { stripMarkdown } from "@/lib/markdown";
 import { Plus, Map, Users } from "lucide-react";
 import type { NoteEntry } from "@/lib/types";
 import { toast } from "sonner";
@@ -118,9 +117,9 @@ export function NoteList({
         >
           <h4 className="font-heading text-accent text-sm">{note.title}</h4>
           {note.content && (
-            <p className="text-xs text-foreground/80 mt-1 line-clamp-2">
-              {stripMarkdown(note.content)}
-            </p>
+            <Markdown className="text-xs text-foreground/80 mt-1 line-clamp-2">
+              {note.content}
+            </Markdown>
           )}
           {note.fields &&
             Object.entries(note.fields).some(([, v]) => v) && (
