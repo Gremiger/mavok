@@ -178,6 +178,33 @@ function extractGear() {
   const raw = JSON.parse(
     fs.readFileSync(path.join(TOOLS_DIR, "items.json"), "utf-8")
   );
+
+  // 5etools refs packContents entries as "name|source" (lowercased). Build a
+  // lookup over every item in the file (not just XPHB gear) so refs to items
+  // in other categories still resolve to their real display name.
+  const itemsByRef = new Map<string, string>();
+  for (const i of raw.item as Record<string, unknown>[]) {
+    const name = i.name as string;
+    const source = ((i.source as string) || "").toLowerCase();
+    itemsByRef.set(`${name.toLowerCase()}|${source}`, name);
+  }
+
+  function resolvePackContents(
+    packContents: unknown[] | undefined
+  ): { name: string; quantity: number }[] | null {
+    if (!packContents || packContents.length === 0) return null;
+    return packContents.map((entry) => {
+      if (typeof entry === "string") {
+        return { name: itemsByRef.get(entry) ?? entry, quantity: 1 };
+      }
+      const obj = entry as { item: string; quantity: number };
+      return {
+        name: itemsByRef.get(obj.item) ?? obj.item,
+        quantity: obj.quantity,
+      };
+    });
+  }
+
   const gear = raw.item
     .filter(
       (i: Record<string, unknown>) =>
@@ -188,6 +215,9 @@ function extractGear() {
       weight: typeof i.weight === "number" ? i.weight : null,
       value: typeof i.value === "number" ? i.value / 100 : null,
       description: flattenEntries((i.entries as unknown[]) || []),
+      packContents: resolvePackContents(
+        i.packContents as unknown[] | undefined
+      ),
     }));
 
   const ts = `export interface GearData {
@@ -195,6 +225,7 @@ function extractGear() {
   weight: number | null;
   value: number | null;
   description: string;
+  packContents: { name: string; quantity: number }[] | null;
 }
 
 export const GEAR: GearData[] = ${JSON.stringify(gear, null, 2)};
