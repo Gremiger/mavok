@@ -18,6 +18,8 @@ import { GEAR } from "@/data/gear";
 import { MASTERY_PROPERTIES } from "@/data/mastery";
 import { FEATS } from "@/data/feats";
 import { SPELLS } from "@/data/spells";
+import { MAGIC_ITEMS } from "@/data/magic-items";
+import { VARIANT_RULES } from "@/data/variant-rules";
 import {
   CONDITIONS_ES,
   ACTIONS_ES,
@@ -37,6 +39,8 @@ const CATEGORIES = [
   { id: "mastery", label: "Maestrías" },
   { id: "feats", label: "Dotes" },
   { id: "spells", label: "Hechizos" },
+  { id: "magicItems", label: "Objetos mágicos" },
+  { id: "rules", label: "Reglas" },
 ] as const;
 
 type Category = (typeof CATEGORIES)[number]["id"];
@@ -181,6 +185,41 @@ function buildSpellItems(): EncyclopediaItem[] {
   }));
 }
 
+const RARITY_ES: Record<string, string> = {
+  common: "Común",
+  uncommon: "Poco común",
+  rare: "Raro",
+  "very rare": "Muy raro",
+  legendary: "Legendario",
+  artifact: "Artefacto",
+};
+
+const ITEM_TYPE_ES: Record<string, string> = {
+  weapon: "Arma",
+  armor: "Armadura",
+  wondrous: "Maravilloso",
+};
+
+function buildMagicItemItems(): EncyclopediaItem[] {
+  return mapItems("magicItems", MAGIC_ITEMS, (m) => ({
+    hint: RARITY_ES[m.rarity] || m.rarity,
+    statBlock: [
+      { label: "Rareza", value: RARITY_ES[m.rarity] || m.rarity },
+      { label: "Tipo", value: ITEM_TYPE_ES[m.itemType] || m.itemType },
+      m.requiresAttunement ? { label: "Sintonización", value: "Sí" } : null,
+    ].filter((row): row is { label: string; value: string } => row !== null),
+    description: m.description,
+  }));
+}
+
+function buildRuleItems(): EncyclopediaItem[] {
+  return mapItems("rules", VARIANT_RULES, (r) => ({
+    hint: "",
+    statBlock: [],
+    description: r.description,
+  }));
+}
+
 const CATEGORY_ITEMS: Record<Category, () => EncyclopediaItem[]> = {
   conditions: buildConditionItems,
   actions: buildActionItems,
@@ -191,6 +230,8 @@ const CATEGORY_ITEMS: Record<Category, () => EncyclopediaItem[]> = {
   mastery: buildMasteryItems,
   feats: buildFeatItems,
   spells: buildSpellItems,
+  magicItems: buildMagicItemItems,
+  rules: buildRuleItems,
 };
 
 export function EncyclopediaTab() {
