@@ -268,8 +268,8 @@ export function AttackRow({
                 <div className="text-foreground/70 mt-1 pl-2 border-l border-border">
                   <span className="text-accent font-heading">
                     {viewingMasteryCondition}:
-                  </span>{" "}
-                  <Markdown className="inline">
+                  </span>
+                  <Markdown>
                     {CONDITIONS.find(
                       (c) => c.name === viewingMasteryCondition
                     )?.description ?? ""}

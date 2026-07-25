@@ -271,8 +271,8 @@ export function CombatTab() {
           <div className="text-xs text-foreground/80 bg-card/50 border border-border rounded-lg p-2">
             <span className="font-heading text-accent">
               {viewingCondition}:
-            </span>{" "}
-            <Markdown className="inline">
+            </span>
+            <Markdown>
               {CONDITIONS.find((c) => c.name === viewingCondition)
                 ?.description ?? ""}
             </Markdown>
