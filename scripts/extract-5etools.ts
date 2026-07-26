@@ -276,6 +276,66 @@ export const VARIANT_RULES: VariantRuleData[] = ${JSON.stringify(rules, null, 2)
   console.log(`Variant rules: ${rules.length}`);
 }
 
+// --- Species (XPHB) ---
+function extractSpecies() {
+  const raw = JSON.parse(
+    fs.readFileSync(path.join(TOOLS_DIR, "races.json"), "utf-8")
+  );
+  const sizeMap: Record<string, string> = {
+    T: "Diminuto",
+    S: "Pequeño",
+    M: "Mediano",
+    L: "Grande",
+    H: "Enorme",
+  };
+  const species = raw.race
+    .filter((r: Record<string, unknown>) => r.source === "XPHB")
+    .map((r: Record<string, unknown>) => {
+      const sizes = (r.size as string[]) || ["M"];
+      return {
+        name: r.name as string,
+        size: sizes.map((s) => sizeMap[s] || s).join("/"),
+        speed: typeof r.speed === "number" ? r.speed : 30,
+        description: flattenEntries((r.entries as unknown[]) || []),
+      };
+    });
+
+  const ts = `export interface SpeciesData {
+  name: string;
+  size: string;
+  speed: number;
+  description: string;
+}
+
+export const SPECIES: SpeciesData[] = ${JSON.stringify(species, null, 2)};
+`;
+  fs.writeFileSync(path.join(OUT_DIR, "species.ts"), ts);
+  console.log(`Species: ${species.length}`);
+}
+
+// --- Backgrounds (XPHB) ---
+function extractBackgrounds() {
+  const raw = JSON.parse(
+    fs.readFileSync(path.join(TOOLS_DIR, "backgrounds.json"), "utf-8")
+  );
+  const backgrounds = raw.background
+    .filter((b: Record<string, unknown>) => b.source === "XPHB")
+    .map((b: Record<string, unknown>) => ({
+      name: b.name as string,
+      description: flattenEntries((b.entries as unknown[]) || []),
+    }));
+
+  const ts = `export interface BackgroundData {
+  name: string;
+  description: string;
+}
+
+export const BACKGROUNDS: BackgroundData[] = ${JSON.stringify(backgrounds, null, 2)};
+`;
+  fs.writeFileSync(path.join(OUT_DIR, "backgrounds.ts"), ts);
+  console.log(`Backgrounds: ${backgrounds.length}`);
+}
+
 // --- Actions ---
 function extractActions() {
   const raw = JSON.parse(
@@ -719,6 +779,8 @@ extractMastery();
 extractFeats();
 extractMagicItems();
 extractVariantRules();
+extractSpecies();
+extractBackgrounds();
 extractBarbarianProgression();
 extractSubclasses();
 console.log("\nDone!");
