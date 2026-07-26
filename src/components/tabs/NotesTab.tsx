@@ -131,6 +131,14 @@ export function NotesTab() {
     setSearchQuery("");
   }
 
+  function handleNavigate(
+    section: "world" | "npcs" | "quests" | "journal",
+    id: string
+  ) {
+    setActiveSubTab(section);
+    setPendingOpenId(id);
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Search bar */}
@@ -225,16 +233,26 @@ export function NotesTab() {
           <>
             {activeSubTab === "quick" && <QuickNotes />}
             {activeSubTab === "world" && (
-              <NoteList section="world" title="Mundo" initialOpenId={pendingOpenId} />
+              <NoteList
+                section="world"
+                title="Mundo"
+                initialOpenId={pendingOpenId}
+                onNavigate={handleNavigate}
+              />
             )}
             {activeSubTab === "npcs" && (
-              <NoteList section="npcs" title="NPCs" initialOpenId={pendingOpenId} />
+              <NoteList
+                section="npcs"
+                title="NPCs"
+                initialOpenId={pendingOpenId}
+                onNavigate={handleNavigate}
+              />
             )}
             {activeSubTab === "quests" && (
-              <QuestList initialOpenId={pendingOpenId} />
+              <QuestList initialOpenId={pendingOpenId} onNavigate={handleNavigate} />
             )}
             {activeSubTab === "journal" && (
-              <JournalList initialOpenId={pendingOpenId} />
+              <JournalList initialOpenId={pendingOpenId} onNavigate={handleNavigate} />
             )}
           </>
         )}

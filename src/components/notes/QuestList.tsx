@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { Tag } from "@/components/ui/Tag";
@@ -10,6 +10,11 @@ import { Markdown } from "@/components/ui/Markdown";
 import { Plus, ScrollText } from "lucide-react";
 import type { QuestEntry } from "@/lib/types";
 import { toast } from "sonner";
+import {
+  buildLinkableNotes,
+  linkifyMentions,
+  parseNoteLink,
+} from "@/lib/note-links";
 
 const STATUS_CONFIG = {
   active: { label: "Activa", variant: "default" as const },
@@ -21,8 +26,13 @@ type StatusFilter = "all" | QuestEntry["status"];
 
 export function QuestList({
   initialOpenId,
+  onNavigate,
 }: {
   initialOpenId?: string;
+  onNavigate?: (
+    section: "world" | "npcs" | "quests" | "journal",
+    id: string
+  ) => void;
 } = {}) {
   const { character, addQuest, updateQuest, removeQuest } =
     useCharacterContext();
@@ -39,12 +49,11 @@ export function QuestList({
     status: "active" as QuestEntry["status"],
   });
 
-  useEffect(() => {
-    if (!character || !initialOpenId) return;
-    const quest = character.notes.quests.find((q) => q.id === initialOpenId);
-    if (quest) openEdit(quest);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialOpenId]);
+  const [prevInitialOpenId, setPrevInitialOpenId] = useState(initialOpenId);
+  if (initialOpenId !== prevInitialOpenId) {
+    setPrevInitialOpenId(initialOpenId);
+    if (initialOpenId) setViewingId(initialOpenId);
+  }
 
   if (!character) return null;
 
@@ -295,7 +304,18 @@ export function QuestList({
                 <p className="text-xs text-muted">De: {quest.givenBy}</p>
               )}
               {quest.content && (
-                <Markdown className="text-sm">{quest.content}</Markdown>
+                <Markdown
+                  className="text-sm"
+                  onInternalLink={(href) => {
+                    const link = parseNoteLink(href);
+                    if (link) onNavigate?.(link.section, link.id);
+                  }}
+                >
+                  {linkifyMentions(
+                    quest.content,
+                    buildLinkableNotes(character.notes)
+                  )}
+                </Markdown>
               )}
               {quest.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1">

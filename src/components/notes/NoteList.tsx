@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -8,15 +8,25 @@ import { Markdown } from "@/components/ui/Markdown";
 import { Plus, Map, Users } from "lucide-react";
 import type { NoteEntry } from "@/lib/types";
 import { toast } from "sonner";
+import {
+  buildLinkableNotes,
+  linkifyMentions,
+  parseNoteLink,
+} from "@/lib/note-links";
 
 export function NoteList({
   section,
   title,
   initialOpenId,
+  onNavigate,
 }: {
   section: "world" | "npcs";
   title: string;
   initialOpenId?: string;
+  onNavigate?: (
+    section: "world" | "npcs" | "quests" | "journal",
+    id: string
+  ) => void;
 }) {
   const { character, addNote, updateNote, removeNote } =
     useCharacterContext();
@@ -31,13 +41,11 @@ export function NoteList({
   });
   const [newFieldKey, setNewFieldKey] = useState("");
   const [viewingId, setViewingId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!character || !initialOpenId) return;
-    const note = character.notes[section].find((n) => n.id === initialOpenId);
-    if (note) openEdit(note);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialOpenId]);
+  const [prevInitialOpenId, setPrevInitialOpenId] = useState(initialOpenId);
+  if (initialOpenId !== prevInitialOpenId) {
+    setPrevInitialOpenId(initialOpenId);
+    if (initialOpenId) setViewingId(initialOpenId);
+  }
 
   if (!character) return null;
 
@@ -300,7 +308,18 @@ export function NoteList({
           return (
             <div className="space-y-3">
               {note.content && (
-                <Markdown className="text-sm">{note.content}</Markdown>
+                <Markdown
+                  className="text-sm"
+                  onInternalLink={(href) => {
+                    const link = parseNoteLink(href);
+                    if (link) onNavigate?.(link.section, link.id);
+                  }}
+                >
+                  {linkifyMentions(
+                    note.content,
+                    buildLinkableNotes(character.notes)
+                  )}
+                </Markdown>
               )}
               {note.fields &&
                 Object.entries(note.fields).some(([, v]) => v) && (

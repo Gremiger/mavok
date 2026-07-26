@@ -8,11 +8,21 @@ import { Markdown } from "@/components/ui/Markdown";
 import { Plus, BookOpen } from "lucide-react";
 import type { JournalEntry } from "@/lib/types";
 import { toast } from "sonner";
+import {
+  buildLinkableNotes,
+  linkifyMentions,
+  parseNoteLink,
+} from "@/lib/note-links";
 
 export function JournalList({
   initialOpenId,
+  onNavigate,
 }: {
   initialOpenId?: string;
+  onNavigate?: (
+    section: "world" | "npcs" | "quests" | "journal",
+    id: string
+  ) => void;
 } = {}) {
   const { character, addJournalEntry, updateJournalEntry, removeJournalEntry } =
     useCharacterContext();
@@ -276,7 +286,18 @@ export function JournalList({
             <div className="space-y-3">
               <h3 className="font-heading text-accent">{viewingEntry.title}</h3>
               <p className="text-xs text-muted">{viewingEntry.date}</p>
-              <Markdown className="text-sm">{viewingEntry.content}</Markdown>
+              <Markdown
+                className="text-sm"
+                onInternalLink={(href) => {
+                  const link = parseNoteLink(href);
+                  if (link) onNavigate?.(link.section, link.id);
+                }}
+              >
+                {linkifyMentions(
+                  viewingEntry.content,
+                  buildLinkableNotes(character.notes)
+                )}
+              </Markdown>
               <div className="flex gap-3">
                 <button
                   onClick={startEdit}
