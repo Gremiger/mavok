@@ -7,9 +7,11 @@ import remarkBreaks from "remark-breaks";
 export function Markdown({
   children,
   className,
+  onInternalLink,
 }: {
   children: string;
   className?: string;
+  onInternalLink?: (href: string) => void;
 }) {
   return (
     <div className={`space-y-2 ${className ?? ""}`}>
@@ -29,6 +31,32 @@ export function Markdown({
           ol: ({ children }) => (
             <ol className="list-decimal pl-4 space-y-0.5">{children}</ol>
           ),
+          a: ({ href, children }) => {
+            if (href?.startsWith("mavok-note://") && onInternalLink) {
+              return (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onInternalLink(href);
+                  }}
+                  className="text-accent underline underline-offset-2"
+                >
+                  {children}
+                </button>
+              );
+            }
+            return (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent underline underline-offset-2"
+              >
+                {children}
+              </a>
+            );
+          },
         }}
       >
         {children}
