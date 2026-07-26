@@ -20,6 +20,8 @@ import { FEATS } from "@/data/feats";
 import { SPELLS } from "@/data/spells";
 import { MAGIC_ITEMS } from "@/data/magic-items";
 import { VARIANT_RULES } from "@/data/variant-rules";
+import { SPECIES } from "@/data/species";
+import { BACKGROUNDS } from "@/data/backgrounds";
 import {
   CONDITIONS_ES,
   ACTIONS_ES,
@@ -41,6 +43,8 @@ const CATEGORIES = [
   { id: "spells", label: "Hechizos" },
   { id: "magicItems", label: "Objetos mágicos" },
   { id: "rules", label: "Reglas" },
+  { id: "species", label: "Especies" },
+  { id: "backgrounds", label: "Trasfondos" },
 ] as const;
 
 type Category = (typeof CATEGORIES)[number]["id"];
@@ -220,6 +224,25 @@ function buildRuleItems(): EncyclopediaItem[] {
   }));
 }
 
+function buildSpeciesItems(): EncyclopediaItem[] {
+  return mapItems("species", SPECIES, (s) => ({
+    hint: `${s.size} · ${s.speed} ft`,
+    statBlock: [
+      { label: "Tamaño", value: s.size },
+      { label: "Velocidad", value: `${s.speed} ft` },
+    ],
+    description: s.description,
+  }));
+}
+
+function buildBackgroundItems(): EncyclopediaItem[] {
+  return mapItems("backgrounds", BACKGROUNDS, (b) => ({
+    hint: "",
+    statBlock: [],
+    description: b.description,
+  }));
+}
+
 const CATEGORY_ITEMS: Record<Category, () => EncyclopediaItem[]> = {
   conditions: buildConditionItems,
   actions: buildActionItems,
@@ -232,6 +255,8 @@ const CATEGORY_ITEMS: Record<Category, () => EncyclopediaItem[]> = {
   spells: buildSpellItems,
   magicItems: buildMagicItemItems,
   rules: buildRuleItems,
+  species: buildSpeciesItems,
+  backgrounds: buildBackgroundItems,
 };
 
 export function EncyclopediaTab() {
