@@ -16,12 +16,18 @@ export function flattenEntries(entries: unknown[]): string {
       parts.push(stripMarkup(e));
     } else if (typeof e === "object" && e !== null) {
       const obj = e as Record<string, unknown>;
-      if (obj.name) parts.push(`**${obj.name}:** `);
+      if (typeof obj.name === "string") {
+        const label = obj.name.endsWith(":") ? obj.name.slice(0, -1) : obj.name;
+        parts.push(`**${label}:** `);
+      }
       if (Array.isArray(obj.entries)) {
         parts.push(flattenEntries(obj.entries));
       }
       if (Array.isArray(obj.items)) {
         parts.push(flattenEntries(obj.items));
+      }
+      if (typeof obj.entry === "string") {
+        parts.push(stripMarkup(obj.entry));
       }
     }
   }

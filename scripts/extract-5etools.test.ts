@@ -50,4 +50,14 @@ describe("flattenEntries", () => {
     expect(result).toContain("2 minor beneficial properties");
     expect(result).toContain("1 major beneficial property");
   });
+
+  it("recurses into a singular `.entry` string field and doesn't double a trailing colon in the name", () => {
+    const entries = [
+      {
+        type: "list",
+        items: [{ type: "item", name: "Feat:", entry: "{@feat Tough|XPHB}" }],
+      },
+    ];
+    expect(flattenEntries(entries)).toBe("**Feat:** Tough");
+  });
 });
