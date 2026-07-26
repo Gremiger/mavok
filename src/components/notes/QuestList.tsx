@@ -40,7 +40,9 @@ export function QuestList({
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [viewingId, setViewingId] = useState<string | null>(null);
+  const [viewingId, setViewingId] = useState<string | null>(
+    initialOpenId ?? null
+  );
   const [form, setForm] = useState({
     title: "",
     content: "",

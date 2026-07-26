@@ -40,7 +40,9 @@ export function NoteList({
     fields: {} as Record<string, string>,
   });
   const [newFieldKey, setNewFieldKey] = useState("");
-  const [viewingId, setViewingId] = useState<string | null>(null);
+  const [viewingId, setViewingId] = useState<string | null>(
+    initialOpenId ?? null
+  );
   const [prevInitialOpenId, setPrevInitialOpenId] = useState(initialOpenId);
   if (initialOpenId !== prevInitialOpenId) {
     setPrevInitialOpenId(initialOpenId);

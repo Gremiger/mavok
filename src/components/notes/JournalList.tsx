@@ -28,7 +28,9 @@ export function JournalList({
     useCharacterContext();
   const { density } = useThemeContext();
   const [formOpen, setFormOpen] = useState(false);
-  const [viewingId, setViewingId] = useState<string | null>(null);
+  const [viewingId, setViewingId] = useState<string | null>(
+    initialOpenId ?? null
+  );
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     session: 1,
