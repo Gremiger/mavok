@@ -181,6 +181,8 @@ export function InventoryTab() {
               magicDamageBonus: null,
               baseWeaponName: null,
               grantedAction: null,
+              requiresAttunement: false,
+              attuned: false,
             },
           ];
         }
@@ -291,6 +293,18 @@ export function InventoryTab() {
         </div>
       </div>
 
+      {(() => {
+        const attunedCount = inventory.filter((i) => i.attuned).length;
+        if (attunedCount === 0) return null;
+        return (
+          <p
+            className={`text-xs ${attunedCount > 3 ? "text-danger" : "text-muted"}`}
+          >
+            Sintonizados: {attunedCount}/3
+          </p>
+        );
+      })()}
+
       {/* Inventory List */}
       {grouped.map((group, gi) => (
         <div key={group.value}>
@@ -346,6 +360,11 @@ export function InventoryTab() {
                         </span>
                       );
                     })()}
+                    {item.attuned && (
+                      <span className="text-[0.6rem] px-1.5 py-0.5 bg-accent/20 text-accent rounded ml-1">
+                        Sintonizado
+                      </span>
+                    )}
                   </div>
                   {(item.weight !== null || item.value !== null) && (
                     <span className="text-muted text-xs">
