@@ -7,6 +7,7 @@ import { Tag } from "@/components/ui/Tag";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { GhostChip } from "@/components/ui/GhostChip";
 import { Markdown } from "@/components/ui/Markdown";
+import { MentionTextarea } from "@/components/notes/MentionTextarea";
 import { Plus, ScrollText } from "lucide-react";
 import type { QuestEntry } from "@/lib/types";
 import { toast } from "sonner";
@@ -219,9 +220,10 @@ export function QuestList({
               <option key={n.id} value={n.title} />
             ))}
           </datalist>
-          <textarea
+          <MentionTextarea
             value={form.content}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
+            onChange={(v) => setForm({ ...form, content: v })}
+            linkables={buildLinkableNotes(character.notes)}
             placeholder="Detalles"
             rows={4}
             className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"

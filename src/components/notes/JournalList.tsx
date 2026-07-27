@@ -5,6 +5,7 @@ import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Markdown } from "@/components/ui/Markdown";
+import { MentionTextarea } from "@/components/notes/MentionTextarea";
 import { Plus, BookOpen } from "lucide-react";
 import type { JournalEntry } from "@/lib/types";
 import { toast } from "sonner";
@@ -203,11 +204,10 @@ export function JournalList({
               />
             </div>
           </div>
-          <textarea
+          <MentionTextarea
             value={form.content}
-            onChange={(e) =>
-              setForm({ ...form, content: e.target.value })
-            }
+            onChange={(v) => setForm({ ...form, content: v })}
+            linkables={buildLinkableNotes(character.notes)}
             placeholder="Resumen de la sesión..."
             rows={6}
             className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"
@@ -261,11 +261,10 @@ export function JournalList({
                   />
                 </div>
               </div>
-              <textarea
+              <MentionTextarea
                 value={editForm.content}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, content: e.target.value })
-                }
+                onChange={(v) => setEditForm({ ...editForm, content: v })}
+                linkables={buildLinkableNotes(character.notes)}
                 rows={6}
                 className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"
               />

@@ -5,6 +5,7 @@ import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Markdown } from "@/components/ui/Markdown";
+import { MentionTextarea } from "@/components/notes/MentionTextarea";
 import { Plus, Map, Users } from "lucide-react";
 import type { NoteEntry } from "@/lib/types";
 import { toast } from "sonner";
@@ -190,9 +191,10 @@ export function NoteList({
             className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground"
             autoFocus
           />
-          <textarea
+          <MentionTextarea
             value={form.content}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
+            onChange={(v) => setForm({ ...form, content: v })}
+            linkables={buildLinkableNotes(character.notes)}
             placeholder="Contenido"
             rows={4}
             className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground resize-none"
