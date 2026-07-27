@@ -64,14 +64,17 @@ behavior below — it does not auto-close on a non-matching query).
 
 ## Insertion Behavior
 
-Tapping/clicking a suggestion replaces the active mention range (the `@`
-through the caret) with `<title> ` — the full title plus one trailing
-space — and moves the caret to just after that inserted space, so the
-user can keep typing immediately. This is done by computing the new
-string in JS, calling the existing `onChange` with it, and then
-imperatively restoring the textarea's `selectionStart`/`selectionEnd` via
-a ref (React controlled inputs don't move the native caret on their own
-after a value change).
+Tapping/clicking a suggestion replaces only the **query** portion — the
+text after `@` up to the caret, not the `@` character itself — with
+`<title> ` (the full title plus one trailing space), and moves the caret
+to just after that inserted space. The `@` stays in place so the stored
+content still reads `@Bar de Nim ` — a literal `@` immediately followed
+by the title is exactly what `linkifyMentions` requires to link it later;
+dropping the `@` here would silently produce content that can never be
+linkified. This is done by computing the new string in JS, calling the
+existing `onChange` with it, and then imperatively restoring the
+textarea's `selectionStart`/`selectionEnd` via a ref (React controlled
+inputs don't move the native caret on their own after a value change).
 
 ## Closing Behavior
 
