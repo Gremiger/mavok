@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { WEAPONS } from "@/data/weapons";
 import { ARMOR } from "@/data/armor";
 import { GEAR } from "@/data/gear";
+import { MAGIC_ITEMS } from "@/data/magic-items";
 import type { InventoryItem, GrantedAction } from "@/lib/types";
 
 const CATEGORIES: { value: InventoryItem["category"]; label: string }[] = [
@@ -35,6 +36,8 @@ const EMPTY_FORM = {
   actionLimitedUses: false,
   actionTotalUses: "",
   actionRecharge: "long" as NonNullable<GrantedAction["charges"]>["recharge"],
+  requiresAttunement: false,
+  attuned: false,
 };
 
 function formFromItem(item: InventoryItem): typeof EMPTY_FORM {
@@ -61,6 +64,8 @@ function formFromItem(item: InventoryItem): typeof EMPTY_FORM {
       ? String(item.grantedAction.charges.total)
       : "",
     actionRecharge: item.grantedAction?.charges?.recharge ?? "long",
+    requiresAttunement: item.requiresAttunement,
+    attuned: item.attuned,
   };
 }
 
@@ -136,6 +141,8 @@ export function ItemFormModal({
       magicDamageBonus: magicDamageBonus ? magicDamageBonus : null,
       baseWeaponName: form.baseWeaponName.trim() || null,
       grantedAction,
+      requiresAttunement: form.requiresAttunement,
+      attuned: form.attuned,
     };
     onSave(saved);
     onClose();
@@ -188,6 +195,25 @@ export function ItemFormModal({
         value: g.value !== null ? String(g.value) : "",
         category: "gear",
         description: g.description,
+      });
+    }
+  }
+
+  function prefillFromMagicItem(itemName: string) {
+    const m = MAGIC_ITEMS.find((mi) => mi.name === itemName);
+    if (m) {
+      setForm({
+        ...form,
+        name: m.name,
+        category:
+          m.itemType === "weapon"
+            ? "weapon"
+            : m.itemType === "armor"
+              ? "armor"
+              : "gear",
+        description: m.description,
+        requiresAttunement: m.requiresAttunement,
+        attuned: false,
       });
     }
   }
@@ -253,6 +279,25 @@ export function ItemFormModal({
                 {GEAR.map((g) => (
                   <option key={g.name} value={g.name}>
                     {g.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs text-muted">Objeto mágico rápido</label>
+              <select
+                onChange={(e) => {
+                  if (e.target.value) prefillFromMagicItem(e.target.value);
+                  e.target.value = "";
+                }}
+                className="w-full bg-background border border-border rounded-lg p-2 text-sm text-foreground mt-1"
+                defaultValue=""
+              >
+                <option value="">Elegir objeto mágico...</option>
+                {MAGIC_ITEMS.map((m) => (
+                  <option key={m.name} value={m.name}>
+                    {m.name} ({m.rarity})
                   </option>
                 ))}
               </select>
@@ -352,6 +397,32 @@ export function ItemFormModal({
               ))}
             </div>
           </div>
+        )}
+
+        <label className="flex items-center gap-1.5 text-xs text-foreground">
+          <input
+            type="checkbox"
+            checked={form.requiresAttunement}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                requiresAttunement: e.target.checked,
+                attuned: e.target.checked ? form.attuned : false,
+              })
+            }
+          />
+          Requiere sintonía
+        </label>
+
+        {form.requiresAttunement && (
+          <label className="flex items-center gap-1.5 text-xs text-foreground">
+            <input
+              type="checkbox"
+              checked={form.attuned}
+              onChange={(e) => setForm({ ...form, attuned: e.target.checked })}
+            />
+            Sintonizado
+          </label>
         )}
 
         <div className="flex gap-2">
