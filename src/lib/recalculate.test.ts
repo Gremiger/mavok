@@ -20,6 +20,8 @@ function makeInventoryItem(
     magicDamageBonus: null,
     baseWeaponName: null,
     grantedAction: null,
+    requiresAttunement: false,
+    attuned: false,
     ...overrides,
   };
 }

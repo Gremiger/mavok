@@ -240,6 +240,25 @@ const MIGRATIONS: Record<number, MigrationFn> = {
 
     return d;
   },
+
+  13: (data) => {
+    const d = data as Record<string, unknown>;
+    d._version = 13;
+
+    const inventory = d.inventory as Array<Record<string, unknown>> | undefined;
+    if (Array.isArray(inventory)) {
+      for (const item of inventory) {
+        if (item.requiresAttunement === undefined) {
+          item.requiresAttunement = false;
+        }
+        if (item.attuned === undefined) {
+          item.attuned = false;
+        }
+      }
+    }
+
+    return d;
+  },
 };
 
 const BACKUP_PREFIX = "mavok_backup_pre_migration_";

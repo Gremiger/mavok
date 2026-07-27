@@ -165,4 +165,31 @@ describe("migrateCharacterData", () => {
     // v6 backfills recklessActive only when undefined — it was already true here.
     expect(result.combat.recklessActive).toBe(true);
   });
+
+  it("migration 13 backfills requiresAttunement and attuned on inventory items", () => {
+    const raw = JSON.stringify({
+      _version: 12,
+      meta: { proficiencyBonus: 2 },
+      resources: {
+        rpiRages: { total: 2, remaining: 2, slots: [true, true] },
+        stoneEndurance: { total: 2, remaining: 2 },
+      },
+      combat: { maxHp: 16, currentHp: 16 },
+      features: [],
+      inventory: [
+        { id: "inv-1", name: "Old Item" },
+        { id: "inv-2", name: "Already Set", requiresAttunement: true, attuned: true },
+      ],
+      levelUpHistory: [],
+    });
+    const { data } = migrateCharacterData(raw);
+    const result = JSON.parse(data);
+
+    expect(result._version).toBe(CURRENT_DATA_VERSION);
+    expect(result.inventory[0].requiresAttunement).toBe(false);
+    expect(result.inventory[0].attuned).toBe(false);
+    // A field the data already had is left untouched by the backfill.
+    expect(result.inventory[1].requiresAttunement).toBe(true);
+    expect(result.inventory[1].attuned).toBe(true);
+  });
 });
