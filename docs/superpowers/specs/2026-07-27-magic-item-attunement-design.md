@@ -46,7 +46,7 @@ Both default `false`. This needs:
   pattern of migration `12` at line 219) that backfills every inventory
   item with `requiresAttunement: false, attuned: false` if either field
   is undefined
-- `src/data/mavok-default.ts`'s 10 existing inventory entries updated to
+- `src/data/mavok-default.ts`'s 16 existing inventory entries updated to
   include both new fields (`requiresAttunement: false, attuned: false`),
   matching the existing inline-object-literal style already used there
 
