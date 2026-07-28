@@ -255,11 +255,7 @@ export function SettingsTab() {
             onClick={() =>
               setDiceRollMode(diceRollMode === "text" ? "3d" : "text")
             }
-            name={`Modo de tirada: ${
-              diceRollMode === "3d"
-                ? "3D (solo Dado suelto por ahora)"
-                : "Texto"
-            }`}
+            name={`Modo de tirada: ${diceRollMode === "3d" ? "3D" : "Texto"}`}
             right={<span className="text-xs text-muted">Tap para cambiar</span>}
           />
         </div>
