@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { motion } from "framer-motion";
-import type { DiceRoll } from "@/lib/dice";
+import { isD20Crit, isD20Fumble, type DiceRoll } from "@/lib/dice";
 
 export function DiceResult({
   roll,
@@ -20,10 +20,8 @@ export function DiceResult({
     return () => clearTimeout(timer);
   }, [roll.timestamp, onClear, autoCloseMs]);
 
-  const isD20 = roll.expression.startsWith("1d20");
-  const isCrit = isD20 && roll.rolls.some((r) => r === 20);
-  const isFumble =
-    isD20 && roll.rolls.length > 0 && roll.rolls.every((r) => r === 1);
+  const isCrit = isD20Crit(roll);
+  const isFumble = isD20Fumble(roll);
 
   return (
     <motion.div

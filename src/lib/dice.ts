@@ -42,3 +42,19 @@ export function rollD20WithAdvantage(modifier: number = 0): DiceRoll {
     timestamp: Date.now(),
   };
 }
+
+function isD20Roll(roll: DiceRoll): boolean {
+  return roll.expression.startsWith("1d20");
+}
+
+export function isD20Crit(roll: DiceRoll): boolean {
+  return isD20Roll(roll) && roll.rolls.some((r) => r === 20);
+}
+
+export function isD20Fumble(roll: DiceRoll): boolean {
+  return (
+    isD20Roll(roll) &&
+    roll.rolls.length > 0 &&
+    roll.rolls.every((r) => r === 1)
+  );
+}

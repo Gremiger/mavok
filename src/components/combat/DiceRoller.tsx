@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { rollDice, type DiceRoll } from "@/lib/dice";
+import { motion } from "framer-motion";
+import { rollDice, isD20Crit, isD20Fumble, type DiceRoll } from "@/lib/dice";
 
 const QUICK_DICE = ["1d4", "1d6", "1d8", "1d10", "1d12", "1d20"];
 
@@ -58,23 +59,45 @@ export function DiceRoller() {
 
       {history.length > 0 && (
         <div className="space-y-1">
-          {history.map((r, i) => (
-            <div
-              key={r.timestamp}
-              className={`flex items-center justify-between text-sm py-1 ${
-                i === 0 ? "text-foreground" : "text-muted"
-              }`}
-            >
-              <span>
-                {r.expression}: [{r.rolls.join(", ")}]
-                {r.modifier !== 0 &&
-                  ` ${r.modifier >= 0 ? "+" : ""}${r.modifier}`}
-              </span>
-              <span className={`font-heading ${i === 0 ? "text-accent" : ""}`}>
-                = {r.total}
-              </span>
-            </div>
-          ))}
+          {history.map((r, i) => {
+            const crit = isD20Crit(r);
+            const fumble = isD20Fumble(r);
+            const animateFlash = i === 0 && (crit || fumble);
+            return (
+              <motion.div
+                key={r.timestamp}
+                initial={
+                  animateFlash
+                    ? crit
+                      ? { scale: 1.15, boxShadow: "0 0 0 4px rgba(234,179,8,0.5)" }
+                      : { scale: 1.15, boxShadow: "0 0 0 4px rgba(220,38,38,0.5)" }
+                    : { scale: 1, boxShadow: "0 0 0 0 rgba(0,0,0,0)" }
+                }
+                animate={{ scale: 1, boxShadow: "0 0 0 0 rgba(0,0,0,0)" }}
+                transition={{ duration: 0.4 }}
+                className={`flex items-center justify-between text-sm py-1 ${
+                  i === 0 ? "text-foreground" : "text-muted"
+                }`}
+              >
+                <span>
+                  {r.expression}: [{r.rolls.join(", ")}]
+                  {r.modifier !== 0 &&
+                    ` ${r.modifier >= 0 ? "+" : ""}${r.modifier}`}
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className={`font-heading ${i === 0 ? "text-accent" : ""}`}>
+                    = {r.total}
+                  </span>
+                  {crit && (
+                    <span className="text-success font-heading text-xs">¡CRIT!</span>
+                  )}
+                  {fumble && (
+                    <span className="text-danger font-heading text-xs">Pifia</span>
+                  )}
+                </span>
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>
