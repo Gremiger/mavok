@@ -21,29 +21,29 @@ function makeCombat(overrides: Partial<CombatState> = {}): CombatState {
 }
 
 describe("spendHitDie", () => {
-  it("returns null when no hit dice remain", () => {
+  it("returns null when no hit dice remain", async () => {
     const combat = makeCombat({ hitDice: { total: 2, remaining: 0, die: "d12" } });
-    expect(spendHitDie(combat, 2)).toBeNull();
+    expect(await spendHitDie(combat, 2)).toBeNull();
   });
 
-  it("decrements remaining and leaves total unchanged", () => {
+  it("decrements remaining and leaves total unchanged", async () => {
     const combat = makeCombat({ hitDice: { total: 2, remaining: 2, die: "d12" } });
-    const result = spendHitDie(combat, 2);
+    const result = await spendHitDie(combat, 2);
     expect(result).not.toBeNull();
     expect(result!.combat.hitDice.remaining).toBe(1);
     expect(result!.combat.hitDice.total).toBe(2);
   });
 
-  it("clamps healed HP at maxHp regardless of the roll", () => {
+  it("clamps healed HP at maxHp regardless of the roll", async () => {
     const combat = makeCombat({ currentHp: 16, maxHp: 16 });
-    const result = spendHitDie(combat, 2);
+    const result = await spendHitDie(combat, 2);
     expect(result).not.toBeNull();
     expect(result!.combat.currentHp).toBe(16);
   });
 
-  it("healing is always at least 1", () => {
+  it("healing is always at least 1", async () => {
     const combat = makeCombat({ currentHp: 0, maxHp: 16 });
-    const result = spendHitDie(combat, -5);
+    const result = await spendHitDie(combat, -5);
     expect(result).not.toBeNull();
     expect(result!.healing).toBeGreaterThanOrEqual(1);
   });

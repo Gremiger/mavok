@@ -1,4 +1,4 @@
-import { rollDice } from "./dice";
+import { rollDiceAsync } from "./dice";
 import type { CombatState } from "./types";
 
 export interface HitDiceSpendResult {
@@ -7,12 +7,12 @@ export interface HitDiceSpendResult {
   rollTotal: number;
 }
 
-export function spendHitDie(
+export async function spendHitDie(
   combat: CombatState,
   conMod: number
-): HitDiceSpendResult | null {
+): Promise<HitDiceSpendResult | null> {
   if (combat.hitDice.remaining <= 0) return null;
-  const roll = rollDice(`1d12${conMod >= 0 ? "+" : ""}${conMod}`);
+  const roll = await rollDiceAsync(`1d12${conMod >= 0 ? "+" : ""}${conMod}`);
   const healing = Math.max(1, roll.total);
   const newHp = Math.min(combat.currentHp + healing, combat.maxHp);
   return {

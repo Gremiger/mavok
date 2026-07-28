@@ -1,5 +1,10 @@
 import type { Attack } from "./types";
-import { rollD20, rollD20WithAdvantage, rollDice, type DiceRoll } from "./dice";
+import {
+  rollD20Async,
+  rollD20WithAdvantageAsync,
+  rollDiceAsync,
+  type DiceRoll,
+} from "./dice";
 import { exhaustionPenalty } from "./exhaustion";
 
 export function isStrBasedAttack(attack: Attack): boolean {
@@ -26,20 +31,20 @@ export function computeRageBonus(
   return rageActive && isStrBasedAttack(attack) ? rageDamage : 0;
 }
 
-export function rollAttackHit(
+export async function rollAttackHit(
   attack: Attack,
   opts: { recklessActive: boolean; exhaustionLevel: number }
-): DiceRoll {
+): Promise<DiceRoll> {
   const bonus = attack.attackBonus + exhaustionPenalty(opts.exhaustionLevel);
   return opts.recklessActive && isStrBasedAttack(attack)
-    ? rollD20WithAdvantage(bonus)
-    : rollD20(bonus);
+    ? rollD20WithAdvantageAsync(bonus)
+    : rollD20Async(bonus);
 }
 
-export function rollAttackDamage(
+export async function rollAttackDamage(
   attack: Attack,
   opts: { rageActive: boolean; rageDamage: number }
-): DiceRoll {
+): Promise<DiceRoll> {
   const rageBonus = computeRageBonus(attack, opts.rageActive, opts.rageDamage);
   const dmgExpr = attack.damage.replace(/\s/g, "");
   let expr = dmgExpr;
@@ -52,5 +57,5 @@ export function rollAttackDamage(
       expr = `${expr}+${rageBonus}`;
     }
   }
-  return rollDice(expr);
+  return rollDiceAsync(expr);
 }

@@ -51,8 +51,8 @@ describe("computeRageBonus", () => {
 });
 
 describe("rollAttackHit", () => {
-  it("rolls a single d20 without reckless", () => {
-    const result = rollAttackHit(makeAttack(), {
+  it("rolls a single d20 without reckless", async () => {
+    const result = await rollAttackHit(makeAttack(), {
       recklessActive: false,
       exhaustionLevel: 0,
     });
@@ -60,8 +60,8 @@ describe("rollAttackHit", () => {
     expect(result.modifier).toBe(5);
   });
 
-  it("rolls with advantage (2 dice) when reckless on a STR-based attack", () => {
-    const result = rollAttackHit(makeAttack(), {
+  it("rolls with advantage (2 dice) when reckless on a STR-based attack", async () => {
+    const result = await rollAttackHit(makeAttack(), {
       recklessActive: true,
       exhaustionLevel: 0,
     });
@@ -69,17 +69,17 @@ describe("rollAttackHit", () => {
     expect(result.modifier).toBe(5);
   });
 
-  it("does not grant advantage on a Finesse weapon even if reckless", () => {
+  it("does not grant advantage on a Finesse weapon even if reckless", async () => {
     const finesse = makeAttack({ properties: ["Finesse"] });
-    const result = rollAttackHit(finesse, {
+    const result = await rollAttackHit(finesse, {
       recklessActive: true,
       exhaustionLevel: 0,
     });
     expect(result.rolls).toHaveLength(1);
   });
 
-  it("subtracts the exhaustion penalty from the modifier", () => {
-    const result = rollAttackHit(makeAttack(), {
+  it("subtracts the exhaustion penalty from the modifier", async () => {
+    const result = await rollAttackHit(makeAttack(), {
       recklessActive: false,
       exhaustionLevel: 3,
     });
@@ -88,25 +88,25 @@ describe("rollAttackHit", () => {
 });
 
 describe("rollAttackDamage", () => {
-  it("uses the base damage modifier with no rage", () => {
-    const result = rollAttackDamage(makeAttack(), {
+  it("uses the base damage modifier with no rage", async () => {
+    const result = await rollAttackDamage(makeAttack(), {
       rageActive: false,
       rageDamage: 2,
     });
     expect(result.modifier).toBe(3);
   });
 
-  it("folds the rage bonus into the modifier for a STR-based attack", () => {
-    const result = rollAttackDamage(makeAttack(), {
+  it("folds the rage bonus into the modifier for a STR-based attack", async () => {
+    const result = await rollAttackDamage(makeAttack(), {
       rageActive: true,
       rageDamage: 2,
     });
     expect(result.modifier).toBe(5);
   });
 
-  it("does not add a rage bonus for a Finesse attack", () => {
+  it("does not add a rage bonus for a Finesse attack", async () => {
     const finesse = makeAttack({ properties: ["Finesse"], damage: "1d6+2" });
-    const result = rollAttackDamage(finesse, {
+    const result = await rollAttackDamage(finesse, {
       rageActive: true,
       rageDamage: 2,
     });
