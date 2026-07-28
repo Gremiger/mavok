@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { isD20Crit, isD20Fumble, type DiceRoll } from "./dice";
+import {
+  isD20Crit,
+  isD20Fumble,
+  parseExpression,
+  generateFaces,
+  composeRoll,
+  type DiceRoll,
+} from "./dice";
 
 function makeRoll(overrides: Partial<DiceRoll> = {}): DiceRoll {
   return {
@@ -11,6 +18,68 @@ function makeRoll(overrides: Partial<DiceRoll> = {}): DiceRoll {
     ...overrides,
   };
 }
+
+describe("parseExpression", () => {
+  it("parses count, faces, and a positive modifier", () => {
+    expect(parseExpression("2d6+3")).toEqual({
+      count: 2,
+      faces: 6,
+      modifier: 3,
+    });
+  });
+
+  it("parses a negative modifier", () => {
+    expect(parseExpression("1d20-2")).toEqual({
+      count: 1,
+      faces: 20,
+      modifier: -2,
+    });
+  });
+
+  it("defaults modifier to 0 when absent", () => {
+    expect(parseExpression("1d12")).toEqual({
+      count: 1,
+      faces: 12,
+      modifier: 0,
+    });
+  });
+
+  it("throws on an invalid expression", () => {
+    expect(() => parseExpression("not-dice")).toThrow(
+      "Invalid dice expression: not-dice"
+    );
+  });
+});
+
+describe("generateFaces", () => {
+  it("generates the requested count of rolls", () => {
+    expect(generateFaces(3, 6)).toHaveLength(3);
+  });
+
+  it("generates values within 1..faces", () => {
+    const rolls = generateFaces(50, 6);
+    for (const r of rolls) {
+      expect(r).toBeGreaterThanOrEqual(1);
+      expect(r).toBeLessThanOrEqual(6);
+    }
+  });
+});
+
+describe("composeRoll", () => {
+  it("sums the rolls and adds the modifier", () => {
+    const result = composeRoll("2d6+3", [4, 5], 3);
+    expect(result.total).toBe(12);
+    expect(result.expression).toBe("2d6+3");
+    expect(result.rolls).toEqual([4, 5]);
+    expect(result.modifier).toBe(3);
+  });
+
+  it("stamps a timestamp", () => {
+    const before = Date.now();
+    const result = composeRoll("1d6+0", [3], 0);
+    expect(result.timestamp).toBeGreaterThanOrEqual(before);
+  });
+});
 
 describe("isD20Crit", () => {
   it("returns true for a natural 20 on a d20 roll", () => {
