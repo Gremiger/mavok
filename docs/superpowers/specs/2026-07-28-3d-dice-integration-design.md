@@ -22,10 +22,14 @@ tarball was downloaded and inspected directly:
   back to copying into `<repo>/public/assets` if nothing answers —
   works fine non-interactively, just adds a ~10s pause the first time.
   `public/assets/` doesn't exist yet in this repo (no collision).
-- **npm 11** (this project's version) blocks lifecycle scripts for
-  newly-installed packages by default — `npm approve-scripts` will be
-  needed after `npm install @3d-dice/dice-box`, or the asset copy won't
-  run at all.
+- **npm 11** (this project's version) prints a warning about
+  unreviewed install scripts, but `npm help approve-scripts` confirms
+  this gate is currently advisory only — "install scripts still run by
+  default" — so `dice-box`'s postinstall runs automatically on
+  `npm install`, no approval step required for it to work. Running
+  `npm approve-scripts @3d-dice/dice-box` afterward is still good
+  practice (records it in `package.json`'s `allowScripts`, silences the
+  warning on future installs) but isn't load-bearing.
 - **Constructor/API** (confirmed by reading `dist/dice-box.es.js`
   directly): `new DiceBox("#dice-box-canvas", { assetPath: "/assets/" })`,
   then `await box.init()`. Critically — `box.roll(notation)` **returns
@@ -222,13 +226,14 @@ sub-project 3.
 
 ## Setup Steps (not code, but required before this can work)
 
-1. `npm install @3d-dice/dice-box@1.1.4`
-2. Answer the postinstall's asset-destination prompt (or let it
-   timeout after 10s) — either way it lands in `public/assets/`
-3. `npm approve-scripts @3d-dice/dice-box` (or equivalent) so the
-   postinstall actually runs on future clean installs / CI
-4. Verify `public/assets/ammo/ammo.wasm.wasm` and
+1. `npm install @3d-dice/dice-box@1.1.4` — the postinstall runs
+   automatically (advisory-only gate, confirmed above); its prompt
+   times out after 10s and defaults to `public/assets/`
+2. Verify `public/assets/ammo/ammo.wasm.wasm` and
    `public/assets/themes/default/...` exist after install
+3. Optionally run `npm approve-scripts @3d-dice/dice-box` to record it
+   in `package.json`'s `allowScripts` and silence the install warning
+   on future clean installs — not required for this to work today
 
 ## Testing
 
