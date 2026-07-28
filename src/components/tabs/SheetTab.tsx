@@ -10,7 +10,7 @@ import { FeatsBrowserModal } from "@/components/sheet/FeatsBrowserModal";
 import { Markdown } from "@/components/ui/Markdown";
 import { User } from "lucide-react";
 import type { AbilityScore } from "@/lib/types";
-import { rollD20, rollD20WithAdvantage, type DiceRoll } from "@/lib/dice";
+import { rollD20Async, rollD20WithAdvantageAsync, type DiceRoll } from "@/lib/dice";
 import { describeWeaponMastery } from "@/lib/weaponMatch";
 import { exhaustionPenalty } from "@/lib/exhaustion";
 import {
@@ -71,35 +71,35 @@ export function SheetTab() {
   const passiveInsight = 10 + skillTotal(character, 'insight');
   const passiveInvestigation = 10 + skillTotal(character, 'investigation');
 
-  function rollAbility(ab: AbilityScore) {
+  async function rollAbility(ab: AbilityScore) {
     const mod = abilityModifier(attributes[ab]) + exhaustionPenalty(combat.exhaustionLevel);
-    const result = rollD20(mod);
+    const result = await rollD20Async(mod);
     setActiveRoll({ key: `ability-${ab}`, roll: result });
   }
 
-  function rollSave(ab: AbilityScore) {
+  async function rollSave(ab: AbilityScore) {
     const total = saveTotal(character!, ab) + exhaustionPenalty(combat.exhaustionLevel);
     const result =
       ab === "dex" && hasDangerSense
-        ? rollD20WithAdvantage(total)
-        : rollD20(total);
+        ? await rollD20WithAdvantageAsync(total)
+        : await rollD20Async(total);
     setActiveRoll({ key: `save-${ab}`, roll: result });
   }
 
-  function rollSkill(key: string) {
+  async function rollSkill(key: string) {
     const total = skillTotal(character!, key) + exhaustionPenalty(combat.exhaustionLevel);
-    const result = rollD20(total);
+    const result = await rollD20Async(total);
     setActiveRoll({ key: `skill-${key}`, roll: result });
   }
 
-  function rollSkillStr(key: string) {
+  async function rollSkillStr(key: string) {
     const skill = skills[key];
     const strMod = abilityModifier(attributes.str);
     const total =
       strMod +
       (skill?.proficient ? meta.proficiencyBonus : 0) +
       exhaustionPenalty(combat.exhaustionLevel);
-    const result = rollD20(total);
+    const result = await rollD20Async(total);
     setActiveRoll({ key: `skill-str-${key}`, roll: result });
   }
 

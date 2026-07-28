@@ -83,13 +83,13 @@ export function AttackRow({
     return attack.damage;
   }
 
-  function handleRollHit() {
-    const result = rollAttackHit(attack, { recklessActive, exhaustionLevel });
+  async function handleRollHit() {
+    const result = await rollAttackHit(attack, { recklessActive, exhaustionLevel });
     setLastRoll({ roll: result, type: "hit" });
   }
 
-  function handleRollDamage() {
-    const result = rollAttackDamage(attack, { rageActive, rageDamage });
+  async function handleRollDamage() {
+    const result = await rollAttackDamage(attack, { rageActive, rageDamage });
     setLastRoll({ roll: result, type: "damage" });
   }
 

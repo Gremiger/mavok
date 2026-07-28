@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { rollDice, isD20Crit, isD20Fumble, type DiceRoll } from "@/lib/dice";
+import { rollDiceAsync, isD20Crit, isD20Fumble, type DiceRoll } from "@/lib/dice";
 
 const QUICK_DICE = ["1d4", "1d6", "1d8", "1d10", "1d12", "1d20"];
 
@@ -10,9 +10,9 @@ export function DiceRoller() {
   const [history, setHistory] = useState<DiceRoll[]>([]);
   const [custom, setCustom] = useState("");
 
-  function roll(expression: string) {
+  async function roll(expression: string) {
     try {
-      const result = rollDice(expression);
+      const result = await rollDiceAsync(expression);
       setHistory((prev) => [result, ...prev].slice(0, 5));
     } catch {
       // invalid expression, ignore

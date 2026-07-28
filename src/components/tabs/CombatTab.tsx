@@ -23,7 +23,7 @@ import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
 import type { Attack, InventoryItem } from "@/lib/types";
 import { formatModifier, getEquippedGrantedActions } from "@/lib/utils";
 import { computeAttackMagicBonus, sumMagicBonus } from "@/lib/recalculate";
-import { rollD20, type DiceRoll } from "@/lib/dice";
+import { rollD20Async, type DiceRoll } from "@/lib/dice";
 import { exhaustionPenalty } from "@/lib/exhaustion";
 import { toggleVersatileDamage } from "@/lib/attackRoll";
 import { toast } from "sonner";
@@ -183,9 +183,9 @@ export function CombatTab() {
   const speedReduction = 5 * combat.exhaustionLevel;
   const effectiveSpeed = Math.max(0, combat.speed - speedReduction);
 
-  function rollInitiative() {
+  async function rollInitiative() {
     const total = combat.initiative + exhaustionPenalty(combat.exhaustionLevel);
-    setInitiativeRoll(rollD20(total));
+    setInitiativeRoll(await rollD20Async(total));
   }
 
   return (

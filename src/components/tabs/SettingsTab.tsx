@@ -87,8 +87,8 @@ export function SettingsTab() {
     });
   }
 
-  function spendHitDie() {
-    const result = computeHitDieSpend(character!.combat, conMod);
+  async function spendHitDie() {
+    const result = await computeHitDieSpend(character!.combat, conMod);
     if (!result) return;
     updateCombat(result.combat);
     setShortRestLog((prev) => [

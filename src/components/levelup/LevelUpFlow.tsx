@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useCharacterContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
-import { rollDice } from "@/lib/dice";
+import { rollDiceAsync } from "@/lib/dice";
 import {
   abilityModifier,
   formatModifier,
@@ -115,8 +115,8 @@ export function LevelUpFlow({
     if (idx < steps.length - 1) setStep(steps[idx + 1]);
   }
 
-  function rollHp() {
-    const result = rollDice("1d12+0");
+  async function rollHp() {
+    const result = await rollDiceAsync("1d12+0");
     setHpRoll(result.rolls[0]);
   }
 
