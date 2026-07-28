@@ -1,4 +1,10 @@
-import { parseExpression, composeRoll, rollDice, type DiceRoll } from "./dice";
+import {
+  parseExpression,
+  composeRoll,
+  rollDice,
+  rollD20WithAdvantage,
+  type DiceRoll,
+} from "./dice";
 import { roll3D, hide3D } from "./diceBox";
 import type { AppSettings } from "./types";
 
@@ -25,4 +31,34 @@ export async function rollDiceMode(
     }
   }
   return { roll: rollDice(expression), usedFallback: mode === "3d" };
+}
+
+export async function rollD20Mode(
+  modifier: number,
+  mode: AppSettings["diceRollMode"]
+): Promise<RollWithModeResult> {
+  return rollDiceMode(`1d20${modifier >= 0 ? "+" : ""}${modifier}`, mode);
+}
+
+export async function rollD20WithAdvantageMode(
+  modifier: number,
+  mode: AppSettings["diceRollMode"]
+): Promise<RollWithModeResult> {
+  if (mode === "3d") {
+    try {
+      const faceValues = await roll3D(2, 20);
+      const roll: DiceRoll = {
+        expression: `1d20adv${modifier >= 0 ? "+" : ""}${modifier}`,
+        rolls: faceValues,
+        modifier,
+        total: Math.max(...faceValues) + modifier,
+        timestamp: Date.now(),
+      };
+      setTimeout(() => hide3D(), 1500);
+      return { roll, usedFallback: false };
+    } catch {
+      // Falls through to the text path below.
+    }
+  }
+  return { roll: rollD20WithAdvantage(modifier), usedFallback: mode === "3d" };
 }
