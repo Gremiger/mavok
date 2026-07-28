@@ -23,7 +23,8 @@ import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
 import type { Attack, InventoryItem } from "@/lib/types";
 import { formatModifier, getEquippedGrantedActions } from "@/lib/utils";
 import { computeAttackMagicBonus, sumMagicBonus } from "@/lib/recalculate";
-import { rollD20Async, type DiceRoll } from "@/lib/dice";
+import type { DiceRoll } from "@/lib/dice";
+import { rollD20Mode } from "@/lib/rollWithMode";
 import { exhaustionPenalty } from "@/lib/exhaustion";
 import { toggleVersatileDamage } from "@/lib/attackRoll";
 import { toast } from "sonner";
@@ -45,7 +46,7 @@ export function CombatTab() {
     moveAttack,
     updateInventoryItem,
   } = useCharacterContext();
-  const { magicItemIndicator } = useThemeContext();
+  const { magicItemIndicator, diceRollMode } = useThemeContext();
   const [hpModalOpen, setHpModalOpen] = useState(false);
   const [conditionModalOpen, setConditionModalOpen] = useState(false);
   const [viewingCondition, setViewingCondition] = useState<string | null>(
@@ -185,7 +186,8 @@ export function CombatTab() {
 
   async function rollInitiative() {
     const total = combat.initiative + exhaustionPenalty(combat.exhaustionLevel);
-    setInitiativeRoll(await rollD20Async(total));
+    const { roll } = await rollD20Mode(total, diceRollMode);
+    setInitiativeRoll(roll);
   }
 
   return (
