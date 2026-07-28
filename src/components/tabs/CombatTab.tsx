@@ -23,6 +23,8 @@ import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
 import type { Attack, InventoryItem } from "@/lib/types";
 import { formatModifier, getEquippedGrantedActions } from "@/lib/utils";
 import { computeAttackMagicBonus, sumMagicBonus } from "@/lib/recalculate";
+import { rollD20, type DiceRoll } from "@/lib/dice";
+import { exhaustionPenalty } from "@/lib/exhaustion";
 import { toggleVersatileDamage } from "@/lib/attackRoll";
 import { toast } from "sonner";
 
@@ -64,6 +66,7 @@ export function CombatTab() {
   const [healerKitPulseKey, setHealerKitPulseKey] = useState(0);
   const [attacksForceOpenKey, setAttacksForceOpenKey] = useState(0);
   const [dadosForceOpenKey, setDadosForceOpenKey] = useState(0);
+  const [initiativeRoll, setInitiativeRoll] = useState<DiceRoll | null>(null);
   const attacksSectionRef = useRef<HTMLDivElement>(null);
   const dadosSectionRef = useRef<HTMLDivElement>(null);
   const tempHpInputRef = useRef<HTMLInputElement>(null);
@@ -180,6 +183,11 @@ export function CombatTab() {
   const speedReduction = 5 * combat.exhaustionLevel;
   const effectiveSpeed = Math.max(0, combat.speed - speedReduction);
 
+  function rollInitiative() {
+    const total = combat.initiative + exhaustionPenalty(combat.exhaustionLevel);
+    setInitiativeRoll(rollD20(total));
+  }
+
   return (
     <div className="p-4 space-y-3">
       {/* Top Bar */}
@@ -193,6 +201,7 @@ export function CombatTab() {
         magicAcBonus={magicAcBonus}
         showExplicitMagicTag={magicItemIndicator === "explicit-tag"}
         initiative={combat.initiative}
+        initiativeRoll={initiativeRoll}
         inspiration={meta.inspiration}
         effectiveSpeed={effectiveSpeed}
         speedReduction={speedReduction}
@@ -207,6 +216,8 @@ export function CombatTab() {
         onOpenHp={() => setHpModalOpen(true)}
         onOpenTempHp={() => setTempHpInput(true)}
         onOpenAc={() => setAcModalOpen(true)}
+        onRollInitiative={rollInitiative}
+        onClearInitiativeRoll={() => setInitiativeRoll(null)}
         onToggleInspiration={toggleInspiration}
         onDeathSavesChange={(s, f) => updateCombat({ deathSaves: { successes: s, failures: f } })}
         onRegainConsciousness={() =>

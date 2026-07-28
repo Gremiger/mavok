@@ -3,7 +3,9 @@
 import { StatBadge } from "@/components/ui/StatBadge";
 import { RageCluster, type RageClusterProps } from "@/components/combat/RageCluster";
 import { DeathSaves } from "@/components/combat/DeathSaves";
+import { DiceResult } from "@/components/ui/DiceResult";
 import { formatModifier } from "@/lib/utils";
+import type { DiceRoll } from "@/lib/dice";
 
 export interface CombatVitalsProps {
   isDying: boolean;
@@ -15,6 +17,7 @@ export interface CombatVitalsProps {
   magicAcBonus: number;
   showExplicitMagicTag: boolean;
   initiative: number;
+  initiativeRoll: DiceRoll | null;
   inspiration: boolean;
   effectiveSpeed: number;
   speedReduction: number;
@@ -24,6 +27,8 @@ export interface CombatVitalsProps {
   onOpenHp: () => void;
   onOpenTempHp: () => void;
   onOpenAc: () => void;
+  onRollInitiative: () => void;
+  onClearInitiativeRoll: () => void;
   onToggleInspiration: () => void;
   onDeathSavesChange: (successes: number, failures: number) => void;
   onRegainConsciousness: () => void;
@@ -39,6 +44,7 @@ export function CombatVitals({
   magicAcBonus,
   showExplicitMagicTag,
   initiative,
+  initiativeRoll,
   inspiration,
   effectiveSpeed,
   speedReduction,
@@ -48,6 +54,8 @@ export function CombatVitals({
   onOpenHp,
   onOpenTempHp,
   onOpenAc,
+  onRollInitiative,
+  onClearInitiativeRoll,
   onToggleInspiration,
   onDeathSavesChange,
   onRegainConsciousness,
@@ -117,7 +125,7 @@ export function CombatVitals({
 
       <div className="relative flex items-center justify-around gap-1.5 mt-2.5 pt-2 border-t border-border/40">
         <StatBadge compact label="Temp" value={`+${tempHp}`} onClick={onOpenTempHp} highlight={tempHp > 0} />
-        <StatBadge compact label="Init" value={formatModifier(initiative)} />
+        <StatBadge compact label="Init" value={formatModifier(initiative)} onClick={onRollInitiative} />
         <StatBadge compact label="Insp" value={inspiration ? "★" : "☆"} onClick={onToggleInspiration} highlight={inspiration} />
         <StatBadge
           compact
@@ -126,6 +134,16 @@ export function CombatVitals({
           highlight={speedReduction > 0}
         />
       </div>
+
+      {initiativeRoll && (
+        <div className="mt-2">
+          <DiceResult
+            roll={initiativeRoll}
+            label="Iniciativa"
+            onClear={onClearInitiativeRoll}
+          />
+        </div>
+      )}
     </div>
   );
 }
