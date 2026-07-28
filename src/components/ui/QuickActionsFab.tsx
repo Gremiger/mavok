@@ -14,7 +14,7 @@ import {
   Zap,
   X,
 } from "lucide-react";
-import { useCharacterContext } from "@/lib/context";
+import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { useLongPress } from "@/hooks/useLongPress";
 import { Modal } from "@/components/ui/Modal";
 import { HpModal } from "@/components/combat/HpModal";
@@ -48,6 +48,7 @@ function iconFor(action: PinnedAction) {
 export function QuickActionsFab({ activeTab }: { activeTab: string }) {
   const { character, updateCombat, updateResources, updateQuickActions } =
     useCharacterContext();
+  const { diceRollMode } = useThemeContext();
   const [expanded, setExpanded] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [hpModalOpen, setHpModalOpen] = useState(false);
@@ -107,10 +108,14 @@ export function QuickActionsFab({ activeTab }: { activeTab: string }) {
       case "attackRoll": {
         const attack = attacks.find((a) => a.id === action.attackId);
         if (!attack) break;
-        const roll = await rollAttackHit(attack, {
-          recklessActive: combat.recklessActive,
-          exhaustionLevel: combat.exhaustionLevel,
-        });
+        const roll = await rollAttackHit(
+          attack,
+          {
+            recklessActive: combat.recklessActive,
+            exhaustionLevel: combat.exhaustionLevel,
+          },
+          diceRollMode
+        );
         toast(`${attack.name}: ${roll.total} (${roll.rolls.join(", ")})`, {
           icon: "🎲",
         });
@@ -119,7 +124,11 @@ export function QuickActionsFab({ activeTab }: { activeTab: string }) {
       case "attackDamage": {
         const attack = attacks.find((a) => a.id === action.attackId);
         if (!attack) break;
-        const roll = await rollAttackDamage(attack, { rageActive, rageDamage });
+        const roll = await rollAttackDamage(
+          attack,
+          { rageActive, rageDamage },
+          diceRollMode
+        );
         toast(`${attack.name}: ${roll.total} daño`, { icon: "🎲" });
         break;
       }

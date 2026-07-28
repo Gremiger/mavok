@@ -46,7 +46,7 @@ export function AttackRow({
   onMoveUp?: () => void;
   onMoveDown?: () => void;
 }) {
-  const { density, magicItemIndicator } = useThemeContext();
+  const { density, magicItemIndicator, diceRollMode } = useThemeContext();
   const [expanded, setExpanded] = useState(false);
   const [viewingMasteryCondition, setViewingMasteryCondition] = useState<
     string | null
@@ -84,12 +84,20 @@ export function AttackRow({
   }
 
   async function handleRollHit() {
-    const result = await rollAttackHit(attack, { recklessActive, exhaustionLevel });
+    const result = await rollAttackHit(
+      attack,
+      { recklessActive, exhaustionLevel },
+      diceRollMode
+    );
     setLastRoll({ roll: result, type: "hit" });
   }
 
   async function handleRollDamage() {
-    const result = await rollAttackDamage(attack, { rageActive, rageDamage });
+    const result = await rollAttackDamage(
+      attack,
+      { rageActive, rageDamage },
+      diceRollMode
+    );
     setLastRoll({ roll: result, type: "damage" });
   }
 
