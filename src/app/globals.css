@@ -441,3 +441,12 @@ dialog::backdrop {
     color: #000 !important;
   }
 }
+
+/* dice-box's injected <canvas> has no intrinsic sizing of its own —
+   without this it defaults to the browser's 300x150 canvas size
+   instead of filling the full-screen #dice-box-canvas container. */
+#dice-box-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}

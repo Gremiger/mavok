@@ -17,7 +17,8 @@ async function getDiceBox(): Promise<DiceBoxInstance> {
   if (!boxPromise) {
     boxPromise = (async () => {
       const { default: DiceBox } = await import("@3d-dice/dice-box");
-      const box = new DiceBox("#dice-box-canvas", {
+      const box = new DiceBox({
+        container: "#dice-box-canvas",
         assetPath: "/assets/",
         scale: 9,
       }) as DiceBoxInstance;
