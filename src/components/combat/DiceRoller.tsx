@@ -2,17 +2,27 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { rollDiceAsync, isD20Crit, isD20Fumble, type DiceRoll } from "@/lib/dice";
+import { isD20Crit, isD20Fumble, type DiceRoll } from "@/lib/dice";
+import { rollDiceMode } from "@/lib/rollWithMode";
+import { useThemeContext } from "@/lib/context";
+import { toast } from "sonner";
 
 const QUICK_DICE = ["1d4", "1d6", "1d8", "1d10", "1d12", "1d20"];
 
 export function DiceRoller() {
+  const { diceRollMode } = useThemeContext();
   const [history, setHistory] = useState<DiceRoll[]>([]);
   const [custom, setCustom] = useState("");
 
   async function roll(expression: string) {
     try {
-      const result = await rollDiceAsync(expression);
+      const { roll: result, usedFallback } = await rollDiceMode(
+        expression,
+        diceRollMode
+      );
+      if (usedFallback) {
+        toast("Dados 3D no disponible, usando texto");
+      }
       setHistory((prev) => [result, ...prev].slice(0, 5));
     } catch {
       // invalid expression, ignore

@@ -48,6 +48,8 @@ export function SettingsTab() {
     toggleDensity,
     magicItemIndicator,
     setMagicItemIndicator,
+    diceRollMode,
+    setDiceRollMode,
   } = useThemeContext();
   const [shortRestOpen, setShortRestOpen] = useState(false);
   const [longRestOpen, setLongRestOpen] = useState(false);
@@ -246,6 +248,17 @@ export function SettingsTab() {
             }
             name={`Indicador de bonos mágicos: ${
               magicItemIndicator === "explicit-tag" ? "Etiqueta explícita" : "Solo número"
+            }`}
+            right={<span className="text-xs text-muted">Tap para cambiar</span>}
+          />
+          <CompactRow
+            onClick={() =>
+              setDiceRollMode(diceRollMode === "text" ? "3d" : "text")
+            }
+            name={`Modo de tirada: ${
+              diceRollMode === "3d"
+                ? "3D (solo Dado suelto por ahora)"
+                : "Texto"
             }`}
             right={<span className="text-xs text-muted">Tap para cambiar</span>}
           />
