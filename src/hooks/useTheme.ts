@@ -29,6 +29,9 @@ export function useTheme() {
   const [magicItemIndicator, setMagicItemIndicatorState] = useState<
     AppSettings["magicItemIndicator"]
   >("number-only");
+  const [diceRollMode, setDiceRollModeState] = useState<
+    AppSettings["diceRollMode"]
+  >("text");
 
   useEffect(() => {
     const settings = loadSettings();
@@ -38,6 +41,7 @@ export function useTheme() {
     setEncyclopediaFavorites(settings.encyclopediaFavorites);
     setEncyclopediaLanguageState(settings.encyclopediaLanguage);
     setMagicItemIndicatorState(settings.magicItemIndicator);
+    setDiceRollModeState(settings.diceRollMode);
     document.documentElement.setAttribute("data-theme", settings.theme);
   }, []);
 
@@ -86,6 +90,15 @@ export function useTheme() {
     []
   );
 
+  const setDiceRollMode = useCallback(
+    (mode: AppSettings["diceRollMode"]) => {
+      setDiceRollModeState(mode);
+      const settings = loadSettings();
+      saveSettings({ ...settings, diceRollMode: mode });
+    },
+    []
+  );
+
   return {
     theme,
     setTheme,
@@ -97,5 +110,7 @@ export function useTheme() {
     setEncyclopediaLanguage,
     magicItemIndicator,
     setMagicItemIndicator,
+    diceRollMode,
+    setDiceRollMode,
   };
 }

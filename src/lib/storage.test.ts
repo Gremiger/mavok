@@ -29,9 +29,15 @@ describe("loadSettings", () => {
       encyclopediaFavorites: [],
       encyclopediaLanguage: "en",
       magicItemIndicator: "number-only",
+      diceRollMode: "text",
     });
 
     const settings = loadSettings();
     expect(settings.theme).toBe("cumbre-helada");
+  });
+
+  it("defaults diceRollMode to text when no settings are stored", () => {
+    const settings = loadSettings();
+    expect(settings.diceRollMode).toBe("text");
   });
 });

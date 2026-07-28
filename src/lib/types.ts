@@ -193,4 +193,5 @@ export interface AppSettings {
   encyclopediaFavorites: string[];
   encyclopediaLanguage: "en" | "es";
   magicItemIndicator: "number-only" | "explicit-tag";
+  diceRollMode: "text" | "3d";
 }

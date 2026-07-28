@@ -70,7 +70,7 @@ export function QuickActionsFab({ activeTab }: { activeTab: string }) {
     BARBARIAN_LEVELS.find((l) => l.level === meta.level)?.rageDamage ?? 2;
   const conMod = abilityModifier(character.attributes.con);
 
-  function execute(action: PinnedAction) {
+  async function execute(action: PinnedAction) {
     switch (action.type) {
       case "rage": {
         const next = !rageActive;
@@ -81,7 +81,7 @@ export function QuickActionsFab({ activeTab }: { activeTab: string }) {
         break;
       }
       case "hitDice": {
-        const result = spendHitDie(combat, conMod);
+        const result = await spendHitDie(combat, conMod);
         if (!result) break;
         updateCombat(result.combat);
         toast(`+${result.healing} HP curados`, { icon: "💚" });
@@ -107,7 +107,7 @@ export function QuickActionsFab({ activeTab }: { activeTab: string }) {
       case "attackRoll": {
         const attack = attacks.find((a) => a.id === action.attackId);
         if (!attack) break;
-        const roll = rollAttackHit(attack, {
+        const roll = await rollAttackHit(attack, {
           recklessActive: combat.recklessActive,
           exhaustionLevel: combat.exhaustionLevel,
         });
@@ -119,7 +119,7 @@ export function QuickActionsFab({ activeTab }: { activeTab: string }) {
       case "attackDamage": {
         const attack = attacks.find((a) => a.id === action.attackId);
         if (!attack) break;
-        const roll = rollAttackDamage(attack, { rageActive, rageDamage });
+        const roll = await rollAttackDamage(attack, { rageActive, rageDamage });
         toast(`${attack.name}: ${roll.total} daño`, { icon: "🎲" });
         break;
       }

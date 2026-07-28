@@ -48,6 +48,7 @@ export function loadSettings(): AppSettings {
     encyclopediaFavorites: [],
     encyclopediaLanguage: "en",
     magicItemIndicator: "number-only",
+    diceRollMode: "text",
   };
   if (typeof window === "undefined") return defaults;
   try {
