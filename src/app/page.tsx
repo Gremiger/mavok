@@ -14,6 +14,7 @@ import { NotesTab } from "@/components/tabs/NotesTab";
 import { EncyclopediaTab } from "@/components/tabs/EncyclopediaTab";
 import { SettingsTab } from "@/components/tabs/SettingsTab";
 import { OfflineBadge } from "@/components/OfflineBadge";
+import { DiceBoxCanvas } from "@/components/DiceBoxCanvas";
 import { QuickActionsFab } from "@/components/ui/QuickActionsFab";
 import { Toaster } from "sonner";
 import { Shield, Swords, Backpack, BookOpen, Library, Settings } from "lucide-react";
@@ -89,6 +90,7 @@ export default function Home() {
             }}
           />
           <OfflineBadge />
+          <DiceBoxCanvas />
           <div className="flex flex-col min-h-dvh">
             <motion.main
               className="flex-1 overflow-y-auto pb-safe-nav"
