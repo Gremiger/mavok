@@ -79,7 +79,9 @@ export function LevelUpFlow({
   const levelData = BARBARIAN_LEVELS[newLevel - 1];
   const currentLevelData = BARBARIAN_LEVELS[character.meta.level - 1];
   const conMod = abilityModifier(character.attributes.con);
-  const toughBonus = 2;
+  const toughBonus = character.features.some((f) => f.name === "Tough")
+    ? 2
+    : 0;
 
   const needsSubclass = newLevel === SUBCLASS_LEVEL && !character.meta.subclass;
   const needsASI = ASI_LEVELS.includes(newLevel);
