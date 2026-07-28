@@ -20,7 +20,7 @@ async function getDiceBox(): Promise<DiceBoxInstance> {
       const box = new DiceBox({
         container: "#dice-box-canvas",
         assetPath: "/assets/",
-        scale: 9,
+        scale: 7,
       }) as DiceBoxInstance;
       await box.init();
       return box;
