@@ -1,3 +1,5 @@
+import type { DiceThemeId } from "@/data/dice-themes";
+
 export type AbilityScore = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
 export const CURRENT_DATA_VERSION = 13;
@@ -194,4 +196,5 @@ export interface AppSettings {
   encyclopediaLanguage: "en" | "es";
   magicItemIndicator: "number-only" | "explicit-tag";
   diceRollMode: "text" | "3d";
+  diceTheme: DiceThemeId;
 }

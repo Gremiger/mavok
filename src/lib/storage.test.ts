@@ -30,6 +30,7 @@ describe("loadSettings", () => {
       encyclopediaLanguage: "en",
       magicItemIndicator: "number-only",
       diceRollMode: "text",
+      diceTheme: "default",
     });
 
     const settings = loadSettings();
@@ -39,5 +40,10 @@ describe("loadSettings", () => {
   it("defaults diceRollMode to text when no settings are stored", () => {
     const settings = loadSettings();
     expect(settings.diceRollMode).toBe("text");
+  });
+
+  it("defaults diceTheme to default when no settings are stored", () => {
+    const settings = loadSettings();
+    expect(settings.diceTheme).toBe("default");
   });
 });

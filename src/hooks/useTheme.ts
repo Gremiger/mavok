@@ -32,6 +32,9 @@ export function useTheme() {
   const [diceRollMode, setDiceRollModeState] = useState<
     AppSettings["diceRollMode"]
   >("text");
+  const [diceTheme, setDiceThemeState] = useState<
+    AppSettings["diceTheme"]
+  >("default");
 
   useEffect(() => {
     const settings = loadSettings();
@@ -42,6 +45,7 @@ export function useTheme() {
     setEncyclopediaLanguageState(settings.encyclopediaLanguage);
     setMagicItemIndicatorState(settings.magicItemIndicator);
     setDiceRollModeState(settings.diceRollMode);
+    setDiceThemeState(settings.diceTheme);
     document.documentElement.setAttribute("data-theme", settings.theme);
   }, []);
 
@@ -99,6 +103,15 @@ export function useTheme() {
     []
   );
 
+  const setDiceTheme = useCallback(
+    (theme: AppSettings["diceTheme"]) => {
+      setDiceThemeState(theme);
+      const settings = loadSettings();
+      saveSettings({ ...settings, diceTheme: theme });
+    },
+    []
+  );
+
   return {
     theme,
     setTheme,
@@ -112,5 +125,7 @@ export function useTheme() {
     setMagicItemIndicator,
     diceRollMode,
     setDiceRollMode,
+    diceTheme,
+    setDiceTheme,
   };
 }
