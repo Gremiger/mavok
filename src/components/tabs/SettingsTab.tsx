@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useCharacterContext, useGoogleDriveContext } from "@/lib/context";
 import { useThemeContext } from "@/lib/context";
@@ -63,6 +63,7 @@ export function SettingsTab() {
   const [quickActionsPickerOpen, setQuickActionsPickerOpen] = useState(false);
   const [levelUpHistoryOpen, setLevelUpHistoryOpen] = useState(false);
   const [restoringBackupKey, setRestoringBackupKey] = useState<string | null>(null);
+  const backups = useMemo(() => getBackups(), []);
   const [levelDownConfirmOpen, setLevelDownConfirmOpen] = useState(false);
   const [expandedChangelogEntry, setExpandedChangelogEntry] = useState<
     string | null
@@ -499,12 +500,12 @@ export function SettingsTab() {
       {/* Backups */}
       <CollapsibleSection title="Backups automáticos">
         <div className="space-y-2">
-          {getBackups().length === 0 ? (
+          {backups.length === 0 ? (
             <p className="text-xs text-muted text-center py-2">
               Los backups se crean automáticamente antes de cada migración de datos.
             </p>
           ) : (
-            getBackups().map((b) => (
+            backups.map((b) => (
               <CompactRow
                 key={b.key}
                 name={
