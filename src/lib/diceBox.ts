@@ -1,12 +1,23 @@
+import { DICE_THEMES } from "@/data/dice-themes";
+import { loadSettings } from "./storage";
+
 interface DiceBoxRollResult {
   sides: number;
   value: number;
   [key: string]: unknown;
 }
 
+interface DiceBoxRollOptions {
+  theme?: string;
+  themeColor?: string;
+}
+
 interface DiceBoxInstance {
   init(): Promise<DiceBoxInstance>;
-  roll(notation: string): Promise<DiceBoxRollResult[]>;
+  roll(
+    notation: string,
+    options?: DiceBoxRollOptions
+  ): Promise<DiceBoxRollResult[]>;
   show(): DiceBoxInstance;
   hide(): DiceBoxInstance;
 }
@@ -31,8 +42,14 @@ async function getDiceBox(): Promise<DiceBoxInstance> {
 
 export async function roll3D(count: number, faces: number): Promise<number[]> {
   const box = await getDiceBox();
+  const { diceTheme } = loadSettings();
+  const preset =
+    DICE_THEMES.find((t) => t.systemName === diceTheme) ?? DICE_THEMES[0];
   box.show();
-  const results = await box.roll(`${count}d${faces}`);
+  const results = await box.roll(`${count}d${faces}`, {
+    theme: preset.systemName,
+    themeColor: preset.themeColor,
+  });
   return results.map((r) => r.value);
 }
 
