@@ -31,6 +31,8 @@ import { getCharacterStorageKey } from "@/lib/storage";
 import { CURRENT_DATA_VERSION } from "@/lib/types";
 import { CHANGELOG } from "@/data/changelog";
 import { THEME_META } from "@/hooks/useTheme";
+import { DICE_THEMES } from "@/data/dice-themes";
+import { DiceThemePickerModal } from "@/components/settings/DiceThemePickerModal";
 
 export function SettingsTab() {
   const {
@@ -50,6 +52,8 @@ export function SettingsTab() {
     setMagicItemIndicator,
     diceRollMode,
     setDiceRollMode,
+    diceTheme,
+    setDiceTheme,
   } = useThemeContext();
   const [shortRestOpen, setShortRestOpen] = useState(false);
   const [longRestOpen, setLongRestOpen] = useState(false);
@@ -62,6 +66,7 @@ export function SettingsTab() {
   const [levelUpOpen, setLevelUpOpen] = useState(false);
   const [levelUpDryRun, setLevelUpDryRun] = useState(false);
   const [weaponMasteryOpen, setWeaponMasteryOpen] = useState(false);
+  const [diceThemePickerOpen, setDiceThemePickerOpen] = useState(false);
   const [quickActionsPickerOpen, setQuickActionsPickerOpen] = useState(false);
   const [levelUpHistoryOpen, setLevelUpHistoryOpen] = useState(false);
   const [restoringBackupKey, setRestoringBackupKey] = useState<string | null>(null);
@@ -256,6 +261,14 @@ export function SettingsTab() {
               setDiceRollMode(diceRollMode === "text" ? "3d" : "text")
             }
             name={`Modo de tirada: ${diceRollMode === "3d" ? "3D" : "Texto"}`}
+            right={<span className="text-xs text-muted">Tap para cambiar</span>}
+          />
+          <CompactRow
+            onClick={() => setDiceThemePickerOpen(true)}
+            name={`Tema de dados: ${
+              DICE_THEMES.find((t) => t.systemName === diceTheme)?.label ??
+              "Verde clásico"
+            }`}
             right={<span className="text-xs text-muted">Tap para cambiar</span>}
           />
         </div>
@@ -739,6 +752,14 @@ export function SettingsTab() {
       <WeaponMasteryModal
         open={weaponMasteryOpen}
         onClose={() => setWeaponMasteryOpen(false)}
+      />
+
+      {/* Dice Theme Picker */}
+      <DiceThemePickerModal
+        open={diceThemePickerOpen}
+        onClose={() => setDiceThemePickerOpen(false)}
+        diceTheme={diceTheme}
+        setDiceTheme={setDiceTheme}
       />
 
       {/* Quick Actions Picker */}
