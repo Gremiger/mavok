@@ -4,12 +4,14 @@ export type DiceThemeId =
   | "blueGreenMetal"
   | "gemstoneMarble"
   | "rock"
-  | "rust";
+  | "rust"
+  | "steel"
+  | "mist";
 
 export interface DiceThemePreset {
   systemName: DiceThemeId;
   label: string;
-  category: "normal" | "especial";
+  category: "normal" | "especial" | "mistborn";
   themeColor?: string;
   swatch: string;
 }
@@ -52,5 +54,19 @@ export const DICE_THEMES: DiceThemePreset[] = [
     category: "especial",
     themeColor: "#8b0000",
     swatch: "#8b0000",
+  },
+  {
+    systemName: "steel",
+    label: "Acero (Mistborn)",
+    category: "mistborn",
+    themeColor: "#8A99A6",
+    swatch: "#8A99A6",
+  },
+  {
+    systemName: "mist",
+    label: "Bruma (Mistborn)",
+    category: "mistborn",
+    themeColor: "#C9C9C4",
+    swatch: "#C9C9C4",
   },
 ];
