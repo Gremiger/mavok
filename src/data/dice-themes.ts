@@ -6,12 +6,13 @@ export type DiceThemeId =
   | "rock"
   | "rust"
   | "steel"
-  | "mist";
+  | "mist"
+  | "misDados";
 
 export interface DiceThemePreset {
   systemName: DiceThemeId;
   label: string;
-  category: "normal" | "especial" | "mistborn";
+  category: "normal" | "especial" | "mistborn" | "personal";
   themeColor?: string;
   swatch: string;
 }
@@ -68,5 +69,11 @@ export const DICE_THEMES: DiceThemePreset[] = [
     category: "mistborn",
     themeColor: "#C9C9C4",
     swatch: "#C9C9C4",
+  },
+  {
+    systemName: "misDados",
+    label: "Mis Dados",
+    category: "personal",
+    swatch: "#050505",
   },
 ];

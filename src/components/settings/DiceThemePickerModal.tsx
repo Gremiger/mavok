@@ -18,6 +18,7 @@ export function DiceThemePickerModal({
   const normales = DICE_THEMES.filter((t) => t.category === "normal");
   const especiales = DICE_THEMES.filter((t) => t.category === "especial");
   const mistborn = DICE_THEMES.filter((t) => t.category === "mistborn");
+  const personal = DICE_THEMES.filter((t) => t.category === "personal");
 
   function renderRow(t: (typeof DICE_THEMES)[number]) {
     return (
@@ -69,6 +70,12 @@ export function DiceThemePickerModal({
             Mistborn
           </p>
           <div className="space-y-1">{mistborn.map(renderRow)}</div>
+        </div>
+        <div>
+          <p className="text-xs text-muted uppercase tracking-wide mb-2">
+            Mis Dados
+          </p>
+          <div className="space-y-1">{personal.map(renderRow)}</div>
         </div>
       </div>
     </Modal>
