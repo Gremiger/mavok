@@ -42,3 +42,7 @@ next-env.d.ts
 
 # superpowers brainstorming companion (session state/keys, not project artifacts)
 .superpowers/
+
+# Source photos for custom dice themes — not needed by the running app,
+# only the derived theme assets under public/assets/themes/ ship.
+/dadosreales/
