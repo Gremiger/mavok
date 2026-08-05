@@ -24,6 +24,22 @@ interface DiceBoxInstance {
 }
 
 let boxPromise: Promise<DiceBoxInstance> | null = null;
+let hideTimer: ReturnType<typeof setTimeout> | null = null;
+
+function cancelPendingHide(): void {
+  if (hideTimer !== null) {
+    clearTimeout(hideTimer);
+    hideTimer = null;
+  }
+}
+
+export function scheduleHide(delayMs: number): void {
+  cancelPendingHide();
+  hideTimer = setTimeout(() => {
+    hideTimer = null;
+    hide3D();
+  }, delayMs);
+}
 
 async function getDiceBox(): Promise<DiceBoxInstance> {
   if (!boxPromise) {
@@ -42,6 +58,10 @@ async function getDiceBox(): Promise<DiceBoxInstance> {
 }
 
 export async function roll3D(count: number, faces: number): Promise<number[]> {
+  // A roll already in flight may have a hide3D() scheduled from its own
+  // completion — cancel it here so it can't fire mid-way through this new
+  // roll and hide the canvas before this one's result is even shown.
+  cancelPendingHide();
   const box = await getDiceBox();
   const { diceTheme } = loadSettings();
   const preset =

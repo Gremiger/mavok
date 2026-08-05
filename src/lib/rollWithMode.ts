@@ -5,7 +5,7 @@ import {
   rollD20WithAdvantage,
   type DiceRoll,
 } from "./dice";
-import { roll3D, hide3D } from "./diceBox";
+import { roll3D, scheduleHide } from "./diceBox";
 import type { AppSettings } from "./types";
 
 export interface RollWithModeResult {
@@ -22,7 +22,7 @@ export async function rollDiceMode(
       const { count, faces, modifier } = parseExpression(expression);
       const faceValues = await roll3D(count, faces);
       const roll = composeRoll(expression, faceValues, modifier);
-      setTimeout(() => hide3D(), 1500);
+      scheduleHide(1500);
       return { roll, usedFallback: false };
     } catch {
       // Falls through to the text path below — 3D unavailable
@@ -54,7 +54,7 @@ export async function rollD20WithAdvantageMode(
         total: Math.max(...faceValues) + modifier,
         timestamp: Date.now(),
       };
-      setTimeout(() => hide3D(), 1500);
+      scheduleHide(1500);
       return { roll, usedFallback: false };
     } catch {
       // Falls through to the text path below.
