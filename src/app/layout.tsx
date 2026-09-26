@@ -1,18 +1,28 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { IM_Fell_English, Spectral, Fraunces } from "next/font/google";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import "./globals.css";
 
-const cormorant = Cormorant_Garamond({
+const fell = IM_Fell_English({
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-cormorant",
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-fell",
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const spectral = Spectral({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-spectral",
+  display: "swap",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["600", "900"],
+  variable: "--font-fraunces",
   display: "swap",
 });
 
@@ -27,10 +37,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${cormorant.variable} ${dmSans.variable}`}>
+    <html
+      lang="es"
+      className={`${fell.variable} ${spectral.variable} ${fraunces.variable}`}
+    >
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#0f0f0f" />
+        <meta name="theme-color" content="#17130f" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover"

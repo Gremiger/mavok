@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { loadSettings, saveSettings } from "@/lib/storage";
+import { applyThemeColor } from "@/lib/themeColor";
 import type { AppSettings } from "@/lib/types";
 
 export const THEME_META: {
@@ -15,6 +16,10 @@ export const THEME_META: {
   { id: "pergamino", label: "Pergamino", swatch: "#7a1f1f", bg: "#d9c9a3" },
   { id: "furia-de-sangre", label: "Furia de Sangre", swatch: "#d23a2c", bg: "#0f0e0e" },
 ];
+
+function themeBg(id: AppSettings["theme"]): string | undefined {
+  return THEME_META.find((t) => t.id === id)?.bg;
+}
 
 export function useTheme() {
   const [theme, setThemeState] = useState<AppSettings["theme"]>(
@@ -48,11 +53,13 @@ export function useTheme() {
     setDiceRollModeState(settings.diceRollMode);
     setDiceThemeState(settings.diceTheme);
     document.documentElement.setAttribute("data-theme", settings.theme);
+    applyThemeColor(document, themeBg(settings.theme));
   }, []);
 
   const setTheme = useCallback((next: AppSettings["theme"]) => {
     setThemeState(next);
     document.documentElement.setAttribute("data-theme", next);
+    applyThemeColor(document, themeBg(next));
     const settings = loadSettings();
     saveSettings({ ...settings, theme: next });
   }, []);

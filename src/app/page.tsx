@@ -85,7 +85,7 @@ export default function Home() {
                 background: "var(--card)",
                 color: "var(--fg)",
                 border: "1px solid var(--border-color)",
-                fontFamily: "var(--font-inter)",
+                fontFamily: "var(--font-body)",
               },
             }}
           />
