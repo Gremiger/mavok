@@ -69,7 +69,7 @@ export function HpModal({
                     ? "bg-danger text-white"
                     : m === "heal"
                       ? "bg-success text-white"
-                      : "bg-accent text-white"
+                      : "btn-primary"
                   : "bg-card border border-border text-muted"
               }`}
             >
@@ -106,7 +106,7 @@ export function HpModal({
 
         <button
           onClick={apply}
-          className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+          className="w-full py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
         >
           Aplicar
         </button>

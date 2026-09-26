@@ -88,7 +88,7 @@ export function DeathSaves({
           Golpe crítico
         </button>
       </div>
-      <p className="text-muted/60 text-[0.6rem] mt-2 text-center leading-relaxed">
+      <p className="text-muted/60 text-xs mt-2 text-center leading-relaxed">
         Si el daño recibido iguala o supera tu HP máximo, mueres al instante. Estable:
         no hace más salvaciones, sigue Unconscious, recupera 1 HP tras 1d4 horas si no
         es curado antes.

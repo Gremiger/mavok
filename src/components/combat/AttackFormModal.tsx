@@ -157,7 +157,7 @@ export function AttackFormModal({
         )}
 
         <div className="space-y-2">
-          <p className="text-xs text-muted uppercase tracking-wide">Básico</p>
+          <p className="text-xs text-muted italic">Básico</p>
           <input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -185,7 +185,7 @@ export function AttackFormModal({
         </div>
 
         <div className="space-y-2 border-t border-border/30 pt-3">
-          <p className="text-xs text-muted uppercase tracking-wide">Daño</p>
+          <p className="text-xs text-muted italic">Daño</p>
           <div className="flex gap-2">
             <input
               value={form.damage}
@@ -213,7 +213,7 @@ export function AttackFormModal({
         </div>
 
         <div className="space-y-2 border-t border-border/30 pt-3">
-          <p className="text-xs text-muted uppercase tracking-wide">Propiedades</p>
+          <p className="text-xs text-muted italic">Propiedades</p>
           <input
             value={form.properties}
             onChange={(e) => setForm({ ...form, properties: e.target.value })}
@@ -259,7 +259,7 @@ export function AttackFormModal({
 
         <button
           onClick={handleSave}
-          className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+          className="w-full py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
         >
           {existingAttack ? "Guardar" : "Agregar"}
         </button>

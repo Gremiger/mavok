@@ -36,11 +36,11 @@ const CATEGORIES: { value: InventoryItem["category"]; label: string }[] = [
 ];
 
 const CATEGORY_ICONS: Record<string, ReactNode> = {
-  weapon: <Sword size={14} />,
-  armor: <Shield size={14} />,
-  gear: <Wrench size={14} />,
-  consumable: <FlaskConical size={14} />,
-  personal: <Heart size={14} />,
+  weapon: <Sword size={14} strokeWidth={1.5} />,
+  armor: <Shield size={14} strokeWidth={1.5} />,
+  gear: <Wrench size={14} strokeWidth={1.5} />,
+  consumable: <FlaskConical size={14} strokeWidth={1.5} />,
+  personal: <Heart size={14} strokeWidth={1.5} />,
 };
 
 export function InventoryTab() {
@@ -223,7 +223,7 @@ export function InventoryTab() {
                   type="number"
                   inputMode="numeric"
                   defaultValue={currency[key]}
-                  className="w-12 bg-background border border-accent rounded text-center text-sm font-heading text-foreground"
+                  className="w-12 bg-background border border-accent rounded text-center text-sm font-numeric text-foreground"
                   autoFocus
                   onBlur={(e) => {
                     const val = parseInt(e.target.value);
@@ -239,7 +239,7 @@ export function InventoryTab() {
               ) : (
                 <button
                   onClick={() => setEditingCurrency(key)}
-                  className="font-heading text-lg text-accent min-w-[2rem]"
+                  className="font-numeric text-lg text-accent min-w-[2rem]"
                 >
                   {currency[key]}
                 </button>
@@ -309,7 +309,7 @@ export function InventoryTab() {
       {grouped.map((group, gi) => (
         <div key={group.value}>
           {gi > 0 && <div className="rule-line mb-4" />}
-          <h3 className="font-heading text-xs text-muted uppercase mb-2 flex items-center gap-1.5">
+          <h3 className="font-heading italic text-sm text-muted mb-2 flex items-center gap-1.5">
             {CATEGORY_ICONS[group.value]} <span>{group.label}</span>
           </h3>
           <div className="space-y-1">
@@ -333,7 +333,7 @@ export function InventoryTab() {
                     }}
                     className={`w-5 h-5 rounded border-2 flex items-center justify-center text-xs ${
                       item.equipped
-                        ? "bg-accent border-accent text-white"
+                        ? "btn-primary border-accent"
                         : "border-muted"
                     }`}
                   >
@@ -355,13 +355,13 @@ export function InventoryTab() {
                       const unique = [...new Set(values)];
                       if (unique.length === 0) return null;
                       return (
-                        <span className="text-accent text-xs ml-1 font-heading">
+                        <span className="text-accent text-xs ml-1 font-numeric">
                           {unique.length === 1 ? formatModifier(unique[0]) : "✦"}
                         </span>
                       );
                     })()}
                     {item.attuned && (
-                      <span className="text-[0.6rem] px-1.5 py-0.5 bg-accent/20 text-accent rounded ml-1">
+                      <span className="text-xs px-1.5 py-0.5 bg-accent/20 text-accent rounded ml-1">
                         Sintonizado
                       </span>
                     )}
@@ -510,9 +510,9 @@ export function InventoryTab() {
       {/* Add Item FAB */}
       <button
         onClick={() => setAddModalOpen(true)}
-        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full bg-accent text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
+        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full btn-primary shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
       >
-        <Plus size={24} />
+        <Plus size={24} strokeWidth={1.5} />
       </button>
 
       <ItemFormModal
@@ -573,7 +573,7 @@ export function InventoryTab() {
                   </button>
                   <button
                     onClick={() => handleUnpack(unpackingItem)}
-                    className="flex-1 py-2 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+                    className="flex-1 py-2 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
                   >
                     Abrir
                   </button>

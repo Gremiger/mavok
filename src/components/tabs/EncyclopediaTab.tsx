@@ -304,7 +304,7 @@ export function EncyclopediaTab() {
         name={
           <>
             {showCategoryBadge && (
-              <span className="text-[0.6rem] px-1.5 py-0.5 bg-accent/20 text-accent rounded mr-1.5">
+              <span className="text-xs px-1.5 py-0.5 bg-accent/20 text-accent rounded mr-1.5">
                 {CATEGORIES.find((c) => c.id === item.category)?.label}
               </span>
             )}
@@ -321,7 +321,7 @@ export function EncyclopediaTab() {
               }}
               className="text-accent"
             >
-              <Star size={14} fill={isFavorite ? "currentColor" : "none"} />
+              <Star size={14} strokeWidth={1.5} fill={isFavorite ? "currentColor" : "none"} />
             </button>
           </span>
         }
@@ -345,7 +345,7 @@ export function EncyclopediaTab() {
             onClick={() => setEncyclopediaLanguage("en")}
             className={`px-2 py-2 text-xs font-heading ${
               encyclopediaLanguage === "en"
-                ? "bg-accent text-white"
+                ? "btn-primary"
                 : "text-muted"
             }`}
           >
@@ -355,7 +355,7 @@ export function EncyclopediaTab() {
             onClick={() => setEncyclopediaLanguage("es")}
             className={`px-2 py-2 text-xs font-heading ${
               encyclopediaLanguage === "es"
-                ? "bg-accent text-white"
+                ? "btn-primary"
                 : "text-muted"
             }`}
           >
@@ -371,7 +371,7 @@ export function EncyclopediaTab() {
           }`}
           aria-label={showingFavorites ? "Ver categoría actual" : "Ver favoritos"}
         >
-          <Star size={16} fill={showingFavorites ? "currentColor" : "none"} />
+          <Star size={16} strokeWidth={1.5} fill={showingFavorites ? "currentColor" : "none"} />
         </button>
       </div>
 
@@ -447,6 +447,7 @@ export function EncyclopediaTab() {
             >
               <Star
                 size={16}
+                strokeWidth={1.5}
                 fill={
                   encyclopediaFavorites.includes(viewingItem.id)
                     ? "currentColor"

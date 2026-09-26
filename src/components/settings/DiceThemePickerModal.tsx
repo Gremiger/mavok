@@ -39,7 +39,7 @@ export function DiceThemePickerModal({
         }
         right={
           diceTheme === t.systemName ? (
-            <span className="w-5 h-5 rounded border-2 border-accent bg-accent text-white flex items-center justify-center text-xs">
+            <span className="w-5 h-5 rounded border-2 border-accent btn-primary flex items-center justify-center text-xs">
               ✓
             </span>
           ) : (
@@ -54,25 +54,25 @@ export function DiceThemePickerModal({
     <Modal open={open} onClose={onClose} title="Tema de dados">
       <div className="space-y-4">
         <div>
-          <p className="text-xs text-muted uppercase tracking-wide mb-2">
+          <p className="text-xs text-muted italic mb-2">
             Normales
           </p>
           <div className="space-y-1">{normales.map(renderRow)}</div>
         </div>
         <div>
-          <p className="text-xs text-muted uppercase tracking-wide mb-2">
+          <p className="text-xs text-muted italic mb-2">
             Especiales
           </p>
           <div className="space-y-1">{especiales.map(renderRow)}</div>
         </div>
         <div>
-          <p className="text-xs text-muted uppercase tracking-wide mb-2">
+          <p className="text-xs text-muted italic mb-2">
             Mistborn
           </p>
           <div className="space-y-1">{mistborn.map(renderRow)}</div>
         </div>
         <div>
-          <p className="text-xs text-muted uppercase tracking-wide mb-2">
+          <p className="text-xs text-muted italic mb-2">
             Mis Dados
           </p>
           <div className="space-y-1">{personal.map(renderRow)}</div>

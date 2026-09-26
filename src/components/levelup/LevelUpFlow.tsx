@@ -339,13 +339,13 @@ export function LevelUpFlow({
       {/* Confirm */}
       {step === "confirm" && (
         <div className="space-y-4 text-center">
-          <p className="font-heading text-4xl text-accent">{newLevel}</p>
+          <p className="font-numeric text-4xl text-accent">{newLevel}</p>
           <p className="text-sm">
             {character.meta.name} sube a nivel {newLevel}. ¿Continuar?
           </p>
           <button
             onClick={nextStep}
-            className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+            className="w-full py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
           >
             Continuar
           </button>
@@ -463,7 +463,7 @@ export function LevelUpFlow({
           ))}
           <button
             onClick={nextStep}
-            className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+            className="w-full py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
           >
             Continuar
           </button>
@@ -544,7 +544,7 @@ export function LevelUpFlow({
           ) : (
             <button
               onClick={applyAll}
-              className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+              className="w-full py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
             >
               Confirmar nivel {newLevel}
             </button>
@@ -587,7 +587,7 @@ function ASIStep({
           onClick={() => setMode("asi")}
           className={`flex-1 py-2 rounded-lg text-sm font-heading ${
             mode === "asi"
-              ? "bg-accent text-white"
+              ? "btn-primary"
               : "bg-card border border-border text-muted"
           }`}
         >
@@ -597,7 +597,7 @@ function ASIStep({
           onClick={() => setMode("feat")}
           className={`flex-1 py-2 rounded-lg text-sm font-heading ${
             mode === "feat"
-              ? "bg-accent text-white"
+              ? "btn-primary"
               : "bg-card border border-border text-muted"
           }`}
         >
@@ -662,7 +662,7 @@ function ASIStep({
             onClick={() =>
               onASI(asi1, asiMode === "+1/+1" ? asi2 : null)
             }
-            className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+            className="w-full py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
           >
             Confirmar
           </button>
@@ -689,11 +689,11 @@ function ASIStep({
                   <span className="font-heading text-accent text-xs">
                     {f.name}
                   </span>
-                  <span className="text-[0.6rem] text-muted">
+                  <span className="text-xs text-muted">
                     {f.category}
                   </span>
                 </div>
-                <p className="text-[0.65rem] text-foreground/70 mt-0.5 line-clamp-2">
+                <p className="text-xs text-foreground/70 mt-0.5 line-clamp-2">
                   {stripMarkdown(f.description)}
                 </p>
               </button>
@@ -724,7 +724,7 @@ function ASIStep({
                 if (homebrew.name.trim()) onFeat(homebrew);
               }}
               disabled={!homebrew.name.trim()}
-              className="w-full py-2 bg-accent text-white rounded-lg font-heading text-sm disabled:opacity-50"
+              className="w-full py-2 btn-primary rounded-lg font-heading text-sm disabled:opacity-50"
             >
               Usar dote personalizada
             </button>
@@ -799,7 +799,7 @@ function HpStep({
               setUseManual(true);
             }}
             placeholder="1-12"
-            className="flex-1 bg-background border border-border rounded-lg p-2 text-center text-lg font-heading text-foreground"
+            className="flex-1 bg-background border border-border rounded-lg p-2 text-center text-lg font-numeric text-foreground"
           />
         </div>
       </div>
@@ -808,7 +808,7 @@ function HpStep({
       {((useManual && isValid) || (!useManual && hpRoll !== null)) && (
         <div className="bg-card border border-border rounded-lg p-3 text-center space-y-2">
           <div className="flex items-center justify-center gap-2 text-sm">
-            <span className="font-heading text-accent text-xl">
+            <span className="font-numeric text-accent text-xl">
               {dieValue}
             </span>
             <span className="text-muted">+</span>
@@ -820,14 +820,14 @@ function HpStep({
               {toughBonus} <span className="text-muted text-xs">(Tough)</span>
             </span>
             <span className="text-muted">=</span>
-            <span className="font-heading text-accent text-xl">
+            <span className="font-numeric text-accent text-xl">
               {totalHp}
             </span>
             <span className="text-muted text-xs">HP</span>
           </div>
           <button
             onClick={() => onConfirm(dieValue!)}
-            className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+            className="w-full py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
           >
             Confirmar +{totalHp} HP
           </button>

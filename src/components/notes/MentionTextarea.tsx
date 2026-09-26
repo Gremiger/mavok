@@ -114,7 +114,7 @@ export function MentionTextarea({
                 className="w-full flex items-center justify-between gap-2 px-3 py-2 text-sm text-left hover:bg-background"
               >
                 <span className="text-foreground">{s.title}</span>
-                <span className="text-[0.6rem] px-1.5 py-0.5 bg-accent/20 text-accent rounded shrink-0">
+                <span className="text-xs px-1.5 py-0.5 bg-accent/20 text-accent rounded shrink-0">
                   {SECTION_LABELS[s.section]}
                 </span>
               </button>

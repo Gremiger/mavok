@@ -155,7 +155,7 @@ export function NotesTab() {
             onClick={() => setSearchScope("current")}
             className={`px-2.5 py-2 text-xs font-heading transition-colors ${
               searchScope === "current"
-                ? "bg-accent text-white"
+                ? "btn-primary"
                 : "bg-card text-muted"
             }`}
           >
@@ -165,7 +165,7 @@ export function NotesTab() {
             onClick={() => setSearchScope("global")}
             className={`px-2.5 py-2 text-xs font-heading transition-colors ${
               searchScope === "global"
-                ? "bg-accent text-white"
+                ? "btn-primary"
                 : "bg-card text-muted"
             }`}
           >
@@ -213,7 +213,7 @@ export function NotesTab() {
                   onClick={() => handleResultTap(r)}
                   name={
                     <>
-                      <span className="text-[0.6rem] px-1.5 py-0.5 bg-accent/20 text-accent rounded mr-1.5">
+                      <span className="text-xs px-1.5 py-0.5 bg-accent/20 text-accent rounded mr-1.5">
                         {r.typeLabel}
                       </span>
                       {r.title}

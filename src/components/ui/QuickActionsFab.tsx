@@ -156,7 +156,7 @@ export function QuickActionsFab({ activeTab }: { activeTab: string }) {
                 onClick={() => execute(action)}
                 className="flex items-center gap-2 pl-3 pr-4 py-2 rounded-full bg-card border border-border shadow-lg text-sm text-foreground active:scale-95 transition-transform"
               >
-                <Icon size={16} className="text-accent" />
+                <Icon size={16} strokeWidth={1.5} className="text-accent" />
                 {pinnedActionLabel(action, attacks)}
               </button>
             );
@@ -167,10 +167,10 @@ export function QuickActionsFab({ activeTab }: { activeTab: string }) {
             if (longPress.wasLongPress()) return;
             setExpanded((e) => !e);
           }}
-          className="w-14 h-14 rounded-full bg-accent text-white shadow-xl flex items-center justify-center active:scale-95 transition-transform select-none [-webkit-touch-callout:none]"
+          className="w-14 h-14 rounded-full btn-primary shadow-xl flex items-center justify-center active:scale-95 transition-transform select-none [-webkit-touch-callout:none]"
           aria-label="Acciones rápidas"
         >
-          {expanded ? <X size={24} /> : <Zap size={24} />}
+          {expanded ? <X size={24} strokeWidth={1.5} /> : <Zap size={24} strokeWidth={1.5} />}
         </button>
       </div>
 

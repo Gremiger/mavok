@@ -49,7 +49,7 @@ export function CompactRow({
       <span className="flex-1 min-w-0">
         <span className="block text-[0.8125rem] text-foreground truncate">{name}</span>
         {meta && (
-          <span className="block text-[0.6875rem] text-muted mt-0.5 leading-snug">
+          <span className="block text-xs text-muted mt-0.5 leading-snug">
             {meta}
           </span>
         )}

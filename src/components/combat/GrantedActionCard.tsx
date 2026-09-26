@@ -47,7 +47,7 @@ export function GrantedActionCard({
             >
               -
             </button>
-            <span className="text-xs text-muted font-heading w-6 text-center">
+            <span className="text-xs text-muted font-numeric w-6 text-center">
               {charges.remaining}
             </span>
             <button

@@ -445,7 +445,7 @@ export function ItemFormModal({
             className="w-1/2 bg-background border border-border rounded-lg p-2 text-sm text-foreground"
           />
         </div>
-        <p className="text-[0.65rem] text-muted -mt-1">
+        <p className="text-xs text-muted -mt-1">
           {form.category === "weapon"
             ? "En un objeto de categoría Arma, aplica solo a esa arma. En cualquier otra categoría (anillo, capa, etc.), aplica a todos tus ataques."
             : "Aplica a todos tus ataques (no está atado a un arma específica)."}
@@ -565,7 +565,7 @@ export function ItemFormModal({
 
         <button
           onClick={handleSave}
-          className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+          className="w-full py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
         >
           {item ? "Guardar" : "Agregar"}
         </button>

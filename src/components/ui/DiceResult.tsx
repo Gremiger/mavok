@@ -43,7 +43,7 @@ export function DiceResult({
         {roll.modifier !== 0 &&
           ` ${roll.modifier >= 0 ? "+" : ""}${roll.modifier}`}
       </span>
-      <span className="font-heading text-accent">= {roll.total}</span>
+      <span className="font-numeric font-semibold text-accent">= {roll.total}</span>
       {isCrit && (
         <span className="text-success font-heading text-xs">¡CRIT!</span>
       )}

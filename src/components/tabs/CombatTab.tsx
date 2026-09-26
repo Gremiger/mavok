@@ -409,7 +409,7 @@ export function CombatTab() {
                   >
                     -
                   </button>
-                  <span className="text-xs text-muted font-heading w-6 text-center">
+                  <span className="text-xs text-muted font-numeric w-6 text-center">
                     {healerKit.remaining}
                   </span>
                   <button
@@ -504,7 +504,7 @@ export function CombatTab() {
               dim
               name="Offhand Attack"
               meta={`${offhandAttack.name} · ${baseDice(offhandAttack.damage)} ${offhandAttack.damageType} (sin mod de característica)`}
-              right={<span className="text-[0.6875rem] text-muted">auto</span>}
+              right={<span className="text-xs text-muted">auto</span>}
             />
           )}
           {getEquippedGrantedActions(character, "bonus").map((item) => (
@@ -561,7 +561,7 @@ export function CombatTab() {
                     >
                       -
                     </button>
-                    <span className="text-xs text-muted font-heading w-6 text-center">
+                    <span className="text-xs text-muted font-numeric w-6 text-center">
                       {stoneEndurance.remaining}
                     </span>
                     <button
@@ -613,7 +613,7 @@ export function CombatTab() {
             dim
             name="Opportunity Attack"
             meta="Mismas armas que Acciones"
-            right={<span className="text-[0.6875rem] text-muted">—</span>}
+            right={<span className="text-xs text-muted">—</span>}
           />
 
           {getEquippedGrantedActions(character, "reaction").map((item) => (
@@ -686,7 +686,7 @@ export function CombatTab() {
             if (matches.length === 0) return null;
             return (
               <div key={group.name}>
-                <p className="text-xs font-heading text-muted uppercase tracking-wide mb-1.5">
+                <p className="font-heading italic text-sm text-muted mb-1.5">
                   {group.name}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
@@ -727,7 +727,7 @@ export function CombatTab() {
             type="number"
             inputMode="numeric"
             defaultValue={combat.tempHp}
-            className="w-full bg-background border border-border rounded-lg p-3 text-center text-2xl font-heading text-foreground"
+            className="w-full bg-background border border-border rounded-lg p-3 text-center text-2xl font-numeric text-foreground"
             autoFocus
             onKeyDown={(e) => {
               if (e.key === "Enter") applyTempHp();
@@ -738,7 +738,7 @@ export function CombatTab() {
           </p>
           <button
             onClick={applyTempHp}
-            className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+            className="w-full py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
           >
             Aplicar
           </button>
@@ -762,7 +762,7 @@ export function CombatTab() {
             >
               -
             </button>
-            <span className="font-heading text-3xl text-accent w-16 text-center">
+            <span className="font-numeric text-3xl text-accent w-16 text-center">
               {formatModifier(tempAcMod)}
             </span>
             <button

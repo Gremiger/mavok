@@ -171,7 +171,7 @@ export function QuestList({
               {quest.tags.map((t) => (
                 <span
                   key={t}
-                  className="text-[0.6rem] px-1.5 py-0.5 bg-background text-muted rounded"
+                  className="text-xs px-1.5 py-0.5 bg-background text-muted rounded"
                 >
                   {t}
                 </span>
@@ -190,9 +190,9 @@ export function QuestList({
 
       <button
         onClick={openNew}
-        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full bg-accent text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
+        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full btn-primary shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
       >
-        <Plus size={24} />
+        <Plus size={24} strokeWidth={1.5} />
       </button>
 
       <Modal
@@ -274,7 +274,7 @@ export function QuestList({
             )}
             <button
               onClick={handleSave}
-              className="flex-1 py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+              className="flex-1 py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
             >
               {editingId ? "Guardar" : "Agregar"}
             </button>
@@ -326,7 +326,7 @@ export function QuestList({
                   {quest.tags.map((t) => (
                     <span
                       key={t}
-                      className="text-[0.6rem] px-1.5 py-0.5 bg-background text-muted rounded"
+                      className="text-xs px-1.5 py-0.5 bg-background text-muted rounded"
                     >
                       {t}
                     </span>

@@ -43,7 +43,7 @@ export function DiceRoller() {
           <button
             key={d}
             onClick={() => roll(d)}
-            className="px-3 py-2 bg-card border border-border rounded-lg text-sm font-heading text-accent active:scale-95 transition-transform"
+            className="px-3 py-2 bg-card border border-border rounded-lg text-sm font-numeric text-accent active:scale-95 transition-transform"
           >
             {d}
           </button>
@@ -61,7 +61,7 @@ export function DiceRoller() {
         />
         <button
           onClick={handleCustomRoll}
-          className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-heading active:scale-95 transition-transform"
+          className="px-4 py-2 btn-primary rounded-lg text-sm font-heading active:scale-95 transition-transform"
         >
           Tirar
         </button>
@@ -95,7 +95,7 @@ export function DiceRoller() {
                     ` ${r.modifier >= 0 ? "+" : ""}${r.modifier}`}
                 </span>
                 <span className="flex items-center gap-2">
-                  <span className={`font-heading ${i === 0 ? "text-accent" : ""}`}>
+                  <span className={`font-numeric ${i === 0 ? "text-accent" : ""}`}>
                     = {r.total}
                   </span>
                   {crit && (

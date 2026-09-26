@@ -83,7 +83,7 @@ export function FeatsBrowserModal({
             onClick={() => setHideSpellcasting((h) => !h)}
             className={`px-2.5 py-1 rounded-full text-xs ${
               hideSpellcasting
-                ? "bg-accent text-white"
+                ? "btn-primary"
                 : "bg-card border border-border text-muted"
             }`}
           >
@@ -93,7 +93,7 @@ export function FeatsBrowserModal({
             onClick={() => setHideFightingStyle((h) => !h)}
             className={`px-2.5 py-1 rounded-full text-xs ${
               hideFightingStyle
-                ? "bg-accent text-white"
+                ? "btn-primary"
                 : "bg-card border border-border text-muted"
             }`}
           >
@@ -106,7 +106,7 @@ export function FeatsBrowserModal({
             onClick={() => setCategoryFilter("all")}
             className={`px-2.5 py-1 rounded-full text-xs ${
               categoryFilter === "all"
-                ? "bg-accent text-white"
+                ? "btn-primary"
                 : "bg-card border border-border text-muted"
             }`}
           >
@@ -118,7 +118,7 @@ export function FeatsBrowserModal({
               onClick={() => setCategoryFilter(c)}
               className={`px-2.5 py-1 rounded-full text-xs ${
                 categoryFilter === c
-                  ? "bg-accent text-white"
+                  ? "btn-primary"
                   : "bg-card border border-border text-muted"
               }`}
             >
@@ -139,11 +139,11 @@ export function FeatsBrowserModal({
                   <span className="font-heading text-accent text-sm">
                     {f.name}
                   </span>
-                  <span className="text-[0.6rem] text-muted border border-border rounded px-1.5 py-0.5">
+                  <span className="text-xs text-muted border border-border rounded px-1.5 py-0.5">
                     {f.category}
                   </span>
                   <span
-                    className={`text-[0.6rem] px-1.5 py-0.5 rounded ${
+                    className={`text-xs px-1.5 py-0.5 rounded ${
                       status === "Disponible ahora"
                         ? "bg-success/20 text-success"
                         : "bg-card border border-border text-muted"

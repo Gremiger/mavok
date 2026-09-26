@@ -125,7 +125,7 @@ export function JournalList({
             className={`stone-card rounded-lg cursor-pointer active:scale-[0.99] transition-transform ${density === "compact" ? "p-2" : "p-3"}`}
           >
             <div className="flex items-center gap-2">
-              <span className="text-xs px-2 py-0.5 bg-accent/20 text-accent rounded font-heading">
+              <span className="text-xs px-2 py-0.5 bg-accent/20 text-accent rounded font-numeric">
                 S{entry.session}
               </span>
               <h4 className="font-heading text-accent text-sm flex-1">
@@ -145,7 +145,7 @@ export function JournalList({
                     e.stopPropagation();
                     togglePreview(entry.id);
                   }}
-                  className="text-[0.65rem] text-accent mt-0.5"
+                  className="text-xs text-accent mt-0.5"
                 >
                   {expandedPreviews.has(entry.id) ? "ver menos" : "ver más"}
                 </button>
@@ -163,9 +163,9 @@ export function JournalList({
 
       <button
         onClick={openNew}
-        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full bg-accent text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
+        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full btn-primary shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
       >
-        <Plus size={24} />
+        <Plus size={24} strokeWidth={1.5} />
       </button>
 
       {/* New Entry Form */}
@@ -214,7 +214,7 @@ export function JournalList({
           />
           <button
             onClick={handleSave}
-            className="w-full py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+            className="w-full py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
           >
             Guardar
           </button>
@@ -277,7 +277,7 @@ export function JournalList({
                 </button>
                 <button
                   onClick={saveEdit}
-                  className="flex-1 py-2 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+                  className="flex-1 py-2 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
                 >
                   Guardar
                 </button>

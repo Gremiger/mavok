@@ -95,7 +95,7 @@ export function QuickActionsPicker({
           onSave(working);
           onClose();
         }}
-        className="w-full mt-4 py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+        className="w-full mt-4 py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
       >
         Guardar
       </button>

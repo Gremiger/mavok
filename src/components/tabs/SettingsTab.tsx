@@ -229,7 +229,7 @@ export function SettingsTab() {
               }
               right={
                 theme === t.id ? (
-                  <span className="w-5 h-5 rounded border-2 border-accent bg-accent text-white flex items-center justify-center text-xs">
+                  <span className="w-5 h-5 rounded border-2 border-accent btn-primary flex items-center justify-center text-xs">
                     ✓
                   </span>
                 ) : (
@@ -284,7 +284,7 @@ export function SettingsTab() {
               className="w-16 h-16 rounded-full object-cover border border-border"
             />
           ) : (
-            <div className="w-16 h-16 rounded-full border border-border bg-card flex items-center justify-center text-muted text-[0.6rem] text-center">
+            <div className="w-16 h-16 rounded-full border border-border bg-card flex items-center justify-center text-muted text-xs text-center">
               Sin foto
             </div>
           )}
@@ -356,7 +356,7 @@ export function SettingsTab() {
       {/* Level Up */}
       <CollapsibleSection title="Nivel" defaultOpen>
         <div className="text-center py-2">
-          <div className="font-heading text-4xl text-accent">
+          <div className="font-numeric text-4xl text-accent">
             {character.meta.level}
           </div>
           <div className="text-sm text-muted mt-1">
@@ -372,7 +372,7 @@ export function SettingsTab() {
                   setLevelUpDryRun(false);
                   setLevelUpOpen(true);
                 }}
-                className="px-5 py-2 bg-accent text-white rounded-lg font-heading text-sm active:scale-95 transition-transform"
+                className="px-5 py-2 btn-primary rounded-lg font-heading text-sm active:scale-95 transition-transform"
               >
                 Subir de nivel
               </button>
@@ -571,7 +571,7 @@ export function SettingsTab() {
                   className="w-full flex items-center justify-between p-3 text-left"
                 >
                   <div>
-                    <span className="font-heading text-accent text-sm">
+                    <span className="font-numeric text-accent text-sm">
                       {entry.version}
                     </span>
                     <span className="text-sm ml-2">{entry.title}</span>
@@ -606,7 +606,7 @@ export function SettingsTab() {
             Guardado: {new Date(lastSaved).toLocaleTimeString("es")}
           </p>
         )}
-        <p className="mt-1 font-mono text-[0.6rem] text-muted/60">
+        <p className="mt-1 font-mono text-xs text-muted/60">
           {process.env.NEXT_PUBLIC_COMMIT_SHA?.slice(0, 7) || "dev"}
         </p>
       </div>
@@ -620,13 +620,13 @@ export function SettingsTab() {
         <div className="space-y-3">
           <div className="text-center">
             <span className="text-sm">HP: </span>
-            <span className="font-heading text-accent text-lg">
+            <span className="font-numeric text-accent text-lg">
               {character.combat.currentHp}/{character.combat.maxHp}
             </span>
           </div>
           <div className="text-center">
             <span className="text-sm">Dados de golpe: </span>
-            <span className="font-heading text-accent">
+            <span className="font-numeric text-accent">
               {character.combat.hitDice.remaining}/
               {character.combat.hitDice.total}
             </span>
@@ -638,7 +638,7 @@ export function SettingsTab() {
               character.combat.hitDice.remaining <= 0 ||
               character.combat.currentHp >= character.combat.maxHp
             }
-            className="w-full py-3 bg-accent text-white rounded-lg font-heading disabled:opacity-50 active:scale-95 transition-transform"
+            className="w-full py-3 btn-primary rounded-lg font-heading disabled:opacity-50 active:scale-95 transition-transform"
           >
             Gastar dado de golpe (1d12+{conMod})
           </button>
@@ -737,7 +737,7 @@ export function SettingsTab() {
             </button>
             <button
               onClick={applyLongRest}
-              className="flex-1 py-2 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+              className="flex-1 py-2 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
             >
               Confirmar
             </button>
@@ -820,7 +820,7 @@ export function SettingsTab() {
                 });
                 setLevelDownConfirmOpen(false);
               }}
-              className="flex-1 py-2 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+              className="flex-1 py-2 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
             >
               Confirmar
             </button>
@@ -857,7 +857,7 @@ export function SettingsTab() {
                 }
                 setRestoringBackupKey(null);
               }}
-              className="flex-1 py-2 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+              className="flex-1 py-2 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
             >
               Confirmar
             </button>
@@ -889,7 +889,7 @@ export function SettingsTab() {
               </button>
               <button
                 onClick={confirmImport}
-                className="flex-1 py-2 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+                className="flex-1 py-2 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
               >
                 Importar
               </button>

@@ -140,7 +140,7 @@ export function NoteList({
                   .map(([k, v]) => (
                     <span
                       key={k}
-                      className="text-[0.6rem] px-1.5 py-0.5 bg-accent/10 text-accent rounded"
+                      className="text-xs px-1.5 py-0.5 bg-accent/10 text-accent rounded"
                     >
                       {k}: {v}
                     </span>
@@ -152,7 +152,7 @@ export function NoteList({
               {note.tags.map((t) => (
                 <span
                   key={t}
-                  className="text-[0.6rem] px-1.5 py-0.5 bg-background text-muted rounded"
+                  className="text-xs px-1.5 py-0.5 bg-background text-muted rounded"
                 >
                   {t}
                 </span>
@@ -172,9 +172,9 @@ export function NoteList({
       {/* Add FAB */}
       <button
         onClick={openNew}
-        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full bg-accent text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
+        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full btn-primary shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
       >
-        <Plus size={24} />
+        <Plus size={24} strokeWidth={1.5} />
       </button>
 
       {/* Note Form Modal */}
@@ -207,7 +207,7 @@ export function NoteList({
           />
 
           <div className="pt-1 border-t border-border">
-            <span className="text-[0.65rem] text-muted uppercase tracking-wide">
+            <span className="text-xs text-muted italic">
               Detalles
             </span>
           </div>
@@ -259,7 +259,7 @@ export function NoteList({
                         fields: { ...form.fields, [f]: "" },
                       })
                     }
-                    className="text-[0.6rem] px-2 py-0.5 border border-border rounded text-muted hover:border-accent hover:text-accent"
+                    className="text-xs px-2 py-0.5 border border-border rounded text-muted hover:border-accent hover:text-accent"
                   >
                     + {f}
                   </button>
@@ -292,7 +292,7 @@ export function NoteList({
             )}
             <button
               onClick={handleSave}
-              className="flex-1 py-3 bg-accent text-white rounded-lg font-heading active:scale-95 transition-transform"
+              className="flex-1 py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
             >
               {editingId ? "Guardar" : "Agregar"}
             </button>
@@ -333,7 +333,7 @@ export function NoteList({
                       .map(([k, v]) => (
                         <span
                           key={k}
-                          className="text-[0.6rem] px-1.5 py-0.5 bg-accent/10 text-accent rounded"
+                          className="text-xs px-1.5 py-0.5 bg-accent/10 text-accent rounded"
                         >
                           {k}: {v}
                         </span>
@@ -345,7 +345,7 @@ export function NoteList({
                   {note.tags.map((t) => (
                     <span
                       key={t}
-                      className="text-[0.6rem] px-1.5 py-0.5 bg-background text-muted rounded"
+                      className="text-xs px-1.5 py-0.5 bg-background text-muted rounded"
                     >
                       {t}
                     </span>

@@ -99,7 +99,7 @@ export function QuickNotes() {
         />
         <button
           onClick={handleAdd}
-          className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-heading active:scale-95 transition-transform"
+          className="px-4 py-2 btn-primary rounded-lg text-sm font-heading active:scale-95 transition-transform"
         >
           +
         </button>
@@ -123,7 +123,7 @@ export function QuickNotes() {
                   />
                   <button
                     onClick={saveEdit}
-                    className="text-xs px-2 py-1 bg-accent text-white rounded"
+                    className="text-xs px-2 py-1 btn-primary rounded"
                   >
                     Guardar
                   </button>
