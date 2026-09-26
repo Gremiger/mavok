@@ -66,9 +66,9 @@ export function HpModal({
               className={`flex-1 py-2 rounded-full text-sm font-heading transition-colors ${
                 mode === m
                   ? m === "damage"
-                    ? "bg-danger text-white"
+                    ? "bg-danger text-background"
                     : m === "heal"
-                      ? "bg-success text-white"
+                      ? "bg-success text-background"
                       : "btn-primary"
                   : "bg-card border border-border text-muted"
               }`}

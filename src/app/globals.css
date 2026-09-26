@@ -14,8 +14,8 @@
   --color-foreground: var(--fg);
   --color-muted: var(--muted);
   --color-border: var(--border-color);
-  --color-danger: #8b3a3a;
-  --color-success: #4a7c59;
+  --color-danger: var(--danger);
+  --color-success: var(--success);
   --color-rage: var(--cord);
 }
 
@@ -29,6 +29,8 @@
   --muted: #a8977a;
   --accent: #e9b877;
   --cord: #c9463a;
+  --danger: #e27d6e;
+  --success: #86b98f;
   --border-color: #4a3d2e;
   --nav-bg: rgba(34, 27, 21, 0.94);
   --grain-opacity: 0.07;
@@ -45,6 +47,8 @@
   --muted: #a39088;
   --accent: #e06a52;
   --cord: #d23a2c;
+  --danger: #f08878;
+  --success: #86b98f;
   --border-color: #3a2a28;
   --nav-bg: rgba(24, 21, 20, 0.94);
   --grain-opacity: 0.06;
@@ -61,6 +65,8 @@
   --muted: #5f4b30;
   --accent: #7a1f1f;
   --cord: #9b2c22;
+  --danger: #8e2a1e;
+  --success: #2f5e37;
   --border-color: #b8a27a;
   --nav-bg: rgba(235, 223, 193, 0.94);
   --grain-opacity: 0.1;
@@ -77,6 +83,8 @@
   --muted: #4f606b;
   --accent: #2f5f86;
   --cord: #7a1f2b;
+  --danger: #9a2433;
+  --success: #2b6a43;
   --border-color: #b3c3cc;
   --nav-bg: rgba(238, 243, 245, 0.94);
   --grain-opacity: 0.08;

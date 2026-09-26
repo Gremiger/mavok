@@ -294,9 +294,9 @@ export function CombatTab() {
 
       <CompactRow
         name={
-          <span className="flex items-center gap-2">
-            Exhaustion
-            <span className="flex gap-1" aria-hidden="true">
+          <span className="flex items-center gap-2 min-w-0">
+            <span className="truncate min-w-0">Exhaustion</span>
+            <span className="flex gap-1 shrink-0" aria-hidden="true">
               {Array.from({ length: 6 }, (_, i) => (
                 <span
                   key={i}
@@ -306,7 +306,7 @@ export function CombatTab() {
                 />
               ))}
             </span>
-            <span className="font-numeric text-muted text-xs">{combat.exhaustionLevel}/6</span>
+            <span className="font-numeric text-muted text-xs shrink-0">{combat.exhaustionLevel}/6</span>
           </span>
         }
         onClick={() => setExhaustionExpanded((e) => !e)}

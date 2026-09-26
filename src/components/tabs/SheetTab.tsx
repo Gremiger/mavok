@@ -232,12 +232,14 @@ export function SheetTab() {
                 />
                 <span>{abilityName(ab)}</span>
                 {ab === "dex" && hasDangerSense && (
-                  <Zap
-                    size={12}
-                    strokeWidth={1.5}
-                    className="text-accent"
+                  <span
+                    role="img"
+                    title="Ventaja automática (Danger Sense)"
                     aria-label="Ventaja automática (Danger Sense)"
-                  />
+                    className="inline-flex"
+                  >
+                    <Zap size={12} strokeWidth={1.5} className="text-accent" aria-hidden="true" />
+                  </span>
                 )}
               </div>
               <span className="font-numeric font-semibold text-accent">

@@ -7,7 +7,7 @@ import { THEME_META } from "@/hooks/useTheme";
 const css = readFileSync(path.resolve(process.cwd(), "src/app/globals.css"), "utf8");
 const themes = parseThemeTokens(css);
 const SURFACES = ["bg", "card", "surface-hi", "surface-lo"] as const;
-const TEXT_TOKENS = ["fg", "muted", "accent"] as const;
+const TEXT_TOKENS = ["fg", "muted", "accent", "danger", "success"] as const;
 
 describe.each(THEME_META.map((t) => [t.id, t] as const))("theme %s", (id, meta) => {
   const tokens = themes[id];
