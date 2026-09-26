@@ -46,3 +46,6 @@ next-env.d.ts
 # Source photos for custom dice themes — not needed by the running app,
 # only the derived theme assets under public/assets/themes/ ship.
 /dadosreales/
+
+# UI screenshots captured for external design review, not project artifacts
+/.ui-screenshots/
