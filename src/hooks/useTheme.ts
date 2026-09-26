@@ -8,11 +8,12 @@ export const THEME_META: {
   id: AppSettings["theme"];
   label: string;
   swatch: string;
+  bg: string;
 }[] = [
-  { id: "piedra-viva", label: "Piedra Viva", swatch: "#b87333" },
-  { id: "cumbre-helada", label: "Cumbre Helada", swatch: "#2f6690" },
-  { id: "pergamino", label: "Pergamino", swatch: "#9c2b2b" },
-  { id: "furia-de-sangre", label: "Furia de Sangre", swatch: "#c23b2b" },
+  { id: "piedra-viva", label: "Piedra Viva", swatch: "#e9b877", bg: "#17130f" },
+  { id: "cumbre-helada", label: "Cumbre Helada", swatch: "#2f5f86", bg: "#dfe7ec" },
+  { id: "pergamino", label: "Pergamino", swatch: "#7a1f1f", bg: "#d9c9a3" },
+  { id: "furia-de-sangre", label: "Furia de Sangre", swatch: "#d23a2c", bg: "#0f0e0e" },
 ];
 
 export function useTheme() {

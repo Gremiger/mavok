@@ -1,11 +1,14 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-heading: var(--font-cormorant);
-  --font-body: var(--font-dm-sans);
+  --font-heading: var(--font-fell);
+  --font-body: var(--font-spectral);
+  --font-numeric: var(--font-fraunces);
 
   --color-background: var(--bg);
   --color-card: var(--card);
+  --color-surface-hi: var(--surface-hi);
+  --color-surface-lo: var(--surface-lo);
   --color-accent: var(--accent);
   --color-cord: var(--cord);
   --color-foreground: var(--fg);
@@ -18,23 +21,67 @@
 
 :root,
 [data-theme="piedra-viva"] {
-  --bg: #14100c;
-  --card: #1f1710;
-  --accent: #c98a4b;
-  --cord: #a63d2f;
-  --fg: #d9c9a3;
-  --muted: #5c4f3d;
-  --border-color: #4a3520;
+  --bg: #17130f;
+  --surface-hi: #2a221a;
+  --surface-lo: #1d1812;
+  --card: #1f1913;
+  --fg: #e8dcc2;
+  --muted: #a8977a;
+  --accent: #e9b877;
+  --cord: #c9463a;
+  --border-color: #4a3d2e;
+  --nav-bg: rgba(34, 27, 21, 0.94);
+  --grain-opacity: 0.07;
+  --lip: rgba(0, 0, 0, 0.45);
+  --slab-shadow: rgba(20, 10, 2, 0.75);
+}
+
+[data-theme="furia-de-sangre"] {
+  --bg: #0f0e0e;
+  --surface-hi: #211d1c;
+  --surface-lo: #161413;
+  --card: #181615;
+  --fg: #ece6e0;
+  --muted: #a39088;
+  --accent: #e06a52;
+  --cord: #d23a2c;
+  --border-color: #3a2a28;
+  --nav-bg: rgba(24, 21, 20, 0.94);
+  --grain-opacity: 0.06;
+  --lip: rgba(0, 0, 0, 0.5);
+  --slab-shadow: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="pergamino"] {
+  --bg: #d9c9a3;
+  --surface-hi: #f1e6c8;
+  --surface-lo: #e6d7b2;
+  --card: #ebdfc1;
+  --fg: #2e2215;
+  --muted: #5f4b30;
+  --accent: #7a1f1f;
+  --cord: #9b2c22;
+  --border-color: #b8a27a;
+  --nav-bg: rgba(235, 223, 193, 0.94);
+  --grain-opacity: 0.1;
+  --lip: rgba(90, 60, 25, 0.16);
+  --slab-shadow: rgba(80, 55, 20, 0.35);
 }
 
 [data-theme="cumbre-helada"] {
-  --bg: #e9f1f5;
-  --card: #f8fbfc;
-  --accent: #2f6690;
+  --bg: #dfe7ec;
+  --surface-hi: #f7fafb;
+  --surface-lo: #e9eff2;
+  --card: #eef3f5;
+  --fg: #1c2a33;
+  --muted: #4f606b;
+  --accent: #2f5f86;
   --cord: #7a1f2b;
-  --fg: #1f2e38;
-  --muted: #6c7f8a;
-  --border-color: #b7c8d1;
+  --border-color: #b3c3cc;
+  --nav-bg: rgba(238, 243, 245, 0.94);
+  --grain-opacity: 0.08;
+  --lip: rgba(30, 50, 65, 0.14);
+  --slab-shadow: rgba(30, 50, 65, 0.3);
 }
 
 [data-theme="cumbre-helada"] body {
@@ -90,26 +137,6 @@
     /* base color */
     var(--bg);
   background-attachment: fixed;
-}
-
-[data-theme="pergamino"] {
-  --bg: #d9c396;
-  --card: #f3e9cc;
-  --accent: #7a1f1f;
-  --cord: #5c3a1f;
-  --fg: #3a2c14;
-  --muted: #8a7554;
-  --border-color: #9c8a54;
-}
-
-[data-theme="furia-de-sangre"] {
-  --bg: #0a0a0a;
-  --card: #131313;
-  --accent: #c23b2b;
-  --cord: #6e1414;
-  --fg: #ece8e4;
-  --muted: #6b4444;
-  --border-color: #2a2a2a;
 }
 
 /* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
