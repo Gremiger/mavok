@@ -127,77 +127,36 @@ body::before {
     0 10px 24px -10px var(--slab-shadow);
 }
 
-/* Red cord — braided wool string */
-.cord-line {
-  position: relative;
+/* Chapters: Roman numerals per tab, via CSS counters (see CollapsibleSection) */
+.chapter-num {
+  display: none;
 }
-.cord-line::before {
-  content: '';
-  position: absolute;
-  left: 2px;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background:
-    repeating-linear-gradient(
-      180deg,
-      var(--cord) 0px,
-      color-mix(in srgb, var(--cord) 70%, #000) 3px,
-      var(--cord) 6px
-    );
-  opacity: 0.5;
-  border-radius: 2px;
-  box-shadow: 0 0 3px rgba(166,61,47,0.15);
+.chapters {
+  counter-reset: chapter;
 }
-
-/* Cord knot — thicker twisted bump on the string */
-.cord-knot::before {
-  content: '';
-  position: absolute;
-  left: calc(-1rem - 2px);
-  top: 50%;
-  transform: translateY(-50%);
-  width: 11px;
-  height: 11px;
-  background: radial-gradient(
-    circle at 40% 35%,
-    color-mix(in srgb, var(--cord) 80%, #fff) 0%,
-    var(--cord) 40%,
-    color-mix(in srgb, var(--cord) 60%, #000) 100%
-  );
-  border-radius: 50%;
-  box-shadow:
-    0 1px 2px rgba(0,0,0,0.4),
-    inset 0 -1px 1px rgba(0,0,0,0.3),
-    inset 0 1px 1px rgba(255,255,255,0.1);
+.chapters .chapter {
+  counter-increment: chapter;
 }
-
-/* Stone crack divider */
-.crack-divider {
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--accent) 8%,
-    color-mix(in srgb, var(--accent) 40%, transparent) 20%,
-    transparent 28%,
-    var(--accent) 35%,
-    color-mix(in srgb, var(--accent) 60%, transparent) 55%,
-    transparent 62%,
-    color-mix(in srgb, var(--accent) 30%, transparent) 70%,
-    var(--accent) 82%,
-    transparent 100%
-  );
-  position: relative;
+/* Fixed, right-aligned column so titles line up from I through VIII */
+.chapters .chapter-num {
+  display: inline-block;
+  min-width: 2.6rem;
+  text-align: right;
 }
-.crack-divider::after {
-  content: '';
-  position: absolute;
-  inset: -1px 0;
-  height: 3px;
-  background: inherit;
-  filter: blur(3px);
-  opacity: 0.4;
+.chapters .chapter-num::before {
+  content: counter(chapter, upper-roman);
+}
+/* Sections inside modals: no numeral, don't consume the tab's numbering */
+.chapters dialog .chapter {
+  counter-increment: none;
+}
+.chapters dialog .chapter-num {
+  display: none;
+}
+.chapter-leader {
+  min-width: 1rem;
+  border-bottom: 1px dotted var(--border-color);
+  transform: translateY(-0.3em);
 }
 
 /* Rage active — animated border sheen, replaces the old static glow */

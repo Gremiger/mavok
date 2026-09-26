@@ -250,7 +250,7 @@ export function CombatTab() {
         </div>
       )}
 
-      <div className="crack-divider" />
+      <div className="rule-line" />
 
       {/* Conditions */}
       <div className="flex flex-col gap-1.5">
@@ -324,7 +324,7 @@ export function CombatTab() {
 
       {/* Actions */}
       <div ref={attacksSectionRef}>
-      <CollapsibleSection title="Acciones" defaultOpen forceOpenKey={attacksForceOpenKey}>
+      <CollapsibleSection title="Acciones" defaultOpen forceOpenKey={attacksForceOpenKey} count={attacks.length}>
         {attacks.map((a, i) => (
           <AttackRow
             key={a.id}

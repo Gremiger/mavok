@@ -148,8 +148,8 @@ export function SheetTab() {
   return (
     <div className="p-4 space-y-0">
       {/* Header */}
-      <div className="mb-6 cord-line pl-4">
-        <div className="relative cord-knot flex items-center gap-3">
+      <div className="mb-6">
+        <div className="flex items-center gap-3">
           {meta.portraitDataUrl ? (
             <img
               src={meta.portraitDataUrl}
@@ -165,7 +165,7 @@ export function SheetTab() {
             {meta.name}
           </h1>
         </div>
-        <div className="crack-divider mt-2 mb-2" />
+        <div className="rule-line mt-2 mb-2" />
         <p className="text-muted text-sm">
           {meta.class} {meta.subclass ? `· ${meta.subclass}` : ""} — Nivel{" "}
           {meta.level}
@@ -176,11 +176,11 @@ export function SheetTab() {
       </div>
 
       {/* Atributos */}
-      <div className="relative">
-        <div className="absolute right-0 top-0 z-10" style={{ marginTop: "0.9rem" }}>
-          <GhostChip>PB {formatModifier(meta.proficiencyBonus)}</GhostChip>
-        </div>
-        <CollapsibleSection title="Atributos" defaultOpen>
+      <CollapsibleSection
+        title="Atributos"
+        defaultOpen
+        aside={<GhostChip>PB {formatModifier(meta.proficiencyBonus)}</GhostChip>}
+      >
         <div className="grid grid-cols-3 gap-2">
           {ABILITIES.map((ab) => (
             <button
@@ -208,10 +208,9 @@ export function SheetTab() {
           </div>
         )}
       </CollapsibleSection>
-      </div>
 
       {/* Tiradas de salvación */}
-      <CollapsibleSection title="Tiradas de salvación">
+      <CollapsibleSection title="Tiradas de salvación" count={ABILITIES.length}>
         <div className="space-y-1">
           {ABILITIES.map((ab) => (
             <button
@@ -258,13 +257,15 @@ export function SheetTab() {
       </CollapsibleSection>
 
       {/* Habilidades */}
-      <div className="relative">
-        <div className="absolute right-0 top-0 z-10" style={{ marginTop: "0.9rem" }}>
+      <CollapsibleSection
+        title="Habilidades"
+        count={Object.keys(skills).length}
+        aside={
           <GhostChip onClick={() => setGroupByAbility((g) => !g)}>
             {groupByAbility ? "A–Z" : "Grupo"}
           </GhostChip>
-        </div>
-        <CollapsibleSection title="Habilidades">
+        }
+      >
           <div className="flex gap-2 flex-wrap mb-3">
             {[
               { label: "Percepción Pasiva", value: passivePerception },
@@ -311,8 +312,7 @@ export function SheetTab() {
               />
             </div>
           )}
-        </CollapsibleSection>
-      </div>
+      </CollapsibleSection>
 
       {/* Competencias */}
       <CollapsibleSection title="Competencias">
@@ -337,7 +337,10 @@ export function SheetTab() {
       </CollapsibleSection>
 
       {/* Rasgos y características */}
-      <CollapsibleSection title="Rasgos y características">
+      <CollapsibleSection
+        title="Rasgos y características"
+        count={features.filter((f) => f.source !== "Dote" && f.level <= meta.level).length}
+      >
         <div className="space-y-3">
           {features
             .filter(f => f.source !== "Dote" && f.level <= meta.level)
@@ -366,7 +369,10 @@ export function SheetTab() {
       </CollapsibleSection>
 
       {/* Dotes */}
-      <CollapsibleSection title="Dotes">
+      <CollapsibleSection
+        title="Dotes"
+        count={features.filter((f) => f.source === "Dote" && f.level <= meta.level).length}
+      >
         <div className="space-y-3">
           {features
             .filter(f => f.source === "Dote" && f.level <= meta.level)

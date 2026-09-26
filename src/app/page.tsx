@@ -93,7 +93,7 @@ export default function Home() {
           <DiceBoxCanvas />
           <div className="flex flex-col min-h-dvh">
             <motion.main
-              className="flex-1 overflow-y-auto pb-safe-nav"
+              className="chapters flex-1 overflow-y-auto pb-safe-nav"
               style={{ x: dragX, opacity: dragOpacity, touchAction: 'pan-y pinch-zoom' }}
               drag={
                 isPinching ||
