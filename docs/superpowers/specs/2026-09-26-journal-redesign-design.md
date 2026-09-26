@@ -54,9 +54,9 @@ Starting palettes (final values must pass the contrast test in §4):
 | `--surface-lo` | `#1d1812` | `#161413` | `#e6d7b2` | `#e9eff2` |
 | `--card` | `#1f1913` | `#181615` | `#ebdfc1` | `#eef3f5` |
 | `--fg` | `#e8dcc2` | `#ece6e0` | `#2e2215` | `#1c2a33` |
-| `--muted` | `#a8977a` | `#a39088` | `#6b5639` | `#4f606b` |
+| `--muted` | `#a8977a` | `#a39088` | `#5f4b30` | `#4f606b` |
 | `--accent` | `#e9b877` | `#e06a52` | `#7a1f1f` | `#2f5f86` |
-| `--cord` (seal) | `#c9463a` | `#b3261e` | `#9b2c22` | `#7a1f2b` |
+| `--cord` (seal) | `#c9463a` | `#d23a2c` | `#9b2c22` | `#7a1f2b` |
 | `--border-color` | `#4a3d2e` | `#3a2a28` | `#b8a27a` | `#b3c3cc` |
 
 `--danger` / `--success` stay as today.
@@ -64,7 +64,7 @@ Starting palettes (final values must pass the contrast test in §4):
 ### Texture and chrome
 
 - Replace the three copy-pasted crack-gradient `body` backgrounds in `globals.css` with **one** rule: an inline SVG `feTurbulence` grain at `--grain-opacity` plus a soft radial glow at the top in `--surface-hi`. Light themes add a faint vignette.
-- `theme-color` meta follows the active theme: `useTheme` updates the `<meta name="theme-color">` content to the theme's `--bg` on load and on change.
+- `theme-color` meta follows the active theme: `THEME_META` in `useTheme.ts` gains a `bg` field (kept equal to the CSS `--bg` by the contrast test); `useTheme` writes it to `<meta name="theme-color">` on load and on change.
 - Global `:focus-visible` ring: 2px `--accent` outline, 2px offset. Buttons keep/gain `active:scale-[0.98]` press feedback with a 150–200ms transition.
 
 ## 2. Shared components
@@ -132,7 +132,7 @@ After every phase:
 - Screenshots at 390px of Ficha and Combate in all four themes, compared against the mockup; include rage-active, dying (death saves), and no-conditions states.
 - Quick pass through Inventario, Notas, Enciclopedia, Ajustes: fix anything broken; note (don't redesign) anything merely plain.
 
-New test: `src/lib/themeContrast.test.ts` reads `src/app/globals.css`, extracts each `[data-theme="…"]` block's hex values for `--bg`, `--card`, `--fg`, `--muted`, and asserts WCAG contrast ≥ 4.5:1 for `--fg` and `--muted` against both `--bg` and `--card` in all four themes. `globals.css` stays the single source of truth; the test fails if a theme block or token is missing. Token values in the theme blocks must therefore be plain 6-digit hex.
+New test: `src/lib/themeContrast.test.ts` reads `src/app/globals.css`, extracts each `[data-theme="…"]` block's hex values, and asserts in all four themes: WCAG contrast ≥ 4.5:1 for `--fg`, `--muted` and `--accent` (all used as text) against `--bg`, `--card`, `--surface-hi` and `--surface-lo`; ≥ 3:1 for `--cord` (used for large numerals and marks) against the same four. It also asserts each theme's `THEME_META` `bg` (used for the `theme-color` meta) equals its CSS `--bg`. `globals.css` stays the single source of truth; the test fails if a theme block or token is missing. Token values in the theme blocks must therefore be plain 6-digit hex.
 
 `public/sw.js` changes on each build — expected, commit it alongside.
 
