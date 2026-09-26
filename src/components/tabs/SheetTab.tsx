@@ -8,7 +8,8 @@ import { GhostChip } from "@/components/ui/GhostChip";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { FeatsBrowserModal } from "@/components/sheet/FeatsBrowserModal";
 import { Markdown } from "@/components/ui/Markdown";
-import { User } from "lucide-react";
+import { User, Zap } from "lucide-react";
+import { splitNameHighlight } from "@/lib/nameHighlight";
 import type { AbilityScore } from "@/lib/types";
 import type { DiceRoll } from "@/lib/dice";
 import { rollD20Mode, rollD20WithAdvantageMode } from "@/lib/rollWithMode";
@@ -19,6 +20,7 @@ import {
   formatModifier,
   abilityLabel,
   abilityLabelShort,
+  abilityName,
   skillLabel,
   skillTotal,
   saveTotal,
@@ -71,6 +73,7 @@ export function SheetTab() {
   const passivePerception = 10 + skillTotal(character, 'perception');
   const passiveInsight = 10 + skillTotal(character, 'insight');
   const passiveInvestigation = 10 + skillTotal(character, 'investigation');
+  const nameParts = splitNameHighlight(meta.name);
 
   async function rollAbility(ab: AbilityScore) {
     const mod = abilityModifier(attributes[ab]) + exhaustionPenalty(combat.exhaustionLevel);
@@ -116,11 +119,7 @@ export function SheetTab() {
           className="flex-1 flex items-center justify-between py-1.5 px-1 text-sm rounded hover:bg-card/50 active:scale-[0.99] transition-transform cursor-pointer"
         >
           <div className="flex items-center gap-2">
-            <span
-              className={`w-3 h-3 rounded-full border ${
-                skill.proficient ? "bg-accent border-accent" : "border-muted"
-              }`}
-            />
+            <span className={`prof-mark ${skill.proficient ? "is-on" : ""}`} aria-hidden="true" />
             <span>{skillLabel(key)}</span>
             {showAbility && (
               <span className="text-muted text-xs">
@@ -128,7 +127,7 @@ export function SheetTab() {
               </span>
             )}
           </div>
-          <span className="font-heading text-accent">
+          <span className="font-numeric font-semibold text-accent">
             {formatModifier(skillTotal(character!, key) + exhaustionPenalty(combat.exhaustionLevel))}
           </span>
         </button>
@@ -136,7 +135,7 @@ export function SheetTab() {
           <button
             onClick={() => rollSkillStr(key)}
             title="Tirar con FUE (Primal Knowledge)"
-            className="px-1.5 py-1 text-[0.6rem] border border-accent/50 text-accent rounded shrink-0"
+            className="ink-stamp shrink-0"
           >
             FUE
           </button>
@@ -148,53 +147,61 @@ export function SheetTab() {
   return (
     <div className="p-4 space-y-0">
       {/* Header */}
-      <div className="mb-6">
+      <header className="mb-6">
         <div className="flex items-center gap-3">
           {meta.portraitDataUrl ? (
             <img
               src={meta.portraitDataUrl}
               alt={meta.name}
-              className="w-14 h-14 rounded-full object-cover border-2 border-accent shrink-0"
+              className="w-14 h-14 rounded-xl object-cover border border-accent/60 shrink-0"
             />
           ) : (
-            <div className="w-14 h-14 rounded-full border-2 border-border bg-card flex items-center justify-center text-muted shrink-0">
-              <User size={24} />
+            <div className="w-14 h-14 rounded-xl stone-card flex items-center justify-center text-muted shrink-0">
+              <User size={24} strokeWidth={1.5} />
             </div>
           )}
-          <h1 className="font-heading text-3xl text-accent font-bold tracking-wide">
-            {meta.name}
-          </h1>
+          <div className="min-w-0">
+            <p className="font-heading italic text-sm text-muted">Diario de campaña de</p>
+            <h1 className="font-heading text-[2.125rem] leading-[1.02] text-foreground [text-wrap:balance]">
+              {nameParts.before}
+              {nameParts.highlight && <span className="text-cord">{nameParts.highlight}</span>}
+              {nameParts.after}
+            </h1>
+          </div>
         </div>
-        <div className="rule-line mt-2 mb-2" />
-        <p className="text-muted text-sm">
-          {meta.class} {meta.subclass ? `· ${meta.subclass}` : ""} — Nivel{" "}
-          {meta.level}
+        <div className="rule-line mt-3 mb-2" />
+        <p className="text-sm text-muted">
+          {meta.class} {meta.subclass ? `· ${meta.subclass}` : ""} · Nivel{" "}
+          <span className="font-numeric">{meta.level}</span>
         </p>
-        <p className="text-muted text-xs mt-0.5">
+        <p className="text-sm text-muted mt-0.5">
           {meta.species} · {meta.giantAncestry} · {meta.background} · {meta.origin}
         </p>
-      </div>
+      </header>
 
       {/* Atributos */}
       <CollapsibleSection
         title="Atributos"
         defaultOpen
-        aside={<GhostChip>PB {formatModifier(meta.proficiencyBonus)}</GhostChip>}
+        aside={
+          <span className="font-heading italic text-sm text-muted">
+            competencia{" "}
+            <span className="font-numeric not-italic">{formatModifier(meta.proficiencyBonus)}</span>
+          </span>
+        }
       >
         <div className="grid grid-cols-3 gap-2">
           {ABILITIES.map((ab) => (
             <button
               key={ab}
               onClick={() => rollAbility(ab)}
-              className="stone-card rounded-lg p-2 text-center active:scale-95 transition-transform cursor-pointer"
+              className="stone-card rounded-xl px-1 pt-2 pb-2.5 text-center active:scale-[0.97] transition-transform duration-150 cursor-pointer"
             >
-              <div className="text-muted text-[0.6rem] uppercase tracking-widest">{abilityLabel(ab)}</div>
-              <div className="font-heading text-3xl text-accent font-bold leading-tight">
-                {attributes[ab]}
-              </div>
-              <div className="text-xs text-foreground/70 font-heading">
+              <div className="italic text-xs text-muted truncate">{abilityName(ab)}</div>
+              <div className="font-numeric font-black text-[1.8rem] leading-tight text-foreground">
                 {formatModifier(abilityModifier(attributes[ab]) + exhaustionPenalty(combat.exhaustionLevel))}
               </div>
+              <div className="font-numeric text-xs text-accent">{attributes[ab]}</div>
             </button>
           ))}
         </div>
@@ -220,23 +227,20 @@ export function SheetTab() {
             >
               <div className="flex items-center gap-2">
                 <span
-                  className={`w-3 h-3 rounded-full border ${
-                    savingThrows[ab]?.proficient
-                      ? "bg-accent border-accent"
-                      : "border-muted"
-                  }`}
+                  className={`prof-mark ${savingThrows[ab]?.proficient ? "is-on" : ""}`}
+                  aria-hidden="true"
                 />
-                <span>{abilityLabel(ab)}</span>
+                <span>{abilityName(ab)}</span>
                 {ab === "dex" && hasDangerSense && (
-                  <span
-                    className="text-[0.6rem]"
-                    title="Ventaja automática (Danger Sense)"
-                  >
-                    ⚡
-                  </span>
+                  <Zap
+                    size={12}
+                    strokeWidth={1.5}
+                    className="text-accent"
+                    aria-label="Ventaja automática (Danger Sense)"
+                  />
                 )}
               </div>
-              <span className="font-heading text-accent">
+              <span className="font-numeric font-semibold text-accent">
                 {formatModifier(saveTotal(character, ab) + exhaustionPenalty(combat.exhaustionLevel))}
                 {magicItemIndicator === "explicit-tag" && magicSaveBonus !== 0 && (
                   <span className="ml-1">✦{formatModifier(magicSaveBonus)}</span>
@@ -273,8 +277,8 @@ export function SheetTab() {
               { label: "Investigación Pasiva", value: passiveInvestigation },
             ].map(({ label, value }) => (
               <div key={label} className="stone-card rounded-lg px-2 py-1 flex items-center gap-1.5">
-                <span className="text-muted text-[0.6rem] uppercase tracking-wider">{label}</span>
-                <span className="font-heading text-accent text-sm font-bold">{value}</span>
+                <span className="text-muted text-xs italic">{label}</span>
+                <span className="font-numeric font-semibold text-accent text-sm">{value}</span>
               </div>
             ))}
           </div>
@@ -285,8 +289,8 @@ export function SheetTab() {
                   if (group.length === 0) return null;
                   return (
                     <div key={ab} className="mb-2">
-                      <div className="text-muted text-[0.6rem] uppercase tracking-widest px-1 mb-1">
-                        {abilityLabelShort(ab)}
+                      <div className="font-heading italic text-sm text-muted px-1 mb-1">
+                        {abilityName(ab)}
                       </div>
                       {group
                         .sort(([a], [b]) => skillLabel(a).localeCompare(skillLabel(b)))
@@ -318,19 +322,19 @@ export function SheetTab() {
       <CollapsibleSection title="Competencias">
         <div className="space-y-3 text-sm">
           <div>
-            <h4 className="text-muted text-xs uppercase mb-1">Armaduras</h4>
+            <h4 className="font-heading italic text-sm text-muted mb-0.5">Armaduras</h4>
             <p>{proficiencies.armor.join(", ")}</p>
           </div>
           <div>
-            <h4 className="text-muted text-xs uppercase mb-1">Armas</h4>
+            <h4 className="font-heading italic text-sm text-muted mb-0.5">Armas</h4>
             <p>{proficiencies.weapons.join(", ")}</p>
           </div>
           <div>
-            <h4 className="text-muted text-xs uppercase mb-1">Herramientas</h4>
+            <h4 className="font-heading italic text-sm text-muted mb-0.5">Herramientas</h4>
             <p>{proficiencies.tools.join(", ")}</p>
           </div>
           <div>
-            <h4 className="text-muted text-xs uppercase mb-1">Idiomas</h4>
+            <h4 className="font-heading italic text-sm text-muted mb-0.5">Idiomas</h4>
             <p>{proficiencies.languages.join(", ")}</p>
           </div>
         </div>
@@ -347,10 +351,10 @@ export function SheetTab() {
             .map((f, i) => (
             <div key={i} className="stone-card rounded-lg p-3">
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-heading text-accent text-base font-semibold">
+                <span className="font-heading text-foreground text-lg leading-tight">
                   {f.name}
                 </span>
-                <span className="text-muted text-[0.6rem] px-1.5 py-0.5 border border-border rounded uppercase tracking-wider">
+                <span className="ink-stamp">
                   {f.source}
                 </span>
               </div>
@@ -379,7 +383,7 @@ export function SheetTab() {
             .map((f, i) => (
               <div key={i} className="stone-card rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-heading text-accent text-base font-semibold">
+                  <span className="font-heading text-foreground text-lg leading-tight">
                     {f.name}
                   </span>
                 </div>
@@ -389,7 +393,7 @@ export function SheetTab() {
               </div>
             ))}
           {features.filter(f => f.source === "Dote" && f.level <= meta.level).length === 0 && (
-            <p className="text-muted text-sm text-center py-4">Sin dotes todavía.</p>
+            <p className="text-muted text-sm italic text-center py-4">Sin dotes todavía.</p>
           )}
           <CompactRow
             conditional
@@ -409,19 +413,19 @@ export function SheetTab() {
       <CollapsibleSection title="Personalidad">
         <div className="space-y-3 text-sm">
           <div>
-            <h4 className="text-muted text-xs uppercase mb-1">Rasgo</h4>
+            <h4 className="font-heading italic text-sm text-muted mb-0.5">Rasgo</h4>
             <p>{meta.personalityTrait}</p>
           </div>
           <div>
-            <h4 className="text-muted text-xs uppercase mb-1">Ideal</h4>
+            <h4 className="font-heading italic text-sm text-muted mb-0.5">Ideal</h4>
             <p>{meta.ideal}</p>
           </div>
           <div>
-            <h4 className="text-muted text-xs uppercase mb-1">Vínculo</h4>
+            <h4 className="font-heading italic text-sm text-muted mb-0.5">Vínculo</h4>
             <p>{meta.bond}</p>
           </div>
           <div>
-            <h4 className="text-muted text-xs uppercase mb-1">Defecto</h4>
+            <h4 className="font-heading italic text-sm text-muted mb-0.5">Defecto</h4>
             <p>{meta.flaw}</p>
           </div>
         </div>

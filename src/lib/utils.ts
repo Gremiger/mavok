@@ -89,6 +89,19 @@ export function abilityLabel(key: AbilityScore): string {
   return ABILITY_LABELS[key] || key.toUpperCase();
 }
 
+const ABILITY_NAMES: Record<AbilityScore, string> = {
+  str: "Fuerza",
+  dex: "Destreza",
+  con: "Constitución",
+  int: "Inteligencia",
+  wis: "Sabiduría",
+  cha: "Carisma",
+};
+
+export function abilityName(key: AbilityScore): string {
+  return ABILITY_NAMES[key];
+}
+
 const ABILITY_LABELS_SHORT: Record<AbilityScore, string> = {
   str: "STR",
   dex: "DEX",
