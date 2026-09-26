@@ -10,7 +10,7 @@ import { linkifyConditions } from "@/lib/linkifyConditions";
 import { CONDITIONS } from "@/data/conditions";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { Markdown } from "@/components/ui/Markdown";
-import { Sword, Target, Hammer } from "lucide-react";
+import { Sword, Target, Hammer, MoreHorizontal } from "lucide-react";
 import { useThemeContext } from "@/lib/context";
 
 const DAMAGE_TYPE_ICONS: Record<string, typeof Sword> = {
@@ -111,20 +111,18 @@ export function AttackRow({
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-heading text-sm text-accent truncate">
+            <span className="font-heading text-[1.1875rem] leading-tight text-foreground truncate">
               {attack.name}
             </span>
-            {attack.mastery && (
-              <span className="text-[0.6rem] px-1.5 py-0.5 bg-accent/20 text-accent rounded">
-                {attack.mastery}
-              </span>
-            )}
+            {attack.mastery && <span className="ink-stamp">{attack.mastery}</span>}
           </div>
-          <div className="text-[0.6875rem] text-muted mt-0.5">
+          <div className="text-xs text-muted mt-0.5">
             {DamageIcon && (
-              <DamageIcon size={11} className="inline-block mb-0.5 mr-1" />
+              <DamageIcon size={12} strokeWidth={1.5} className="inline-block mb-0.5 mr-1" />
             )}
-            {formatModifier(effectiveAttackBonus)} · {displayDamage()} {attack.damageType.slice(0, 4).toLowerCase()}. · {attack.range}
+            <span className="font-numeric">{formatModifier(effectiveAttackBonus)}</span> ·{" "}
+            <span className="font-numeric">{displayDamage()}</span>{" "}
+            {attack.damageType.slice(0, 4).toLowerCase()}. · {attack.range}
             {magicItemIndicator === "explicit-tag" &&
               (attackMagicBonus !== 0 || damageMagicBonus !== 0) &&
               (attackMagicBonus === damageMagicBonus ? (
@@ -145,7 +143,7 @@ export function AttackRow({
               e.stopPropagation();
               handleRollHit();
             }}
-            className="px-2.5 py-1 bg-accent/20 text-accent rounded-full text-[0.6875rem] font-heading active:scale-95 transition-transform"
+            className="btn-primary min-h-9 px-3 rounded-lg font-heading text-[0.95rem] active:scale-95 transition-transform duration-150"
           >
             Hit
           </button>
@@ -154,7 +152,7 @@ export function AttackRow({
               e.stopPropagation();
               handleRollDamage();
             }}
-            className="px-2.5 py-1 bg-danger/20 text-danger rounded-full text-[0.6875rem] font-heading active:scale-95 transition-transform"
+            className="btn-seal min-h-9 px-3 rounded-lg font-heading text-[0.95rem] active:scale-95 transition-transform duration-150"
           >
             Dmg
           </button>
@@ -168,12 +166,13 @@ export function AttackRow({
                   e.stopPropagation();
                   setMenuOpen((m) => !m);
                 }}
-                className="text-muted hover:text-foreground text-sm px-1"
+                aria-label="Más opciones"
+                className="text-muted hover:text-foreground w-8 h-9 flex items-center justify-center"
               >
-                ⋯
+                <MoreHorizontal size={18} strokeWidth={1.5} />
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-6 bg-card border border-border rounded-lg shadow-lg z-10 py-1 w-36">
+                <div className="absolute right-0 top-10 bg-card border border-border rounded-lg shadow-lg z-10 py-1 w-36">
                   {onEdit && (
                     <button
                       onClick={(e) => {
@@ -181,7 +180,7 @@ export function AttackRow({
                         setMenuOpen(false);
                         onEdit();
                       }}
-                      className="w-full text-left px-3 py-2 text-xs hover:bg-background"
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-background"
                     >
                       Editar
                     </button>
@@ -193,7 +192,7 @@ export function AttackRow({
                         setMenuOpen(false);
                         onMoveUp();
                       }}
-                      className="w-full text-left px-3 py-2 text-xs hover:bg-background"
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-background"
                     >
                       Mover arriba
                     </button>
@@ -205,7 +204,7 @@ export function AttackRow({
                         setMenuOpen(false);
                         onMoveDown();
                       }}
-                      className="w-full text-left px-3 py-2 text-xs hover:bg-background"
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-background"
                     >
                       Mover abajo
                     </button>
@@ -217,7 +216,7 @@ export function AttackRow({
                         setMenuOpen(false);
                         onDelete();
                       }}
-                      className="w-full text-left px-3 py-2 text-xs text-danger hover:bg-background"
+                      className="w-full text-left px-3 py-2 text-sm text-danger hover:bg-background"
                     >
                       Eliminar
                     </button>
@@ -263,7 +262,7 @@ export function AttackRow({
             <div>
               <span className="text-accent font-heading">
                 {attack.mastery}
-                {attack.masterySaveDC && ` (DC ${attack.masterySaveDC})`}:
+                {attack.masterySaveDC && <> (DC <span className="font-numeric">{attack.masterySaveDC}</span>)</>}:
               </span>{" "}
               <span className="text-foreground/80">
                 {linkifyConditions(attack.masteryEffect, (name) =>

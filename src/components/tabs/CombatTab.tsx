@@ -28,6 +28,7 @@ import { rollD20Mode } from "@/lib/rollWithMode";
 import { exhaustionPenalty } from "@/lib/exhaustion";
 import { toggleVersatileDamage } from "@/lib/attackRoll";
 import { toast } from "sonner";
+import { Swords, Dices } from "lucide-react";
 
 function baseDice(damage: string): string {
   return damage.replace(/\s*[+-]\s*\d+\s*$/, "").trim();
@@ -234,18 +235,18 @@ export function CombatTab() {
               setAttacksForceOpenKey((k) => k + 1);
               attacksSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
-            className="stone-card rounded-lg py-2 text-center text-xs font-heading text-accent active:scale-95 transition-transform"
+            className="stone-card rounded-xl py-2.5 flex items-center justify-center gap-2 font-heading text-base text-foreground active:scale-[0.97] transition-transform duration-150"
           >
-            ⚔ Atacar
+            <Swords size={16} strokeWidth={1.5} className="text-accent" /> Atacar
           </button>
           <button
             onClick={() => {
               setDadosForceOpenKey((k) => k + 1);
               dadosSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
-            className="stone-card rounded-lg py-2 text-center text-xs font-heading text-accent active:scale-95 transition-transform"
+            className="stone-card rounded-xl py-2.5 flex items-center justify-center gap-2 font-heading text-base text-foreground active:scale-[0.97] transition-transform duration-150"
           >
-            🎲 Roll rápido
+            <Dices size={16} strokeWidth={1.5} className="text-accent" /> Roll rápido
           </button>
         </div>
       )}
@@ -273,15 +274,13 @@ export function CombatTab() {
               }}
             />
           ))}
-          <button
-            onClick={() => setConditionModalOpen(true)}
-            className="w-6 h-6 rounded-full border border-border text-muted text-sm flex items-center justify-center hover:border-accent hover:text-accent"
-          >
-            +
-          </button>
+          {combat.conditions.length === 0 && (
+            <span className="italic text-sm text-muted">sin condiciones</span>
+          )}
+          <GhostChip onClick={() => setConditionModalOpen(true)}>+ Condición</GhostChip>
         </div>
         {viewingCondition && combat.conditions.includes(viewingCondition) && (
-          <div className="text-xs text-foreground/80 bg-card/50 border border-border rounded-lg p-2">
+          <div className="text-sm text-foreground/85 stone-card rounded-xl p-3">
             <span className="font-heading text-accent">
               {viewingCondition}:
             </span>
@@ -294,19 +293,38 @@ export function CombatTab() {
       </div>
 
       <CompactRow
-        name={`Exhaustion ${combat.exhaustionLevel}/6`}
+        name={
+          <span className="flex items-center gap-2">
+            Exhaustion
+            <span className="flex gap-1" aria-hidden="true">
+              {Array.from({ length: 6 }, (_, i) => (
+                <span
+                  key={i}
+                  className={`w-1.5 h-3.5 rounded-sm rotate-[10deg] ${
+                    i < combat.exhaustionLevel ? "bg-cord" : "border border-muted/60"
+                  }`}
+                />
+              ))}
+            </span>
+            <span className="font-numeric text-muted text-xs">{combat.exhaustionLevel}/6</span>
+          </span>
+        }
         onClick={() => setExhaustionExpanded((e) => !e)}
         right={
           <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
             <button
+              type="button"
+              aria-label="Reducir Exhaustion"
               onClick={() => setExhaustionLevel(combat.exhaustionLevel - 1)}
-              className="w-7 h-7 rounded-full border border-border text-muted flex items-center justify-center hover:border-accent hover:text-accent"
+              className="w-8 h-8 rounded-lg border border-border text-muted flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
             >
               −
             </button>
             <button
+              type="button"
+              aria-label="Aumentar Exhaustion"
               onClick={() => setExhaustionLevel(combat.exhaustionLevel + 1)}
-              className="w-7 h-7 rounded-full border border-border text-muted flex items-center justify-center hover:border-accent hover:text-accent"
+              className="w-8 h-8 rounded-lg border border-border text-muted flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
             >
               +
             </button>
@@ -314,7 +332,7 @@ export function CombatTab() {
         }
       />
       {exhaustionExpanded && (
-        <div className="text-xs text-foreground/80 bg-card/50 border border-border rounded-lg p-2">
+        <div className="text-sm text-foreground/85 stone-card rounded-xl p-3">
           <Markdown>
             {CONDITIONS.find((c) => c.name === "Exhaustion")?.description ??
               ""}
