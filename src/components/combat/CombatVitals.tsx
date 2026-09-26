@@ -5,6 +5,7 @@ import { RageCluster, type RageClusterProps } from "@/components/combat/RageClus
 import { DeathSaves } from "@/components/combat/DeathSaves";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { formatModifier } from "@/lib/utils";
+import { hpFraction } from "@/lib/hpBar";
 import type { DiceRoll } from "@/lib/dice";
 
 export interface CombatVitalsProps {
@@ -65,7 +66,7 @@ export function CombatVitals({
 
   return (
     <div
-      className={`${rage.active ? "stone-card-raging" : "stone-card"} rounded-lg p-3 transition-all`}
+      className={`${rage.active ? "stone-card-raging" : "stone-card"} rounded-2xl p-4 transition-all`}
     >
       {isDying ? (
         <DeathSaves
@@ -75,38 +76,49 @@ export function CombatVitals({
           onRegainConsciousness={onRegainConsciousness}
         />
       ) : (
-        <div className="relative flex items-center justify-between gap-2">
-          <button onClick={onOpenHp} className="text-left active:scale-95 transition-transform">
-            <span
-              className={`block font-heading text-2xl leading-none text-accent ${
-                rage.active ? "hp-heartbeat" : ""
-              }`}
+        <div className="relative">
+          <div className="flex items-end justify-between gap-3">
+            <button
+              type="button"
+              onClick={onOpenHp}
+              aria-label={`Puntos de golpe ${currentHp} de ${maxHp}`}
+              className="text-left active:scale-[0.98] transition-transform duration-150"
             >
-              {currentHp}/{maxHp}
-            </span>
-            <span className="block text-[0.625rem] text-muted uppercase tracking-wider mt-0.5">
-              HP
-            </span>
-          </button>
-          <button
-            onClick={onOpenAc}
-            className={`relative w-11 h-11 rounded-full border-2 flex flex-col items-center justify-center shrink-0 active:scale-95 transition-transform ${
-              acModified ? "!border-accent" : "border-border"
-            }`}
-          >
-            <span className="font-heading text-base leading-none">{displayAc}</span>
-            <span className="text-[0.5rem] text-muted">CA</span>
-            {acModified && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent text-background text-[0.55rem] font-bold flex items-center justify-center">
-                {formatModifier(tempAcMod)}
+              <span className="block font-heading italic text-sm text-muted">Puntos de golpe</span>
+              <span
+                className={`block font-numeric font-black text-[3.5rem] leading-[0.85] tracking-tight text-foreground ${
+                  rage.active ? "hp-heartbeat" : ""
+                }`}
+              >
+                {currentHp}
+                <span className="text-2xl font-semibold text-muted"> / {maxHp}</span>
               </span>
-            )}
-            {showMagicMark && (
-              <span className="absolute -bottom-1 -left-1 w-4 h-4 rounded-full bg-card border border-accent text-accent text-[0.6rem] flex items-center justify-center">
-                ✦
+            </button>
+            <button
+              type="button"
+              onClick={onOpenAc}
+              aria-label={`Clase de armadura ${displayAc}`}
+              className="relative shrink-0 active:scale-95 transition-transform duration-150"
+            >
+              <span className="shield-ac w-[58px] h-[66px] flex flex-col items-center justify-center pb-2">
+                <span className="font-numeric font-black text-2xl leading-none">{displayAc}</span>
+                <span className="font-heading italic text-xs leading-none mt-0.5">CA</span>
               </span>
-            )}
-          </button>
+              {acModified && (
+                <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-accent text-background text-xs font-numeric font-semibold flex items-center justify-center">
+                  {formatModifier(tempAcMod)}
+                </span>
+              )}
+              {showMagicMark && (
+                <span className="absolute -bottom-1 -left-1 w-5 h-5 rounded-full bg-card border border-accent text-accent text-xs flex items-center justify-center">
+                  ✦
+                </span>
+              )}
+            </button>
+          </div>
+          <div className="hp-bar mt-3" aria-hidden="true">
+            <span style={{ width: `${hpFraction(currentHp, maxHp) * 100}%` }} />
+          </div>
         </div>
       )}
 
@@ -115,8 +127,10 @@ export function CombatVitals({
       </div>
 
       {rage.active && (
-        <div className="relative mt-2.5 pt-2 border-t border-cord/30 text-[0.7rem] leading-relaxed text-foreground/85">
-          <span className="text-accent font-semibold">{rageDamage} daño</span> · Resistencia
+        <div className="relative mt-2.5 pt-2 border-t border-cord/30 text-xs leading-relaxed text-foreground/85">
+          <span className="text-accent font-semibold">
+            <span className="font-numeric">{rageDamage}</span> daño
+          </span> · Resistencia
           Bludgeoning/Piercing/Slashing · Ventaja FUE checks/saves
           <br />
           Extiende: ataca · fuerza salvación · Bonus Action · No concentración ni hechizos
