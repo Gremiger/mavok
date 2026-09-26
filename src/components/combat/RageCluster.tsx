@@ -60,7 +60,7 @@ export function RageCluster({
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="ink-stamp !not-italic font-numeric !text-foreground !border-cord"
+          className="ink-stamp !not-italic !font-numeric !text-foreground !border-cord"
         >
           {remaining}/{total}
         </button>

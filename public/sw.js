@@ -1,4 +1,4 @@
-const STATIC_CACHE = "mavok-fecc268";
+const STATIC_CACHE = "mavok-4f2b732";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
