@@ -1,0 +1,159 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Spectral:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  .phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:36px;margin-top:20px}
+  .phone{width:360px;margin:0 auto;border-radius:34px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.45);font-variant-numeric:lining-nums tabular-nums;position:relative}
+  .phone *{box-sizing:border-box}
+  .phone-wrap h3{text-align:center;margin:0 0 4px}
+  .phone-wrap p.sub{text-align:center;margin:0 0 12px;opacity:.75;font-size:14px}
+  .pick{margin-top:12px}
+  .noise{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E")}
+
+  /* shared journal type */
+  .J{color:#e8dcc2;font-family:Spectral,serif;padding:22px 18px 96px}
+  .J .kick{font-family:'IM Fell English';font-style:italic;color:#b8a582;font-size:14px}
+  .J .name{font-family:'IM Fell English';font-size:34px;line-height:1.02;color:#efe2c4;margin-top:2px}
+  .J .name em{color:#c9463a;font-style:normal}
+  .J .meta{font-size:13px;color:#b09f80;margin-top:8px;border-top:1px solid #4a3d2e;padding-top:6px}
+  .J .lbl{font-family:'IM Fell English';font-style:italic;font-size:14px}
+  .J .sec{margin:22px 0 10px;display:flex;align-items:baseline;gap:10px}
+  .J .sec .num{font-family:'IM Fell English';font-size:26px;color:#c9463a;line-height:1;min-width:22px}
+  .J .sec h4{margin:0;font-family:'IM Fell English';font-weight:400;font-size:21px;color:#efe2c4}
+  .J .sec .aside{margin-left:auto;font-family:'IM Fell English';font-style:italic;font-size:14px;color:#b09f80}
+  .J .toc{margin-top:6px}
+  .J .toc div{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px dashed #4a3d2e}
+  .J .toc .num{font-family:'IM Fell English';font-size:17px;color:#c9463a;min-width:22px}
+  .J .toc span.t{font-family:'IM Fell English';font-size:18px}
+  .J .toc .dots{flex:1;border-bottom:1px dotted #5a4a36;transform:translateY(-4px)}
+  .J .toc .c{font-family:'IM Fell English';font-style:italic;font-size:14px;color:#b09f80}
+  .J .nav{position:absolute;left:12px;right:12px;bottom:14px;height:62px;border-radius:18px;display:flex;justify-content:space-around;align-items:center;font-family:'IM Fell English';font-size:12.5px}
+  .J .nav span{display:flex;flex-direction:column;align-items:center;gap:3px;opacity:.6}
+  .J .nav span.on{opacity:1}
+  .J .nav i{width:18px;height:18px;border:1.5px solid currentColor;border-radius:4px;display:block}
+  .J .nav span.on i{border-radius:50%}
+
+  /* ===== H1 — Journal on stone ===== */
+  .H1{background:#17130f;background-image:radial-gradient(120% 55% at 50% 0%,#2a2119 0%,transparent 65%)}
+  .H1 .slab{margin-top:16px;border-radius:14px 14px 18px 18px;padding:16px;background:linear-gradient(180deg,#2a221a,#1d1812);box-shadow:inset 0 1px 0 rgba(255,230,190,.08),inset 0 -2px 0 rgba(0,0,0,.5),0 10px 24px -8px rgba(40,20,5,.8);position:relative}
+  .H1 .hprow{display:flex;justify-content:space-between;align-items:flex-end}
+  .H1 .lbl{color:#b09f80}
+  .H1 .hp{font-family:Fraunces;font-weight:900;font-size:56px;line-height:.85;color:#f1e3c3;letter-spacing:-.03em;margin-top:4px}
+  .H1 .hp small{font-size:22px;color:#8f7d60;font-weight:600}
+  .H1 .seal{width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#c9463a,#7d1d15);display:grid;place-items:center;color:#f7dccb;text-align:center;line-height:.9;box-shadow:0 3px 8px rgba(0,0,0,.5),inset 0 -2px 4px rgba(0,0,0,.3);transform:rotate(-6deg)}
+  .H1 .seal b{font-family:Fraunces;font-weight:900;font-size:24px;display:block}.H1 .seal span{font-family:'IM Fell English';font-size:11px}
+  .H1 .bar{height:7px;border-radius:4px;background:#0e0b08;margin:12px 0 10px;box-shadow:inset 0 1px 2px #000;overflow:hidden}.H1 .bar i{display:block;height:100%;width:85%;background:linear-gradient(90deg,#8e2f22,#c4553f)}
+  .H1 .tally{display:flex;gap:7px;align-items:center}
+  .H1 .tally i{width:4px;height:20px;background:#c9463a;border-radius:2px;transform:rotate(10deg);box-shadow:0 0 8px rgba(201,70,58,.5)}
+  .H1 .tally i.off{background:transparent;border:1px dashed #6a5a44;box-shadow:none}
+  .H1 .tally .lbl{margin-right:6px}
+  .H1 .attrs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .H1 .at{border-radius:12px;padding:8px 4px 8px;text-align:center;background:linear-gradient(180deg,#241d16,#1b1611);box-shadow:inset 0 1px 0 rgba(255,230,190,.07),inset 0 -2px 0 rgba(0,0,0,.45)}
+  .H1 .at .l{font-family:'IM Fell English';font-style:italic;font-size:13px;color:#b09f80}
+  .H1 .at .m{font-family:Fraunces;font-weight:900;font-size:29px;line-height:1.05;color:#f1e3c3}
+  .H1 .at .s{font-size:12px;color:#c98a4b}
+  .H1 .atk{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:#1f1913;box-shadow:inset 0 1px 0 rgba(255,230,190,.05)}
+  .H1 .atk .t{flex:1}.H1 .atk .t b{font-family:'IM Fell English';font-weight:400;font-size:19px}.H1 .atk .t div{font-size:12.5px;color:#b09f80}
+  .H1 .btn{padding:7px 12px;border-radius:9px;font-family:'IM Fell English';font-size:15px}
+  .H1 .hit{background:#e9b877;color:#1f140a}.H1 .dmg{background:#3a1a15;color:#f0a896;box-shadow:inset 0 0 0 1px #6a2a20}
+  .H1 .nav{background:rgba(34,27,21,.94);box-shadow:0 6px 24px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,230,190,.06);color:#e9b877}
+
+  /* ===== H2 — Vellum pages ===== */
+  .H2{background:#1a1612;background-image:radial-gradient(140% 90% at 30% 10%,#2b241c 0%,#15110e 70%)}
+  .H2 .page{background:#ebdfc1;color:#2e2215;border-radius:3px 10px 5px 12px;box-shadow:0 12px 26px -10px #000,inset 0 0 36px rgba(120,80,30,.22)}
+  .H2 .hpcard{margin-top:16px;padding:14px 16px 14px;position:relative}
+  .H2 .hprow{display:flex;justify-content:space-between;align-items:flex-start}
+  .H2 .lbl{color:#7a6446}
+  .H2 .hp{font-family:Fraunces;font-weight:900;font-size:54px;line-height:.9;letter-spacing:-.03em;color:#2a1c10}
+  .H2 .hp small{font-size:22px;color:#8a7454;font-weight:600}
+  .H2 .shield{width:58px;height:66px;clip-path:polygon(50% 0,100% 14%,100% 62%,50% 100%,0 62%,0 14%);background:linear-gradient(180deg,#8a2a20,#5a160f);display:grid;place-items:center;color:#f7dccb;font-family:Fraunces;font-weight:900;font-size:24px;padding-bottom:8px}
+  .H2 .bar{height:6px;background:rgba(90,60,30,.18);margin:10px 0 10px;border-radius:3px;overflow:hidden}.H2 .bar i{display:block;height:100%;width:85%;background:#9b2c22}
+  .H2 .tally{display:flex;gap:6px;align-items:center}
+  .H2 .tally i{width:4px;height:20px;background:#9b2c22;border-radius:2px;transform:rotate(8deg)}
+  .H2 .tally i.off{background:transparent;border:1px dashed #9b8360}
+  .H2 .tally .lbl{margin-right:6px}
+  .H2 .attrs{display:grid;grid-template-columns:repeat(3,1fr)}
+  .H2 .at{padding:9px 4px;text-align:center;border-right:1px solid rgba(90,60,30,.25)}.H2 .at:last-child{border-right:0}
+  .H2 .at .l{font-family:'IM Fell English';font-style:italic;font-size:13px;color:#7a6446}
+  .H2 .at .m{font-family:Fraunces;font-weight:900;font-size:28px;line-height:1.05;color:#2a1c10}
+  .H2 .at .s{font-size:12px;color:#8a7454}
+  .H2 .atk{display:flex;align-items:center;gap:10px;padding:11px 14px}
+  .H2 .atk .t{flex:1}.H2 .atk .t b{font-family:'IM Fell English';font-weight:400;font-size:19px}.H2 .atk .t div{font-size:12.5px;color:#7a6446}
+  .H2 .btn{padding:6px 12px;font-family:'IM Fell English';font-size:15px;border-radius:3px}
+  .H2 .hit{background:#2a1c10;color:#efe2c4}.H2 .dmg{border:1px solid #9b2c22;color:#9b2c22}
+  .H2 .nav{background:#ebdfc1;color:#2e2215;box-shadow:0 6px 24px rgba(0,0,0,.6),inset 0 0 20px rgba(120,80,30,.2)}
+  .H2 .nav span.on{color:#9b2c22}
+</style>
+
+<h2>B, with some A: which blend?</h2>
+<p class="subtitle">Both keep B's identity: Fell lettering, numbered chapters, tally-mark Rage, a contents list for collapsed sections. The difference is what the surfaces are made of. Numbers use A's heavy Fraunces in both so they read at a glance.</p>
+
+<div class="phones">
+
+  <div class="phone-wrap">
+    <h3>H1 · Journal on stone</h3>
+    <p class="sub">B's type and structure carved into A's dark stone slabs. Moody, keeps today's dark feel. The wax seal becomes the AC badge.</p>
+    <div class="phone J H1 noise">
+      <div class="kick">Diario de campaña de</div>
+      <div class="name">Mavok <em>Toro</em>-de-casa</div>
+      <div class="meta">Bárbaro de nivel 5 · Goliath, linaje de Stone Giant</div>
+      <div class="slab">
+        <div class="hprow">
+          <div><div class="lbl">Puntos de golpe</div><div class="hp">47<small> / 55</small></div></div>
+          <div class="seal"><div><b>16</b><span>CA</span></div></div>
+        </div>
+        <div class="bar"><i></i></div>
+        <div class="tally"><span class="lbl">Furias</span><i></i><i></i><i class="off"></i></div>
+      </div>
+      <div class="sec"><span class="num">I</span><h4>Atributos</h4><span class="aside">competencia +3</span></div>
+      <div class="attrs">
+        <div class="at"><div class="l">Fuerza</div><div class="m">+4</div><div class="s">18</div></div>
+        <div class="at"><div class="l">Destreza</div><div class="m">+2</div><div class="s">14</div></div>
+        <div class="at"><div class="l">Constitución</div><div class="m">+3</div><div class="s">16</div></div>
+      </div>
+      <div class="sec"><span class="num">II</span><h4>Acciones</h4></div>
+      <div class="atk"><div class="t"><b>Maul</b><div>+7 · 2d6+6 contundente · Topple</div></div><span class="btn hit">Hit</span><span class="btn dmg">Dmg</span></div>
+      <div class="toc">
+        <div><span class="num">III</span><span class="t">Tiradas de salvación</span><span class="dots"></span><span class="c">6</span></div>
+        <div><span class="num">IV</span><span class="t">Habilidades</span><span class="dots"></span><span class="c">18</span></div>
+        <div><span class="num">V</span><span class="t">Rasgos</span><span class="dots"></span><span class="c">7</span></div>
+      </div>
+      <div class="nav"><span class="on"><i></i>Ficha</span><span><i></i>Combate</span><span><i></i>Inventario</span><span><i></i>Notas</span><span><i></i>Más</span></div>
+    </div>
+    <div class="pick options"><div class="option" data-choice="H1" onclick="toggleSelect(this)"><div class="letter">1</div><div class="content"><h3>Journal on stone</h3></div></div></div>
+  </div>
+
+  <div class="phone-wrap">
+    <h3>H2 · Vellum pages</h3>
+    <p class="sub">Every card is a vellum page on a dark desk, so B's paper is everywhere. A contributes the shield AC badge, the HP bar and the heavy numbers. Brighter and more "book".</p>
+    <div class="phone J H2 noise">
+      <div class="kick">Diario de campaña de</div>
+      <div class="name">Mavok <em>Toro</em>-de-casa</div>
+      <div class="meta">Bárbaro de nivel 5 · Goliath, linaje de Stone Giant</div>
+      <div class="page hpcard">
+        <div class="hprow">
+          <div><div class="lbl">Puntos de golpe</div><div class="hp">47<small> / 55</small></div></div>
+          <div class="shield">16</div>
+        </div>
+        <div class="bar"><i></i></div>
+        <div class="tally"><span class="lbl">Furias</span><i></i><i></i><i class="off"></i></div>
+      </div>
+      <div class="sec"><span class="num">I</span><h4>Atributos</h4><span class="aside">competencia +3</span></div>
+      <div class="page attrs">
+        <div class="at"><div class="l">Fuerza</div><div class="m">+4</div><div class="s">18</div></div>
+        <div class="at"><div class="l">Destreza</div><div class="m">+2</div><div class="s">14</div></div>
+        <div class="at"><div class="l">Constitución</div><div class="m">+3</div><div class="s">16</div></div>
+      </div>
+      <div class="sec"><span class="num">II</span><h4>Acciones</h4></div>
+      <div class="page atk"><div class="t"><b>Maul</b><div>+7 · 2d6+6 contundente · Topple</div></div><span class="btn hit">Hit</span><span class="btn dmg">Dmg</span></div>
+      <div class="toc">
+        <div><span class="num">III</span><span class="t">Tiradas de salvación</span><span class="dots"></span><span class="c">6</span></div>
+        <div><span class="num">IV</span><span class="t">Habilidades</span><span class="dots"></span><span class="c">18</span></div>
+        <div><span class="num">V</span><span class="t">Rasgos</span><span class="dots"></span><span class="c">7</span></div>
+      </div>
+      <div class="nav"><span class="on"><i></i>Ficha</span><span><i></i>Combate</span><span><i></i>Inventario</span><span><i></i>Notas</span><span><i></i>Más</span></div>
+    </div>
+    <div class="pick options"><div class="option" data-choice="H2" onclick="toggleSelect(this)"><div class="letter">2</div><div class="content"><h3>Vellum pages</h3></div></div></div>
+  </div>
+
+</div>
+<p class="subtitle" style="margin-top:22px">Nav icons are placeholders here. The nav shows "Más" only to save space in the mockup; the real app keeps all 6 tabs.</p>
