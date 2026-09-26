@@ -27,12 +27,12 @@ type Tab = "ficha" | "combate" | "inventario" | "notas" | "enciclopedia" | "ajus
 const TAB_ORDER: Tab[] = ["ficha", "combate", "inventario", "notas", "enciclopedia", "ajustes"];
 
 const TAB_META: { id: Tab; label: string; icon: ReactNode }[] = [
-  { id: "ficha", label: "Ficha", icon: <Shield size={20} /> },
-  { id: "combate", label: "Combate", icon: <Swords size={20} /> },
-  { id: "inventario", label: "Inventario", icon: <Backpack size={20} /> },
-  { id: "notas", label: "Notas", icon: <BookOpen size={20} /> },
-  { id: "enciclopedia", label: "Enciclopedia", icon: <Library size={20} /> },
-  { id: "ajustes", label: "Ajustes", icon: <Settings size={20} /> },
+  { id: "ficha", label: "Ficha", icon: <Shield size={20} strokeWidth={1.5} /> },
+  { id: "combate", label: "Combate", icon: <Swords size={20} strokeWidth={1.5} /> },
+  { id: "inventario", label: "Inventario", icon: <Backpack size={20} strokeWidth={1.5} /> },
+  { id: "notas", label: "Notas", icon: <BookOpen size={20} strokeWidth={1.5} /> },
+  { id: "enciclopedia", label: "Enciclopedia", icon: <Library size={20} strokeWidth={1.5} /> },
+  { id: "ajustes", label: "Ajustes", icon: <Settings size={20} strokeWidth={1.5} /> },
 ];
 
 export default function Home() {
@@ -51,9 +51,15 @@ export default function Home() {
   if (!charState.character) {
     return (
       <div className="flex items-center justify-center min-h-dvh bg-background">
-        <div className="text-accent font-heading text-xl animate-pulse">
-          Mavok
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="text-center"
+        >
+          <p className="font-heading italic text-muted">Diario de campaña de</p>
+          <p className="font-heading text-4xl text-foreground">Mavok</p>
+        </motion.div>
       </div>
     );
   }
@@ -122,24 +128,26 @@ export default function Home() {
               <div
                 className="mx-auto max-w-md flex items-center justify-around h-16 rounded-2xl border border-border/60"
                 style={{
-                  background: "rgba(26,25,23,0.92)",
+                  background: "var(--nav-bg)",
                   backdropFilter: "blur(16px)",
                   WebkitBackdropFilter: "blur(16px)",
-                  boxShadow: "0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)",
+                  boxShadow:
+                    "0 6px 24px var(--slab-shadow), inset 0 1px 0 color-mix(in srgb, var(--fg) 6%, transparent)",
                 }}
               >
                 {TAB_META.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`relative flex flex-col items-center justify-center gap-0.5 text-[0.65rem] flex-1 h-full transition-colors ${
+                    aria-current={activeTab === tab.id ? "page" : undefined}
+                    className={`relative flex flex-col items-center justify-center gap-0.5 font-heading text-[0.75rem] tracking-[-0.01em] flex-1 h-full transition-colors duration-200 ${
                       activeTab === tab.id ? "text-accent" : "text-muted"
                     }`}
                   >
                     {activeTab === tab.id && (
                       <motion.div
                         layoutId="tab-indicator"
-                        className="absolute -bottom-0.5 left-3 right-3 h-0.5 bg-accent rounded-full"
+                        className="absolute bottom-1 w-1.5 h-1.5 rotate-45 rounded-[1px] bg-cord"
                         transition={{
                           type: "spring",
                           stiffness: 400,

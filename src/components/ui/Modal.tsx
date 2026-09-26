@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { X } from "lucide-react";
 
 export function Modal({
   open,
@@ -34,13 +35,15 @@ export function Modal({
       className="fixed inset-0 m-auto stone-card text-foreground rounded-xl p-0 w-[90vw] max-w-md max-h-[85vh] overflow-y-auto drop-shadow-2xl"
       style={{ zIndex: 100 }}
     >
-      <div className="sticky top-0 flex items-center justify-between p-4 border-b border-border bg-card z-10">
-        <h2 className="font-heading text-accent text-lg">{title}</h2>
+      <div className="sticky top-0 flex items-center justify-between px-4 py-3 border-b border-border bg-surface-hi z-10">
+        <h2 className="font-heading text-foreground text-xl leading-tight">{title}</h2>
         <button
+          type="button"
           onClick={onClose}
-          className="text-muted text-xl leading-none hover:text-foreground"
+          aria-label="Cerrar"
+          className="w-9 h-9 -mr-2 flex items-center justify-center rounded-lg text-muted hover:text-foreground transition-colors"
         >
-          ✕
+          <X size={18} strokeWidth={1.5} />
         </button>
       </div>
       <div className="p-4">{children}</div>

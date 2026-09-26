@@ -1,5 +1,7 @@
 "use client";
 
+import { X } from "lucide-react";
+
 export function Tag({
   label,
   onRemove,
@@ -12,24 +14,24 @@ export function Tag({
   variant?: "default" | "success" | "danger";
 }) {
   const colors = {
-    default: "bg-accent/15 text-accent border border-accent/20",
-    success: "bg-success/15 text-success border border-success/20",
-    danger: "bg-danger/15 text-danger border border-danger/20",
+    default: "",
+    success: "!text-success !border-success/50",
+    danger: "!text-danger !border-danger/50",
   };
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded ${colors[variant]}`}
-    >
+    <span className={`ink-stamp gap-1 ${colors[variant]}`}>
       <span onClick={onClick} className={onClick ? "cursor-pointer" : undefined}>
         {label}
       </span>
       {onRemove && (
         <button
+          type="button"
           onClick={onRemove}
-          className="opacity-60 hover:opacity-100 leading-none"
+          aria-label={`Quitar ${label}`}
+          className="opacity-60 hover:opacity-100 -mr-1 p-0.5"
         >
-          ✕
+          <X size={12} strokeWidth={1.5} />
         </button>
       )}
     </span>

@@ -17,7 +17,7 @@ export function GhostChip({
       onClick={onClick}
       disabled={disabled}
       {...longPressHandlers}
-      className={`whitespace-nowrap text-[0.6875rem] px-2.5 py-1 rounded-full border transition-colors select-none [-webkit-touch-callout:none] ${
+      className={`whitespace-nowrap text-xs italic px-2.5 py-1 rounded-md border transition-colors duration-150 select-none [-webkit-touch-callout:none] ${
         disabled
           ? "border-border/50 text-muted opacity-40 cursor-not-allowed"
           : solid
