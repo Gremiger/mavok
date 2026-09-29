@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { useCharacter } from "@/hooks/useCharacter";
 import { useTheme } from "@/hooks/useTheme";
@@ -22,6 +22,8 @@ import { motion } from "framer-motion";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { EffectsProvider } from "@/components/effects/EffectsProvider";
+import { TabTransition } from "@/components/ui/TabTransition";
+import { swipeOrigin, tabDirection } from "@/lib/motion";
 import type { ReactNode } from "react";
 
 type Tab = "ficha" | "combate" | "inventario" | "notas" | "enciclopedia" | "ajustes";
@@ -45,12 +47,42 @@ export default function Home() {
   const driveState = useGoogleDriveAuth();
   const reducedMotion = usePrefersReducedMotion();
   const appRootRef = useRef<HTMLDivElement>(null);
+  const [tabFx, setTabFx] = useState<{
+    origin: { x: number; y: number } | null;
+    scrollOffset: number;
+  }>({ origin: null, scrollOffset: 0 });
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+  function goToTab(next: Tab, origin: { x: number; y: number } | null) {
+    if (next === activeTab) return;
+    setTabFx({ origin, scrollOffset: window.scrollY });
+    setActiveTab(next);
+  }
+
   const { dragX, dragOpacity, handleDragEnd } = useSwipeNavigation(
     TAB_ORDER,
     activeTab,
-    setActiveTab
+    (next) =>
+      goToTab(
+        next,
+        swipeOrigin(
+          tabDirection(TAB_ORDER, activeTab, next),
+          window.innerWidth,
+          window.innerHeight
+        )
+      )
   );
+
+  // Each tab starts at the top; the leaving tab is drawn at its old offset.
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeTab]);
+
+  const transitionMode = reducedMotion
+    ? "instant"
+    : themeState.motionStyle === "flashy"
+      ? "flashy"
+      : "normal";
 
   if (!charState.character) {
     return (
@@ -109,7 +141,7 @@ export default function Home() {
           <DiceBoxCanvas />
           <div ref={appRootRef} className="flex flex-col min-h-dvh">
             <motion.main
-              className="chapters flex-1 overflow-y-auto pb-safe-nav"
+              className="flex-1 overflow-y-auto pb-safe-nav"
               style={{ x: dragX, opacity: dragOpacity, touchAction: 'pan-y pinch-zoom' }}
               drag={
                 isPinching ||
@@ -131,7 +163,15 @@ export default function Home() {
                 if (e.touches.length === 0) setIsPinching(false);
               }}
             >
-              {tabContent[activeTab]}
+              <TabTransition
+                tabKey={activeTab}
+                order={TAB_ORDER}
+                origin={tabFx.origin}
+                mode={transitionMode}
+                scrollOffset={tabFx.scrollOffset}
+              >
+                {tabContent[activeTab]}
+              </TabTransition>
             </motion.main>
 
             <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 nav-island-bottom">
@@ -148,7 +188,10 @@ export default function Home() {
                 {TAB_META.map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={(e) => {
+                      const r = e.currentTarget.getBoundingClientRect();
+                      goToTab(tab.id, { x: r.left + r.width / 2, y: r.top + r.height / 2 });
+                    }}
                     aria-current={activeTab === tab.id ? "page" : undefined}
                     className={`relative flex flex-col items-center justify-center gap-0.5 font-heading text-[0.75rem] tracking-[-0.01em] flex-1 h-full transition-colors duration-200 ${
                       activeTab === tab.id ? "text-accent" : "text-muted"

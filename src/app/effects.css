@@ -278,3 +278,143 @@
   15% { opacity: 1; }
   100% { opacity: 0; transform: translate(var(--dx), -240px); }
 }
+
+/* ========== Tab transitions (TabTransition.tsx) ========== */
+.tab-stage {
+  position: relative;
+}
+.tab-stage.is-transitioning {
+  min-height: 100dvh;
+  overflow: clip;
+}
+.tab-leaving {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--scroll, 0px) * -1);
+  pointer-events: none;
+}
+
+/* Normal: quick fade + small slide in the travel direction */
+.fx-normal-out {
+  animation: tab-n-out 140ms ease-in forwards;
+}
+.fx-normal-in {
+  animation: tab-n-in 220ms 60ms ease-out both;
+}
+@keyframes tab-n-out {
+  to { opacity: 0; transform: translateX(calc(var(--dir) * -14px)); }
+}
+@keyframes tab-n-in {
+  from { opacity: 0; transform: translateX(calc(var(--dir) * 18px)); }
+}
+
+/* Flashy "Ink & scatter" */
+.fx-combo-out {
+  z-index: 1;
+  animation: tab-dim 700ms forwards;
+}
+.fx-combo-in {
+  position: relative;
+  z-index: 2;
+  background:
+    radial-gradient(120% 55% at 50% 0%, var(--surface-hi) 0%, transparent 65%),
+    var(--bg);
+  background-attachment: fixed;
+  clip-path: circle(0 at var(--ox) var(--oy));
+  animation: tab-ink 620ms cubic-bezier(0.6, 0, 0.2, 1) forwards;
+}
+.fx-combo-out > * > *,
+.fx-combo-in > * > * {
+  --i: 7;
+  --rot: 6deg;
+  --jx: 0px;
+}
+.fx-combo-out > * > *:nth-child(1), .fx-combo-in > * > *:nth-child(1) { --i: 0; --rot: -7deg; --jx: -20px; }
+.fx-combo-out > * > *:nth-child(2), .fx-combo-in > * > *:nth-child(2) { --i: 1; --rot: 8deg; --jx: 16px; }
+.fx-combo-out > * > *:nth-child(3), .fx-combo-in > * > *:nth-child(3) { --i: 2; --rot: -5deg; --jx: -10px; }
+.fx-combo-out > * > *:nth-child(4), .fx-combo-in > * > *:nth-child(4) { --i: 3; --rot: 9deg; --jx: 18px; }
+.fx-combo-out > * > *:nth-child(5), .fx-combo-in > * > *:nth-child(5) { --i: 4; --rot: -8deg; --jx: -14px; }
+.fx-combo-out > * > *:nth-child(6), .fx-combo-in > * > *:nth-child(6) { --i: 5; --rot: 5deg; --jx: 12px; }
+.fx-combo-out > * > *:nth-child(7), .fx-combo-in > * > *:nth-child(7) { --i: 6; --rot: -6deg; --jx: -8px; }
+.fx-combo-out > * > * {
+  animation: tab-sc-out 380ms cubic-bezier(0.5, 0, 0.9, 0.4) calc(var(--i) * 30ms) forwards;
+}
+.fx-combo-in > * > * {
+  animation: tab-sc-in 520ms cubic-bezier(0.34, 1.56, 0.64, 1) calc(220ms + var(--i) * 65ms) both;
+}
+.fx-combo-in .chapter-num {
+  animation: tab-stamp 460ms cubic-bezier(0.3, 1.8, 0.5, 1) calc(260ms + var(--i) * 65ms) both;
+}
+@keyframes tab-dim {
+  to { filter: brightness(0.55) blur(1px); }
+}
+@keyframes tab-ink {
+  60% { clip-path: circle(62% at var(--ox) var(--oy)); }
+  100% { clip-path: circle(150% at var(--ox) var(--oy)); }
+}
+@keyframes tab-sc-out {
+  to {
+    transform: translate(calc(var(--dir) * -40px + var(--jx)), 140px) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+@keyframes tab-sc-in {
+  0% { transform: translateY(-70px) rotate(calc(var(--rot) * -1)) scale(0.9); opacity: 0; }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes tab-stamp {
+  0% { transform: scale(2.6) rotate(-18deg); opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: none; }
+}
+.tab-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+}
+.tab-splat {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  left: calc(var(--ox) - 60px);
+  top: calc(var(--oy) - 60px);
+  fill: var(--cord);
+  animation: tab-splat 700ms ease-out forwards;
+}
+@keyframes tab-splat {
+  0% { transform: scale(0.1) rotate(0); opacity: 0.95; }
+  55% { opacity: 0.8; }
+  100% { transform: scale(3.4) rotate(40deg); opacity: 0; }
+}
+.tab-drop {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cord);
+  left: var(--ox);
+  top: var(--oy);
+  animation: tab-drop 620ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes tab-drop {
+  to { transform: translate(var(--dx), var(--dy)) scale(0.3); opacity: 0; }
+}
+.tab-ember {
+  position: absolute;
+  top: calc(var(--oy) - 30px);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f0a070;
+  box-shadow: 0 0 6px var(--cord);
+  opacity: 0;
+  animation: tab-ember 900ms ease-out forwards;
+}
+@keyframes tab-ember {
+  0% { opacity: 0; transform: translate(0, 0); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), -300px) scale(0.4); }
+}
