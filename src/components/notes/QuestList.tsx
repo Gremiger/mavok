@@ -8,7 +8,8 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { GhostChip } from "@/components/ui/GhostChip";
 import { Markdown } from "@/components/ui/Markdown";
 import { MentionTextarea } from "@/components/notes/MentionTextarea";
-import { Plus, ScrollText } from "lucide-react";
+import { ScrollText } from "lucide-react";
+import { TabFab } from "@/components/ui/TabFab";
 import type { QuestEntry } from "@/lib/types";
 import { toast } from "sonner";
 import {
@@ -188,12 +189,7 @@ export function QuestList({
         />
       )}
 
-      <button
-        onClick={openNew}
-        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full btn-primary shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
-      >
-        <Plus size={24} strokeWidth={1.5} />
-      </button>
+      <TabFab label="Nueva misión" onClick={openNew} />
 
       <Modal
         open={formOpen}

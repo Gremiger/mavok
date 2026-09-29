@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { StatBadge } from "@/components/ui/StatBadge";
+import { useEffects } from "@/components/effects/EffectsProvider";
+import { particleSpread } from "@/lib/motion";
 import { RageCluster, type RageClusterProps } from "@/components/combat/RageCluster";
 import { DeathSaves } from "@/components/combat/DeathSaves";
 import { DiceResult } from "@/components/ui/DiceResult";
@@ -61,12 +64,55 @@ export function CombatVitals({
   onDeathSavesChange,
   onRegainConsciousness,
 }: CombatVitalsProps) {
+  const { play, flashy } = useEffects();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const inspRef = useRef<HTMLSpanElement>(null);
+  const [prevHp, setPrevHp] = useState(currentHp);
+  const [hpAnim, setHpAnim] = useState<{ kind: "damage" | "heal"; n: number } | null>(null);
+
+  // Flashy HP flourishes follow HP changes while this card is on screen.
+  if (currentHp !== prevHp) {
+    setPrevHp(currentHp);
+    setHpAnim(
+      flashy
+        ? { kind: currentHp < prevHp ? "damage" : "heal", n: (hpAnim?.n ?? 0) + 1 }
+        : null
+    );
+  }
+
+  // Card shake on damage (Web Animations API; no React state involved).
+  useEffect(() => {
+    if (hpAnim?.kind !== "damage") return;
+    cardRef.current?.animate?.(
+      [
+        { transform: "translate(0,0)" },
+        { transform: "translate(-6px,2px)" },
+        { transform: "translate(5px,-2px)" },
+        { transform: "translate(-3px,1px)" },
+        { transform: "translate(0,0)" },
+      ],
+      { duration: 320, easing: "cubic-bezier(.36,.07,.19,.97)" }
+    );
+  }, [hpAnim]);
+
+  function toggleInspiration() {
+    if (!inspiration) {
+      const r = inspRef.current?.getBoundingClientRect();
+      play("inspiration", {
+        origin: r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : undefined,
+      });
+    }
+    onToggleInspiration();
+  }
+
   const acModified = tempAcMod !== 0;
   const showMagicMark = showExplicitMagicTag && magicAcBonus !== 0;
 
   return (
     <div
-      className={`${rage.active ? "stone-card-raging" : "stone-card"} rounded-2xl p-4 transition-all`}
+      ref={cardRef}
+      data-vitals
+      className={`${rage.active ? "stone-card-raging" : "stone-card"} relative rounded-2xl p-4 transition-all`}
     >
       {isDying ? (
         <DeathSaves
@@ -86,12 +132,31 @@ export function CombatVitals({
             >
               <span className="block font-heading italic text-sm text-muted">Puntos de golpe</span>
               <span
-                className={`block font-numeric font-black text-[3.5rem] leading-[0.85] tracking-tight text-foreground ${
-                  rage.active ? "hp-heartbeat" : ""
-                }`}
+                key={hpAnim ? `hp-${hpAnim.n}` : "hp"}
+                className={`relative block ${hpAnim ? `hp-${hpAnim.kind}` : ""}`}
               >
-                {currentHp}
-                <span className="text-2xl font-semibold text-muted"> / {maxHp}</span>
+                <span
+                  className={`block font-numeric font-black text-[3.5rem] leading-[0.85] tracking-tight text-foreground ${
+                    rage.active ? "hp-heartbeat" : ""
+                  }`}
+                >
+                  {currentHp}
+                  <span className="text-2xl font-semibold text-muted"> / {maxHp}</span>
+                </span>
+                {hpAnim?.kind === "heal" &&
+                  particleSpread(`heal-${hpAnim.n}`, 14).map((p, i) => (
+                    <i
+                      key={i}
+                      className="hp-heal-spark"
+                      style={
+                        {
+                          left: `${p.a * 100}%`,
+                          animationDelay: `${Math.round(p.b * 300)}ms`,
+                          "--dx": `${p.c * 40 - 20}px`,
+                        } as CSSProperties
+                      }
+                    />
+                  ))}
               </span>
             </button>
             <button
@@ -116,10 +181,21 @@ export function CombatVitals({
               )}
             </button>
           </div>
-          <div className="hp-bar mt-3" aria-hidden="true">
-            <span style={{ width: `${hpFraction(currentHp, maxHp) * 100}%` }} />
+          <div className={`hp-bar mt-3${flashy ? " has-ghost" : ""}`} aria-hidden="true">
+            {flashy && (
+              <span className="hp-ghost" style={{ width: `${hpFraction(currentHp, maxHp) * 100}%` }} />
+            )}
+            <span className="hp-fill" style={{ width: `${hpFraction(currentHp, maxHp) * 100}%` }} />
           </div>
         </div>
+      )}
+
+      {hpAnim?.kind === "damage" && (
+        <svg key={`claw-${hpAnim.n}`} className="hp-claws" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M14 4 L52 44" />
+          <path d="M26 2 L64 42" style={{ animationDelay: "70ms" }} />
+          <path d="M38 0 L76 40" style={{ animationDelay: "140ms" }} />
+        </svg>
       )}
 
       <div className="relative mt-2.5">
@@ -140,7 +216,9 @@ export function CombatVitals({
       <div className="relative flex items-center justify-around gap-1.5 mt-2.5 pt-2 border-t border-border/40">
         <StatBadge compact label="Temp" value={`+${tempHp}`} onClick={onOpenTempHp} highlight={tempHp > 0} />
         <StatBadge compact label="Init" value={formatModifier(initiative)} onClick={onRollInitiative} />
-        <StatBadge compact label="Insp" value={inspiration ? "★" : "☆"} onClick={onToggleInspiration} highlight={inspiration} />
+        <span ref={inspRef} className="inline-flex">
+          <StatBadge compact label="Insp" value={inspiration ? "★" : "☆"} onClick={toggleInspiration} highlight={inspiration} />
+        </span>
         <StatBadge
           compact
           label="Vel"

@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { createContext, useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { TAB_TRANSITION_MS, particleSpread, tabDirection } from "@/lib/motion";
 
 export type TransitionMode = "normal" | "flashy" | "instant";
 
 type Vars = CSSProperties & Record<`--${string}`, string | number>;
+
+// True inside the tab that is animating out (see TabFab).
+export const TabLeavingContext = createContext(false);
 
 interface Leaving {
   key: string;
@@ -77,11 +80,13 @@ export function TabTransition({
     <div className={`tab-stage${leaving ? " is-transitioning" : ""}`} style={stageStyle}>
       {leaving && (
         <div key={leaving.key} className={`tab-panel chapters tab-leaving fx-${fx}-out`} aria-hidden="true" inert>
-          {leaving.node}
+          <TabLeavingContext.Provider value={true}>{leaving.node}</TabLeavingContext.Provider>
         </div>
       )}
       <div key={tabKey} className={`tab-panel chapters${fx ? ` fx-${fx}-in` : ""}`}>
-        {children}
+        {/* Same wrapper shape as the leaving panel, so a tab keeps its state
+            when it moves from current to leaving. */}
+        <TabLeavingContext.Provider value={false}>{children}</TabLeavingContext.Provider>
       </div>
       {leaving?.mode === "flashy" && <InkSplash seed={`tab-${leaving.id}`} key={leaving.id} />}
     </div>

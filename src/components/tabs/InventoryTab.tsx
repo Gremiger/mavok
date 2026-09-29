@@ -11,7 +11,8 @@ import { exportInventoryCSV } from "@/lib/export";
 import { formatModifier, simplifyCurrency } from "@/lib/utils";
 import { resolveItemDescription } from "@/lib/inventory";
 import { toast } from "sonner";
-import { Sword, Shield, Wrench, FlaskConical, Heart, Plus, SearchX } from "lucide-react";
+import { Sword, Shield, Wrench, FlaskConical, Heart, SearchX } from "lucide-react";
+import { TabFab } from "@/components/ui/TabFab";
 import type { InventoryItem } from "@/lib/types";
 import type { ReactNode } from "react";
 import { WEAPONS } from "@/data/weapons";
@@ -508,12 +509,7 @@ export function InventoryTab() {
       </div>
 
       {/* Add Item FAB */}
-      <button
-        onClick={() => setAddModalOpen(true)}
-        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full btn-primary shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
-      >
-        <Plus size={24} strokeWidth={1.5} />
-      </button>
+      <TabFab label="Añadir objeto" onClick={() => setAddModalOpen(true)} />
 
       <ItemFormModal
         open={addModalOpen}

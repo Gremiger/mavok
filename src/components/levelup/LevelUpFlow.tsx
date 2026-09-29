@@ -21,6 +21,7 @@ import { SUBCLASSES } from "@/data/subclasses";
 import { FEATS, type FeatData } from "@/data/feats";
 import { meetsAbilityPrereqs } from "@/lib/feats";
 import { toast } from "sonner";
+import { useEffects } from "@/components/effects/EffectsProvider";
 import type { AbilityScore, Character, Feature } from "@/lib/types";
 
 const ABILITIES: AbilityScore[] = ["str", "dex", "con", "int", "wis", "cha"];
@@ -68,6 +69,7 @@ export function LevelUpFlow({
   dryRun?: boolean;
 }) {
   const { character, update } = useCharacterContext();
+  const { play } = useEffects();
   const [step, setStep] = useState<Step>("confirm");
   const [changes, setChanges] = useState<PendingChanges>(emptyChanges());
   const [hpRoll, setHpRoll] = useState<number | null>(null);
@@ -306,6 +308,7 @@ export function LevelUpFlow({
       return updated;
     });
     toast.success(`¡Nivel ${newLevel}!`, { icon: "⬆️" });
+    play("level-up", { data: { level: newLevel } });
     onClose();
     resetState();
   }

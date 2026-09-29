@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffects } from "@/components/effects/EffectsProvider";
+
 export function DeathSaves({
   successes,
   failures,
@@ -11,6 +13,8 @@ export function DeathSaves({
   onChange: (successes: number, failures: number) => void;
   onRegainConsciousness: () => void;
 }) {
+  const { flashy } = useEffects();
+  const stamp = flashy ? " stamp-in" : "";
   const isStable = successes >= 3;
   const isDead = failures >= 3;
 
@@ -38,7 +42,7 @@ export function DeathSaves({
                 onClick={() => onChange(i < successes ? i : i + 1, failures)}
                 className={`w-6 h-6 rounded-full border-2 transition-colors ${
                   i < successes
-                    ? "bg-success border-success"
+                    ? `bg-success border-success${stamp}`
                     : "border-muted"
                 }`}
               />
@@ -54,7 +58,7 @@ export function DeathSaves({
                 onClick={() => onChange(successes, i < failures ? i : i + 1)}
                 className={`w-6 h-6 rounded-full border-2 transition-colors ${
                   i < failures
-                    ? "bg-danger border-danger"
+                    ? `bg-danger border-danger${stamp}`
                     : "border-muted"
                 }`}
               />

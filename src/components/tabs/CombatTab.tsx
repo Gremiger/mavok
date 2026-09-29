@@ -28,6 +28,7 @@ import { rollD20Mode } from "@/lib/rollWithMode";
 import { exhaustionPenalty } from "@/lib/exhaustion";
 import { toggleVersatileDamage } from "@/lib/attackRoll";
 import { toast } from "sonner";
+import { useEffects } from "@/components/effects/EffectsProvider";
 import { Swords, Dices } from "lucide-react";
 
 function baseDice(damage: string): string {
@@ -48,6 +49,8 @@ export function CombatTab() {
     updateInventoryItem,
   } = useCharacterContext();
   const { magicItemIndicator, diceRollMode } = useThemeContext();
+  const { flashy } = useEffects();
+  const [stampCondition, setStampCondition] = useState<string | null>(null);
   const [hpModalOpen, setHpModalOpen] = useState(false);
   const [conditionModalOpen, setConditionModalOpen] = useState(false);
   const [viewingCondition, setViewingCondition] = useState<string | null>(
@@ -150,6 +153,7 @@ export function CombatTab() {
   function addCondition(name: string) {
     if (!combat.conditions.includes(name)) {
       updateCombat({ conditions: [...combat.conditions, name] });
+      setStampCondition(name);
     }
     setConditionModalOpen(false);
   }
@@ -260,6 +264,7 @@ export function CombatTab() {
             <Tag
               key={c}
               label={c}
+              stampIn={flashy && c === stampCondition}
               onClick={() =>
                 setViewingCondition(viewingCondition === c ? null : c)
               }

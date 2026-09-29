@@ -11,6 +11,7 @@ import { Tag } from "@/components/ui/Tag";
 import { spendHitDie as computeHitDieSpend } from "@/lib/hitDice";
 import { abilityModifier } from "@/lib/utils";
 import { toast } from "sonner";
+import { useEffects } from "@/components/effects/EffectsProvider";
 import {
   exportCharacterJSON,
   exportInventoryCSV,
@@ -57,6 +58,7 @@ export function SettingsTab() {
     motionStyle,
     setMotionStyle,
   } = useThemeContext();
+  const { play } = useEffects();
   const [shortRestOpen, setShortRestOpen] = useState(false);
   const [longRestOpen, setLongRestOpen] = useState(false);
   const [importPreview, setImportPreview] = useState<{
@@ -159,6 +161,7 @@ export function SettingsTab() {
     }));
     setLongRestOpen(false);
     toast.success("Descanso largo completado");
+    play("long-rest");
   }
 
   async function handleImport(file: File) {
@@ -703,6 +706,7 @@ export function SettingsTab() {
                 ),
               }));
               setShortRestOpen(false);
+              play("short-rest");
             }}
             className="w-full py-2 text-sm text-muted border border-border rounded-lg"
           >

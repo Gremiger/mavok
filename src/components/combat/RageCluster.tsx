@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Flame } from "lucide-react";
 import { shouldUseRageBadge } from "@/lib/rageDisplay";
+import { useEffects } from "@/components/effects/EffectsProvider";
 
 const EMBER_WISP_OFFSETS = [25, 55, 75];
 const EMBER_WISP_DELAYS = [0.2, 0.9, 1.6];
@@ -25,6 +26,20 @@ export function RageCluster({
   const [expanded, setExpanded] = useState(false);
   const [prevActive, setPrevActive] = useState(active);
   const [igniteKey, setIgniteKey] = useState(0);
+  const [slashed, setSlashed] = useState<number | null>(null);
+  const flameRef = useRef<HTMLButtonElement>(null);
+  const { play, flashy } = useEffects();
+
+  function toggleActive() {
+    const flame = flameRef.current;
+    const r = flame?.getBoundingClientRect();
+    const card = flame?.closest("[data-vitals]")?.getBoundingClientRect();
+    onToggleActive();
+    play(active ? "rage-end" : "rage-ignite", {
+      origin: r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : undefined,
+      data: card ? { x: card.left, y: card.top, w: card.width, h: card.height } : undefined,
+    });
+  }
 
   if (active !== prevActive) {
     setPrevActive(active);
@@ -47,12 +62,18 @@ export function RageCluster({
               type="button"
               onClick={() => {
                 onToggleSlot(i);
+                setSlashed(available ? i : null);
                 if (useBadge) setExpanded(false);
               }}
-              className="w-8 h-8 flex items-center justify-center"
+              className="relative w-8 h-8 flex items-center justify-center"
               aria-label={`Rage slot ${i + 1}: ${available ? "disponible" : "usado"}`}
             >
               <span className={`tally-mark ${available ? "" : "is-used"}`} />
+              {flashy && !available && slashed === i && (
+                <svg className="tally-slash" viewBox="0 0 32 32" aria-hidden="true">
+                  <path d="M4 22 L28 10" />
+                </svg>
+              )}
             </button>
           ))}
         </div>
@@ -66,8 +87,9 @@ export function RageCluster({
         </button>
       )}
       <button
+        ref={flameRef}
         type="button"
-        onClick={onToggleActive}
+        onClick={toggleActive}
         disabled={!active && !canActivate}
         className={`relative ml-auto w-9 h-9 rounded-full flex items-center justify-center border transition-shadow duration-200 ${
           active

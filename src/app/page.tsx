@@ -139,7 +139,7 @@ export default function Home() {
           />
           <OfflineBadge />
           <DiceBoxCanvas />
-          <div ref={appRootRef} className="flex flex-col min-h-dvh">
+          <div className="flex flex-col min-h-dvh">
             <motion.main
               className="flex-1 overflow-y-auto pb-safe-nav"
               style={{ x: dragX, opacity: dragOpacity, touchAction: 'pan-y pinch-zoom' }}
@@ -163,15 +163,19 @@ export default function Home() {
                 if (e.touches.length === 0) setIsPinching(false);
               }}
             >
-              <TabTransition
-                tabKey={activeTab}
-                order={TAB_ORDER}
-                origin={tabFx.origin}
-                mode={transitionMode}
-                scrollOffset={tabFx.scrollOffset}
-              >
-                {tabContent[activeTab]}
-              </TabTransition>
+              {/* Shake target: only tab content, never the fixed nav/FAB (a
+                  transformed ancestor would re-anchor fixed children). */}
+              <div ref={appRootRef}>
+                <TabTransition
+                  tabKey={activeTab}
+                  order={TAB_ORDER}
+                  origin={tabFx.origin}
+                  mode={transitionMode}
+                  scrollOffset={tabFx.scrollOffset}
+                >
+                  {tabContent[activeTab]}
+                </TabTransition>
+              </div>
             </motion.main>
 
             <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 nav-island-bottom">

@@ -6,7 +6,8 @@ import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Markdown } from "@/components/ui/Markdown";
 import { MentionTextarea } from "@/components/notes/MentionTextarea";
-import { Plus, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
+import { TabFab } from "@/components/ui/TabFab";
 import type { JournalEntry } from "@/lib/types";
 import { toast } from "sonner";
 import {
@@ -161,12 +162,7 @@ export function JournalList({
         />
       )}
 
-      <button
-        onClick={openNew}
-        className="fixed right-4 bottom-safe-fab w-12 h-12 rounded-full btn-primary shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
-      >
-        <Plus size={24} strokeWidth={1.5} />
-      </button>
+      <TabFab label="Nueva entrada" onClick={openNew} />
 
       {/* New Entry Form */}
       <Modal

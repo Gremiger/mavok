@@ -7,11 +7,13 @@ export function Tag({
   onRemove,
   onClick,
   variant = "default",
+  stampIn = false,
 }: {
   label: string;
   onRemove?: () => void;
   onClick?: () => void;
   variant?: "default" | "success" | "danger";
+  stampIn?: boolean;
 }) {
   const colors = {
     default: "",
@@ -20,7 +22,7 @@ export function Tag({
   };
 
   return (
-    <span className={`ink-stamp gap-1 ${colors[variant]}`}>
+    <span className={`ink-stamp gap-1 ${colors[variant]}${stampIn ? " stamp-in" : ""}`}>
       <span onClick={onClick} className={onClick ? "cursor-pointer" : undefined}>
         {label}
       </span>
