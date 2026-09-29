@@ -41,6 +41,9 @@ export function useTheme() {
   const [diceTheme, setDiceThemeState] = useState<
     AppSettings["diceTheme"]
   >("default");
+  const [motionStyle, setMotionStyleState] = useState<
+    AppSettings["motionStyle"]
+  >("normal");
 
   useEffect(() => {
     const settings = loadSettings();
@@ -52,6 +55,7 @@ export function useTheme() {
     setMagicItemIndicatorState(settings.magicItemIndicator);
     setDiceRollModeState(settings.diceRollMode);
     setDiceThemeState(settings.diceTheme);
+    setMotionStyleState(settings.motionStyle);
     document.documentElement.setAttribute("data-theme", settings.theme);
     applyThemeColor(document, themeBg(settings.theme));
   }, []);
@@ -120,6 +124,15 @@ export function useTheme() {
     []
   );
 
+  const setMotionStyle = useCallback(
+    (style: AppSettings["motionStyle"]) => {
+      setMotionStyleState(style);
+      const settings = loadSettings();
+      saveSettings({ ...settings, motionStyle: style });
+    },
+    []
+  );
+
   return {
     theme,
     setTheme,
@@ -135,5 +148,7 @@ export function useTheme() {
     setDiceRollMode,
     diceTheme,
     setDiceTheme,
+    motionStyle,
+    setMotionStyle,
   };
 }

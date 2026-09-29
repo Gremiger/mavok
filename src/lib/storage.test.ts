@@ -30,6 +30,7 @@ describe("loadSettings", () => {
       encyclopediaLanguage: "en",
       magicItemIndicator: "number-only",
       diceRollMode: "text",
+      motionStyle: "normal",
       diceTheme: "default",
     });
 

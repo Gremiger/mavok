@@ -54,6 +54,8 @@ export function SettingsTab() {
     setDiceRollMode,
     diceTheme,
     setDiceTheme,
+    motionStyle,
+    setMotionStyle,
   } = useThemeContext();
   const [shortRestOpen, setShortRestOpen] = useState(false);
   const [longRestOpen, setLongRestOpen] = useState(false);
@@ -261,6 +263,13 @@ export function SettingsTab() {
               setDiceRollMode(diceRollMode === "text" ? "3d" : "text")
             }
             name={`Modo de tirada: ${diceRollMode === "3d" ? "3D" : "Texto"}`}
+            right={<span className="text-xs text-muted">Tap para cambiar</span>}
+          />
+          <CompactRow
+            onClick={() =>
+              setMotionStyle(motionStyle === "flashy" ? "normal" : "flashy")
+            }
+            name={`Animaciones: ${motionStyle === "flashy" ? "Llamativas" : "Normales"}`}
             right={<span className="text-xs text-muted">Tap para cambiar</span>}
           />
           <CompactRow

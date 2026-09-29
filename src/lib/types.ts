@@ -196,5 +196,6 @@ export interface AppSettings {
   encyclopediaLanguage: "en" | "es";
   magicItemIndicator: "number-only" | "explicit-tag";
   diceRollMode: "text" | "3d";
+  motionStyle: "normal" | "flashy";
   diceTheme: DiceThemeId;
 }
