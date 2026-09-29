@@ -1,0 +1,197 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  .lab{display:flex;gap:30px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  .ctrl{max-width:420px;display:flex;flex-direction:column;gap:14px}
+  .ctrl h3{margin:0 0 6px}
+  .ctrl .row{display:flex;flex-wrap:wrap;gap:8px}
+  .ctrl button{font:inherit;font-size:14px;padding:7px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:inherit;cursor:pointer}
+  .ctrl button:hover{background:rgba(255,255,255,.14)}
+  .ctrl p{margin:0;font-size:13px;opacity:.75}
+
+  .ph{width:300px;height:600px;border-radius:34px;overflow:hidden;position:relative;background:#17130f;
+      background-image:radial-gradient(120% 55% at 50% 0%,#2a221a 0%,transparent 65%);box-shadow:0 18px 44px rgba(0,0,0,.5);
+      color:#e8dcc2;font-family:Spectral,serif;padding:16px 14px}
+  .ph *{box-sizing:border-box}
+  .shake{animation:shake 340ms cubic-bezier(.36,.07,.19,.97)}
+  @keyframes shake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(4px,-2px)}30%,50%,70%{transform:translate(-6px,2px)}40%,60%{transform:translate(6px,-1px)}}
+
+  .slab{position:relative;border-radius:16px;padding:14px;background:linear-gradient(180deg,#2a221a,#1d1812);
+        box-shadow:inset 0 1px 0 rgba(232,220,194,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 10px 24px -10px rgba(20,10,2,.75);border:1px solid transparent;transition:box-shadow .4s}
+  .slab.raging{border-color:#c9463a;box-shadow:0 0 16px rgba(201,70,58,.4)}
+  .lbl{font-family:'IM Fell English';font-style:italic;font-size:12.5px;color:#a8977a}
+  .hprow{display:flex;justify-content:space-between;align-items:flex-end}
+  .hp{font-family:Fraunces;font-weight:900;font-size:48px;line-height:.85;position:relative;display:inline-block}
+  .hp small{font-size:20px;color:#a8977a;font-weight:600}
+  .hp.flinch{animation:flinch 420ms}
+  @keyframes flinch{0%{color:#e8dcc2}15%{color:#ff6a55;transform:translateX(-5px) scale(1.06)}35%{transform:translateX(4px)}55%{transform:translateX(-2px)}100%{color:#e8dcc2;transform:none}}
+  .hp.heal{animation:healp 700ms}
+  @keyframes healp{0%{color:#e8dcc2}25%{color:#9fe0a8;transform:scale(1.1)}100%{color:#e8dcc2;transform:none}}
+  .shield{width:52px;height:60px;clip-path:polygon(50% 0,100% 14%,100% 62%,50% 100%,0 62%,0 14%);background:linear-gradient(180deg,#c9463a,#7a2a22);
+          display:grid;place-items:center;color:#f7e6d8;font-family:Fraunces;font-weight:900;font-size:21px;padding-bottom:7px}
+  .bar{position:relative;height:7px;border-radius:4px;background:#0c0a08;margin:11px 0 9px;overflow:hidden}
+  .bar .ghost,.bar .fill{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+  .bar .ghost{background:#f0d9b0;transition:width 500ms ease 380ms}
+  .bar .fill{background:linear-gradient(90deg,#7a2a22,#c9463a);transition:width 200ms ease}
+  .rage{display:flex;align-items:center;gap:4px}
+  .tally{width:28px;height:30px;display:grid;place-items:center;position:relative;cursor:pointer}
+  .tally i{display:block;width:5px;height:21px;border-radius:2px;transform:rotate(10deg);background:#c9463a;box-shadow:0 0 8px rgba(201,70,58,.55)}
+  .tally.used i{background:transparent;box-shadow:none;border:1px dashed #a8977a}
+  .tally svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .tally svg path{stroke:#e8dcc2;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-dasharray:40;stroke-dashoffset:40;animation:draw 260ms ease-out forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .flame{margin-left:auto;width:34px;height:34px;border-radius:50%;border:1px solid rgba(201,70,58,.6);display:grid;place-items:center;color:#c9463a;position:relative}
+  .raging .flame{background:#c9463a;color:#f7e6d8;box-shadow:0 0 10px rgba(201,70,58,.6)}
+  .stats{display:flex;justify-content:space-around;margin-top:10px;padding-top:9px;border-top:1px solid rgba(74,61,46,.5)}
+  .st{text-align:center;border-radius:9px;padding:3px 10px;background:linear-gradient(180deg,#2a221a,#1d1812);position:relative}
+  .st b{font-family:Fraunces;font-weight:600;color:#e9b877;font-size:15px;display:block}
+  .st span{font-size:11px;font-style:italic;color:#a8977a}
+  .sec{display:flex;align-items:baseline;gap:8px;margin:14px 0 7px}
+  .sec .n{font-family:'IM Fell English';color:#c9463a}.sec .t{font-family:'IM Fell English';font-size:16px}
+  .roll{position:relative;display:flex;gap:8px;align-items:center;padding:6px 9px;border-radius:8px;background:rgba(233,184,119,.1);font-size:13px;min-height:32px}
+  .roll b{font-family:Fraunces;font-weight:600;color:#e9b877}
+  .roll.fumble{animation:shake 380ms}
+  .conds{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:26px}
+  .stamp{display:inline-flex;align-items:center;padding:0 6px;border:1px solid rgba(233,184,119,.45);border-radius:3px;color:#e9b877;font-style:italic;font-size:12px;line-height:20px;position:relative}
+  .stamp.new{animation:tagstamp 420ms cubic-bezier(.3,1.8,.5,1) both}
+  @keyframes tagstamp{0%{transform:scale(2.2) rotate(-14deg);opacity:0}60%{opacity:1}100%{transform:none}}
+  .ds{display:flex;gap:6px}.ds i{width:18px;height:18px;border-radius:50%;border:2px solid #a8977a;display:block}
+  .ds i.ok{background:#86b98f;border-color:#86b98f;animation:tagstamp 400ms cubic-bezier(.3,1.8,.5,1)}
+  .ds i.ko{background:#e27d6e;border-color:#e27d6e;animation:tagstamp 400ms cubic-bezier(.3,1.8,.5,1)}
+
+  /* full-screen layer */
+  .fx{position:absolute;inset:0;pointer-events:none;z-index:20;overflow:hidden}
+  .vignette{position:absolute;inset:0;box-shadow:inset 0 0 60px 18px rgba(201,70,58,.0);transition:box-shadow .5s}
+  .vignette.pulse{animation:vpulse 700ms ease-out}
+  @keyframes vpulse{0%{box-shadow:inset 0 0 0 0 rgba(201,70,58,0)}30%{box-shadow:inset 0 0 90px 30px rgba(201,70,58,.75)}100%{box-shadow:inset 0 0 60px 14px rgba(201,70,58,.25)}}
+  .vignette.breath{animation:vbreath 2.6s ease-in-out infinite}
+  @keyframes vbreath{0%,100%{box-shadow:inset 0 0 50px 10px rgba(201,70,58,.18)}50%{box-shadow:inset 0 0 70px 20px rgba(201,70,58,.34)}}
+  .ring{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:3px solid #ff8a6a;animation:ring 650ms ease-out forwards}
+  @keyframes ring{to{transform:scale(18);opacity:0;border-width:1px}}
+  .bigstamp{position:absolute;left:50%;top:40%;font-family:'IM Fell English';font-size:54px;white-space:nowrap;letter-spacing:.02em;
+            transform:translate(-50%,-50%) rotate(-9deg);animation:bigstamp 1300ms cubic-bezier(.3,1.6,.5,1) forwards;text-shadow:0 4px 18px rgba(0,0,0,.6)}
+  .bigstamp.red{color:#ff6a55;-webkit-text-stroke:1px #7a1a12}
+  .bigstamp.gold{color:#ffd27a;-webkit-text-stroke:1px #7a4a12}
+  .bigstamp.seal{color:#f7e6d8;font-size:40px;width:170px;height:170px;border-radius:50%;display:grid;place-items:center;line-height:1;text-align:center;
+                 background:radial-gradient(circle at 40% 35%,#d4574a,#7d1d15);box-shadow:0 8px 30px rgba(0,0,0,.6),inset 0 -4px 10px rgba(0,0,0,.35)}
+  @keyframes bigstamp{0%{transform:translate(-50%,-50%) rotate(-24deg) scale(3);opacity:0}18%{opacity:1;transform:translate(-50%,-50%) rotate(-9deg) scale(.92)}28%{transform:translate(-50%,-50%) rotate(-9deg) scale(1)}78%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) rotate(-9deg) scale(1.04)}}
+  .p{position:absolute;border-radius:50%;animation:pfly var(--t,800ms) cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes pfly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+  .ash{position:absolute;width:4px;height:4px;border-radius:50%;background:#8a837c;animation:ash 1400ms ease-in forwards}
+  @keyframes ash{0%{opacity:.9;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),120px) rotate(200deg)}}
+  .claw{position:absolute;inset:0}
+  .claw path{stroke:#ff5a45;stroke-width:5;stroke-linecap:round;fill:none;stroke-dasharray:220;stroke-dashoffset:220;animation:claw 700ms ease-out forwards;filter:drop-shadow(0 0 4px rgba(255,80,60,.7))}
+  @keyframes claw{35%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+  .burst{position:absolute;width:220px;height:220px;margin:-110px 0 0 -110px;border-radius:50%;
+         background:radial-gradient(circle,rgba(255,215,120,.85) 0%,rgba(255,180,60,.35) 35%,transparent 70%);animation:burst 900ms ease-out forwards}
+  @keyframes burst{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.6);opacity:0}}
+  .crack{position:absolute;inset:0}
+  .crack path{stroke:#1a0e08;stroke-width:2;fill:none;stroke-dasharray:160;stroke-dashoffset:160;animation:draw 320ms ease-out forwards}
+  .drip{position:absolute;width:6px;height:10px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:#c9463a;animation:drip 1100ms ease-in 200ms forwards;opacity:0}
+  @keyframes drip{0%{opacity:1;transform:translateY(0) scaleY(.6)}30%{transform:translateY(4px) scaleY(1.3)}100%{opacity:0;transform:translateY(90px)}}
+  .night{position:absolute;inset:0;animation:night 2600ms ease-in-out forwards}
+  @keyframes night{0%{background:rgba(10,14,40,0)}25%,55%{background:rgba(10,14,40,.88)}75%{background:rgba(255,170,90,.35)}100%{background:rgba(255,170,90,0)}}
+  .moon{position:absolute;left:50%;top:60%;width:60px;height:60px;margin-left:-30px;border-radius:50%;box-shadow:-12px 6px 0 0 #f2ead0;animation:moon 2600ms ease-in-out forwards;opacity:0}
+  @keyframes moon{15%{opacity:0;transform:translateY(40px)}35%{opacity:1;transform:translateY(-120px)}60%{opacity:1;transform:translateY(-160px)}75%{opacity:0;transform:translateY(-200px)}}
+  .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle 2600ms ease-in-out forwards;opacity:0}
+  @keyframes twinkle{25%{opacity:0}35%,55%{opacity:.9}70%{opacity:0}}
+  .dawn{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(0deg,rgba(255,180,90,.55),transparent);animation:dawn 2600ms ease-out forwards}
+  @keyframes dawn{0%,55%{height:0}80%{height:100%}100%{height:100%;opacity:0}}
+  .fire{position:absolute;left:0;right:0;bottom:0;height:45%;background:radial-gradient(80% 100% at 50% 100%,rgba(255,140,50,.5),transparent 70%);animation:fire 1600ms ease-in-out forwards}
+  @keyframes fire{0%{opacity:0}15%{opacity:1}30%{opacity:.7}45%{opacity:1}60%{opacity:.75}80%{opacity:.9}100%{opacity:0}}
+  .spark{position:absolute;width:3px;height:3px;border-radius:50%;background:#ffc070;box-shadow:0 0 5px #ff8a3a;animation:spark 1200ms ease-out forwards;opacity:0}
+  @keyframes spark{0%{opacity:0}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx),-220px)}}
+  .dim{position:absolute;inset:0;background:rgba(0,0,0,.55);animation:dim 1700ms ease forwards}
+  @keyframes dim{0%{opacity:0}15%,70%{opacity:1}100%{opacity:0}}
+  .rays{position:absolute;left:50%;top:40%;width:420px;height:420px;margin:-210px 0 0 -210px;
+        background:repeating-conic-gradient(rgba(255,210,120,.28) 0 6deg,transparent 6deg 18deg);border-radius:50%;
+        -webkit-mask:radial-gradient(circle,#000 20%,transparent 65%);animation:rays 1700ms ease-out forwards}
+  @keyframes rays{0%{opacity:0;transform:rotate(0) scale(.5)}20%{opacity:1}100%{opacity:0;transform:rotate(50deg) scale(1.1)}}
+</style>
+
+<h2>Flashy effects lab</h2>
+<p class="subtitle">Everything here is the <b>Flashy</b> version (Normal keeps today's behaviour). Press the buttons and watch the phone. Tell me in the terminal what to keep, tone down, or push further.</p>
+
+<div class="lab">
+  <div class="ph" id="ph">
+    <div class="slab" id="slab">
+      <div class="hprow">
+        <div><div class="lbl">Puntos de golpe</div><div class="hp" id="hp">16<small> / 16</small></div></div>
+        <div class="shield">14</div>
+      </div>
+      <div class="bar"><span class="ghost" id="ghost" style="width:100%"></span><span class="fill" id="fill" style="width:100%"></span></div>
+      <div class="rage"><span class="lbl" style="margin-right:4px">Furias</span>
+        <span class="tally" id="t0"><i></i></span><span class="tally" id="t1"><i></i></span><span class="tally" id="t2"><i></i></span>
+        <span class="flame" id="flame"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span></div>
+      <div class="stats"><div class="st"><b>+0</b><span>Temp</span></div><div class="st"><b>+2</b><span>Init</span></div><div class="st" id="insp"><b id="inspv">☆</b><span>Insp</span></div><div class="st"><b>35</b><span>Vel</span></div></div>
+    </div>
+    <div class="sec"><span class="n">·</span><span class="t">Última tirada</span></div>
+    <div class="roll" id="roll"><span style="color:#a8977a;font-size:12px">Maul:</span> [11] +5 <b>= 16</b></div>
+    <div class="sec"><span class="n">·</span><span class="t">Condiciones</span></div>
+    <div class="conds" id="conds"><span style="font-style:italic;color:#a8977a;font-size:13px">sin condiciones</span></div>
+    <div class="sec"><span class="n">·</span><span class="t">Salvaciones de muerte</span></div>
+    <div class="ds"><i></i><i></i><i></i><span style="width:14px"></span><i></i><i></i><i></i></div>
+    <div class="fx" id="fx"><div class="vignette" id="vig"></div></div>
+  </div>
+
+  <div class="ctrl">
+    <div><h3>Rage</h3><div class="row"><button data-a="rageOn">🔥 Activar Furia</button><button data-a="slot">Gastar una furia</button><button data-a="rageOff">Terminar Furia</button></div>
+      <p>Ignite: shockwave, red edge pulse, shake, "¡FURIA!" seal, ember burst, then a breathing glow. Ending: embers cool into falling ash.</p></div>
+    <div><h3>Dice</h3><div class="row"><button data-a="crit">Nat 20</button><button data-a="fumble">Nat 1</button></div>
+      <p>Crit: gold burst + "¡CRÍTICO!" stamp + scattering sparks. Fumble: the roll shakes, cracks, and drips ink.</p></div>
+    <div><h3>HP</h3><div class="row"><button data-a="dmg">Recibir 5 daño</button><button data-a="heal">Curar 5</button></div>
+      <p>Damage: claw slashes, HP flinches red, the bar drops and a pale "ghost" bar catches up. Heal: green sparks rise.</p></div>
+    <div><h3>Big moments</h3><div class="row"><button data-a="level">Subir de nivel</button><button data-a="long">Descanso largo</button><button data-a="short">Descanso corto</button></div>
+      <p>Level up: rays + wax seal "Nivel 2". Long rest: night falls, moon rises, dawn breaks. Short rest: campfire glow and sparks.</p></div>
+    <div><h3>Small touches</h3><div class="row"><button data-a="cond">Añadir condición</button><button data-a="insp">Inspiración</button><button data-a="dsok">Salvación ✓</button><button data-a="dsko">Salvación ✗</button></div>
+      <p>Conditions and death-save marks stamp down; Inspiration bursts into sparkles.</p></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ph=document.getElementById('ph'),fx=document.getElementById('fx'),vig=document.getElementById('vig'),slab=document.getElementById('slab');
+  let hp=16,max=16,slot=0,raging=false,level=1;
+  const rel=(el)=>{const a=ph.getBoundingClientRect(),b=el.getBoundingClientRect();return{x:b.left-a.left+b.width/2,y:b.top-a.top+b.height/2,w:b.width,h:b.height,l:b.left-a.left,t:b.top-a.top}};
+  const add=(html,ms,parent=fx)=>{const d=document.createElement('div');d.innerHTML=html;const el=d.firstElementChild;parent.appendChild(el);setTimeout(()=>el.remove(),ms);return el};
+  const particles=(x,y,n,color,dist,t=800,size=5)=>{for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,r=dist*(.5+Math.random()*.7);
+    const el=add(`<i class="p" style="left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:${color};box-shadow:0 0 6px ${color};--dx:${Math.cos(a)*r}px;--dy:${Math.sin(a)*r}px;--t:${t}ms"></i>`,t+50)}};
+  const shake=()=>{ph.classList.remove('shake');void ph.offsetWidth;ph.classList.add('shake')};
+  const stamp=(text,cls,ms=1300)=>add(`<div class="bigstamp ${cls}">${text}</div>`,ms);
+  const setHp=(v)=>{hp=Math.max(0,Math.min(max,v));document.getElementById('hp').firstChild.nodeValue=hp;const w=(hp/max*100)+'%';document.getElementById('fill').style.width=w;document.getElementById('ghost').style.width=w};
+  const replay=(el,cls)=>{el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls)};
+
+  const A={
+    rageOn(){if(raging)return;raging=true;const f=rel(document.getElementById('flame'));
+      slab.classList.add('raging');add(`<div class="ring" style="left:${f.x}px;top:${f.y}px"></div>`,700);
+      vig.classList.remove('breath');replay(vig,'pulse');shake();particles(f.x,f.y,22,'#ff8a5a',110,900,4);
+      stamp('¡FURIA!','red');setTimeout(()=>{if(raging){vig.classList.remove('pulse');vig.classList.add('breath')}},750)},
+    rageOff(){if(!raging)return;raging=false;slab.classList.remove('raging');vig.classList.remove('breath','pulse');
+      const s=rel(slab);for(let i=0;i<18;i++)add(`<i class="ash" style="left:${s.l+Math.random()*s.w}px;top:${s.t+Math.random()*s.h*.6}px;--dx:${Math.random()*40-20}px;animation-delay:${Math.random()*300}ms"></i>`,1800)},
+    slot(){if(slot>2)return;const t=document.getElementById('t'+slot);t.classList.add('used');
+      t.insertAdjacentHTML('beforeend','<svg viewBox="0 0 28 30"><path d="M2 20 L26 9"/></svg>');slot++},
+    crit(){const r=document.getElementById('roll');r.innerHTML='<span style="color:#a8977a;font-size:12px">Maul:</span> [20] +5 <b>= 25</b> <span style="color:#86b98f;font-family:IM Fell English">¡CRIT!</span>';
+      const p=rel(r);add(`<div class="burst" style="left:${p.x}px;top:${p.y}px"></div>`,950);particles(p.x,p.y,26,'#ffd27a',140,1000,4);stamp('¡CRÍTICO!','gold',1400)},
+    fumble(){const r=document.getElementById('roll');r.innerHTML='<span style="color:#a8977a;font-size:12px">Maul:</span> [1] +5 <b>= 6</b> <span style="color:#e27d6e;font-family:IM Fell English">Pifia</span>';
+      replay(r,'fumble');r.insertAdjacentHTML('beforeend','<svg class="crack" viewBox="0 0 272 32" preserveAspectRatio="none"><path d="M40 0 L52 12 L46 17 L64 32 M52 12 L70 8"/></svg>');
+      const p=rel(r);add(`<i class="drip" style="left:${p.l+p.w*.7}px;top:${p.t+p.h-2}px"></i>`,1400);setTimeout(()=>{const c=r.querySelector('.crack');c&&c.remove()},2200)},
+    dmg(){const s=rel(slab);add(`<svg class="claw" viewBox="0 0 300 600"><path d="M${s.l+40} ${s.t+10} L${s.l+150} ${s.t+120}"/><path d="M${s.l+70} ${s.t+5} L${s.l+185} ${s.t+118}" style="animation-delay:70ms"/><path d="M${s.l+100} ${s.t+2} L${s.l+215} ${s.t+114}" style="animation-delay:140ms"/></svg>`,800);
+      document.getElementById('fill').style.width=(Math.max(0,hp-5)/max*100)+'%';hp=Math.max(0,hp-5);document.getElementById('hp').firstChild.nodeValue=hp;
+      setTimeout(()=>{document.getElementById('ghost').style.width=(hp/max*100)+'%'},0);replay(document.getElementById('hp'),'flinch');shake()},
+    heal(){setHp(hp+5);const h=rel(document.getElementById('hp'));replay(document.getElementById('hp'),'heal');
+      for(let i=0;i<14;i++)add(`<i class="spark" style="left:${h.l+Math.random()*h.w*1.6}px;top:${h.t+h.h}px;background:#a6f0b0;box-shadow:0 0 6px #4ad07a;--dx:${Math.random()*40-20}px;animation-delay:${Math.random()*300}ms"></i>`,1600)},
+    level(){level++;add('<div class="dim"></div>',1750);add('<div class="rays"></div>',1750);particles(150,240,30,'#ffb070',170,1200,4);
+      stamp(`Nivel<br>${level}`,'seal',1700)},
+    long(){add('<div class="night"></div>',2650);add('<div class="moon"></div>',2650);add('<div class="dawn"></div>',2650);
+      for(let i=0;i<18;i++)add(`<i class="star" style="left:${Math.random()*300}px;top:${Math.random()*320}px;animation-delay:${Math.random()*200}ms"></i>`,2700);
+      setTimeout(()=>{setHp(max);slot=0;[0,1,2].forEach(i=>{const t=document.getElementById('t'+i);t.classList.remove('used');const s=t.querySelector('svg');s&&s.remove()})},1300)},
+    short(){add('<div class="fire"></div>',1650);for(let i=0;i<16;i++)add(`<i class="spark" style="left:${60+Math.random()*180}px;top:560px;--dx:${Math.random()*50-25}px;animation-delay:${Math.random()*700}ms"></i>`,2000)},
+    cond(){const c=document.getElementById('conds');const names=['Prone','Grappled','Frightened','Poisoned'];const have=c.querySelectorAll('.stamp').length;if(have>=names.length)return;
+      if(!have)c.innerHTML='';c.insertAdjacentHTML('beforeend',`<span class="stamp new">${names[have]} ✕</span>`)},
+    insp(){const v=document.getElementById('inspv');const on=v.textContent==='☆';v.textContent=on?'★':'☆';if(on){const p=rel(document.getElementById('insp'));particles(p.x,p.y,16,'#ffe39a',60,700,3)}},
+    dsok(){const i=[...document.querySelectorAll('.ds i')].slice(0,3).find(x=>!x.className);i&&(i.className='ok')},
+    dsko(){const i=[...document.querySelectorAll('.ds i')].slice(3).find(x=>!x.className);i&&(i.className='ko')}
+  };
+  document.querySelectorAll('.ctrl button').forEach(b=>b.onclick=()=>A[b.dataset.a]());
+})();
+</script>
