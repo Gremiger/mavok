@@ -62,6 +62,15 @@ describe("EffectsProvider", () => {
     expect(effects("crit")).toHaveLength(1);
   });
 
+  test("an id that already played never replays, even after the effect ended", () => {
+    render("flashy");
+    click();
+    act(() => vi.advanceTimersByTime(1500));
+    expect(effects("crit")).toHaveLength(0);
+    click();
+    expect(effects("crit")).toHaveLength(0);
+  });
+
   test("reduced motion suppresses flashy effects", () => {
     render("flashy", true);
     click();

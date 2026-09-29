@@ -50,6 +50,22 @@ describe("DiceResult flashy effects", () => {
     expect(crits()).toHaveLength(1);
   });
 
+  test("re-mounting the same roll after the crit ended does not replay it", () => {
+    render(nat20, "flashy");
+    act(() => vi.advanceTimersByTime(1500));
+    expect(crits()).toHaveLength(0);
+    // Collapse (unmount) and reopen (re-mount) the result, as a CollapsibleSection does.
+    act(() =>
+      root.render(
+        <EffectsProvider motionStyle="flashy" reducedMotion={false} rageActive={false}>
+          <p>collapsed</p>
+        </EffectsProvider>
+      )
+    );
+    render(nat20, "flashy");
+    expect(crits()).toHaveLength(0);
+  });
+
   test("normal mode never plays the crit effect", () => {
     render(nat20, "normal");
     expect(crits()).toHaveLength(0);

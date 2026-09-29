@@ -60,7 +60,9 @@ export function EffectsProvider({
 }) {
   const flashy = shouldAnimate(motionStyle, reducedMotion);
   const [effects, setEffects] = useState<ActiveEffect[]>([]);
-  const activeIds = useRef(new Set<string>());
+  // Ids that have played, kept after the effect ends so a re-mounted source
+  // (e.g. a roll result in a collapsed-and-reopened section) never replays.
+  const playedIds = useRef(new Set<string>());
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
   const layerRef = useRef<HTMLDivElement>(null);
 
@@ -82,14 +84,15 @@ export function EffectsProvider({
     (name: EffectName, opts: PlayOptions = {}) => {
       if (!flashy) return;
       const id = opts.id ?? `${name}-${Date.now()}`;
-      if (activeIds.current.has(id)) return;
-      activeIds.current.add(id);
+      const played = playedIds.current;
+      if (played.has(id)) return;
+      played.add(id);
+      if (played.size > 100) played.delete(played.values().next().value as string);
       const fx: ActiveEffect = { id, name, startedAt: Date.now(), origin: opts.origin, data: opts.data };
       setEffects((list) => addEffect(list, fx));
       if (SHAKING.includes(name)) shake();
       const timer = setTimeout(() => {
         timers.current.delete(timer);
-        activeIds.current.delete(id);
         setEffects((list) => list.filter((e) => e.id !== id));
       }, EFFECT_DURATIONS[name]);
       timers.current.add(timer);
