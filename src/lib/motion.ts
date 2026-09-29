@@ -49,6 +49,23 @@ export function tabDirection<T>(order: readonly T[], from: T, to: T): 1 | -1 {
   return order.indexOf(to) < order.indexOf(from) ? -1 : 1;
 }
 
+// Deterministic per-effect randomness for particle positions, so render stays
+// pure (no Math.random) and a re-render never reshuffles particles.
+export function particleSpread(
+  seed: string,
+  n: number
+): { a: number; b: number; c: number; d: number }[] {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
+  const next = () => {
+    h = (h + 0x6d2b79f5) | 0;
+    let t = Math.imul(h ^ (h >>> 15), 1 | h);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  return Array.from({ length: n }, () => ({ a: next(), b: next(), c: next(), d: next() }));
+}
+
 // A swipe that moves forward in the tab order is a right-to-left drag, so the
 // ink enters from the right edge (and vice versa), near the nav bar.
 export function swipeOrigin(dir: 1 | -1, width: number, height: number): { x: number; y: number } {

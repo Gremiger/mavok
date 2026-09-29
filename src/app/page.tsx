@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Script from "next/script";
 import { useCharacter } from "@/hooks/useCharacter";
 import { useTheme } from "@/hooks/useTheme";
@@ -20,6 +20,8 @@ import { Toaster } from "sonner";
 import { Shield, Swords, Backpack, BookOpen, Library, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { EffectsProvider } from "@/components/effects/EffectsProvider";
 import type { ReactNode } from "react";
 
 type Tab = "ficha" | "combate" | "inventario" | "notas" | "enciclopedia" | "ajustes";
@@ -41,6 +43,8 @@ export default function Home() {
   const charState = useCharacter();
   const themeState = useTheme();
   const driveState = useGoogleDriveAuth();
+  const reducedMotion = usePrefersReducedMotion();
+  const appRootRef = useRef<HTMLDivElement>(null);
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const { dragX, dragOpacity, handleDragEnd } = useSwipeNavigation(
     TAB_ORDER,
@@ -77,6 +81,12 @@ export default function Home() {
     <CharacterContext.Provider value={charState}>
       <ThemeContext.Provider value={themeState}>
         <GoogleDriveContext.Provider value={driveState}>
+          <EffectsProvider
+            motionStyle={themeState.motionStyle}
+            reducedMotion={reducedMotion}
+            rageActive={charState.character.resources.rpiRages.active}
+            shakeTarget={appRootRef}
+          >
           {googleClientId && (
             <Script
               src="https://accounts.google.com/gsi/client"
@@ -97,7 +107,7 @@ export default function Home() {
           />
           <OfflineBadge />
           <DiceBoxCanvas />
-          <div className="flex flex-col min-h-dvh">
+          <div ref={appRootRef} className="flex flex-col min-h-dvh">
             <motion.main
               className="chapters flex-1 overflow-y-auto pb-safe-nav"
               style={{ x: dragX, opacity: dragOpacity, touchAction: 'pan-y pinch-zoom' }}
@@ -165,6 +175,7 @@ export default function Home() {
               <QuickActionsFab activeTab={activeTab} />
             )}
           </div>
+          </EffectsProvider>
         </GoogleDriveContext.Provider>
       </ThemeContext.Provider>
     </CharacterContext.Provider>

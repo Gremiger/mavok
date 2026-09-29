@@ -3,6 +3,7 @@ import {
   EFFECT_DURATIONS,
   TAB_TRANSITION_MS,
   addEffect,
+  particleSpread,
   pruneEffects,
   shouldAnimate,
   swipeOrigin,
@@ -65,6 +66,25 @@ describe("tabDirection", () => {
   });
   test("same tab counts as +1", () => {
     expect(tabDirection(order, "combate", "combate")).toBe(1);
+  });
+});
+
+describe("particleSpread", () => {
+  test("is deterministic for the same seed", () => {
+    expect(particleSpread("crit-1", 5)).toEqual(particleSpread("crit-1", 5));
+  });
+  test("differs between seeds", () => {
+    expect(particleSpread("crit-1", 5)).not.toEqual(particleSpread("crit-2", 5));
+  });
+  test("returns n values, each in [0, 1)", () => {
+    const ps = particleSpread("x", 30);
+    expect(ps).toHaveLength(30);
+    for (const p of ps) {
+      for (const v of [p.a, p.b, p.c, p.d]) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThan(1);
+      }
+    }
   });
 });
 

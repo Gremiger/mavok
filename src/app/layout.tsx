@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IM_Fell_English, Spectral, Fraunces } from "next/font/google";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import "./globals.css";
+import "./effects.css";
 
 const fell = IM_Fell_English({
   subsets: ["latin"],
