@@ -198,4 +198,6 @@ export interface AppSettings {
   diceRollMode: "text" | "3d";
   motionStyle: "normal" | "flashy";
   diceTheme: DiceThemeId;
+  attacksView: "list" | "hand";
+  journalView: "list" | "time";
 }

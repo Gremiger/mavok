@@ -17,6 +17,9 @@ import { DiceRoller } from "@/components/combat/DiceRoller";
 import { StandardActionsModal } from "@/components/combat/StandardActionsModal";
 import { AttackFormModal } from "@/components/combat/AttackFormModal";
 import { GrantedActionCard } from "@/components/combat/GrantedActionCard";
+import { WeaponHand } from "@/components/combat/WeaponHand";
+import { ViewToggle } from "@/components/ui/ViewToggle";
+import { useViewPref } from "@/hooks/useViewPref";
 import { CONDITIONS } from "@/data/conditions";
 import { CONDITION_GROUPS } from "@/data/condition-groups";
 import { BARBARIAN_LEVELS } from "@/data/barbarian-progression";
@@ -79,6 +82,8 @@ export function CombatTab() {
     setStoneEnduranceEditing(true)
   );
   const healerKitLongPress = useLongPress(() => setHealerKitEditing(true));
+  const [attacksView, setAttacksView] = useViewPref("attacksView");
+  const [handSelectedId, setHandSelectedId] = useState<string | null>(null);
 
   if (!character) return null;
 
@@ -88,6 +93,9 @@ export function CombatTab() {
   const rageDamage =
     BARBARIAN_LEVELS.find((l) => l.level === meta.level)?.rageDamage ?? 2;
   const offhandAttack = attacks.find((a) => a.properties.includes("Light"));
+  // The hand needs at least two weapons to be worth fanning.
+  const showHand = attacksView === "hand" && attacks.length >= 2;
+  const handSelected = showHand ? attacks.find((a) => a.id === handSelectedId) : undefined;
   const hasRecklessAttack = character.features.some(
     (f) => f.name === "Reckless Attack"
   );
@@ -95,6 +103,45 @@ export function CombatTab() {
   const slots = resources.rpiRages.slots?.length === resources.rpiRages.total
     ? resources.rpiRages.slots
     : Array.from({ length: resources.rpiRages.total }, (_, i) => i < resources.rpiRages.remaining);
+
+  const char = character;
+  function renderAttackRow(a: Attack, i: number) {
+    return (
+      <AttackRow
+        key={a.id}
+        attack={a}
+        rageActive={rageActive}
+        rageDamage={rageDamage}
+        recklessActive={combat.recklessActive}
+        exhaustionLevel={combat.exhaustionLevel}
+        attackMagicBonus={computeAttackMagicBonus(char, a, "attack")}
+        damageMagicBonus={computeAttackMagicBonus(char, a, "damage")}
+        onToggleVersatile={() =>
+          updateAttack(a.id, toggleVersatileDamage(a))
+        }
+        onEdit={() => setAttackModalState(a)}
+        onDelete={() => {
+          const index = attacks.findIndex((x) => x.id === a.id);
+          removeAttack(a.id);
+          toast(`${a.name} eliminado`, {
+            action: {
+              label: "Deshacer",
+              onClick: () =>
+                update((c) => {
+                  const next = [...c.attacks];
+                  next.splice(index, 0, a);
+                  return { ...c, attacks: next };
+                }),
+            },
+          });
+        }}
+        onMoveUp={i > 0 ? () => moveAttack(a.id, "up") : undefined}
+        onMoveDown={
+          i < attacks.length - 1 ? () => moveAttack(a.id, "down") : undefined
+        }
+      />
+    );
+  }
 
   function toggleRageSlot(index: number) {
     const newSlots = [...slots];
@@ -347,42 +394,32 @@ export function CombatTab() {
 
       {/* Actions */}
       <div ref={attacksSectionRef}>
-      <CollapsibleSection title="Acciones" defaultOpen forceOpenKey={attacksForceOpenKey} count={attacks.length}>
-        {attacks.map((a, i) => (
-          <AttackRow
-            key={a.id}
-            attack={a}
-            rageActive={rageActive}
-            rageDamage={rageDamage}
-            recklessActive={combat.recklessActive}
-            exhaustionLevel={combat.exhaustionLevel}
-            attackMagicBonus={computeAttackMagicBonus(character, a, "attack")}
-            damageMagicBonus={computeAttackMagicBonus(character, a, "damage")}
-            onToggleVersatile={() =>
-              updateAttack(a.id, toggleVersatileDamage(a))
-            }
-            onEdit={() => setAttackModalState(a)}
-            onDelete={() => {
-              const index = attacks.findIndex((x) => x.id === a.id);
-              removeAttack(a.id);
-              toast(`${a.name} eliminado`, {
-                action: {
-                  label: "Deshacer",
-                  onClick: () =>
-                    update((c) => {
-                      const next = [...c.attacks];
-                      next.splice(index, 0, a);
-                      return { ...c, attacks: next };
-                    }),
-                },
-              });
-            }}
-            onMoveUp={i > 0 ? () => moveAttack(a.id, "up") : undefined}
-            onMoveDown={
-              i < attacks.length - 1 ? () => moveAttack(a.id, "down") : undefined
-            }
-          />
-        ))}
+      <CollapsibleSection
+        title="Acciones"
+        defaultOpen
+        forceOpenKey={attacksForceOpenKey}
+        count={attacks.length}
+        aside={
+          attacks.length >= 2 ? (
+            <ViewToggle
+              value={attacksView}
+              options={[
+                { value: "hand", label: "Mano" },
+                { value: "list", label: "Lista" },
+              ]}
+              onChange={setAttacksView}
+            />
+          ) : undefined
+        }
+      >
+        {showHand ? (
+          <>
+            <WeaponHand attacks={attacks} selectedId={handSelectedId} onSelect={setHandSelectedId} />
+            {handSelected && renderAttackRow(handSelected, attacks.indexOf(handSelected))}
+          </>
+        ) : (
+          attacks.map(renderAttackRow)
+        )}
         <button
           onClick={() => setAttackModalState("add")}
           className="w-full mt-2 p-2 rounded-lg border border-border/50 bg-card/50 text-left"

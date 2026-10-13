@@ -40,18 +40,22 @@ export function getCharacterStorageKey(id: string): string {
   return `${CHAR_PREFIX}${id}`;
 }
 
+export const DEFAULT_SETTINGS: AppSettings = {
+  theme: "piedra-viva",
+  lastCharacterId: "mavok-1",
+  density: "spacious",
+  encyclopediaFavorites: [],
+  encyclopediaLanguage: "en",
+  magicItemIndicator: "number-only",
+  diceRollMode: "text",
+  motionStyle: "normal",
+  diceTheme: "default",
+  attacksView: "hand",
+  journalView: "time",
+};
+
 export function loadSettings(): AppSettings {
-  const defaults: AppSettings = {
-    theme: "piedra-viva",
-    lastCharacterId: "mavok-1",
-    density: "spacious",
-    encyclopediaFavorites: [],
-    encyclopediaLanguage: "en",
-    magicItemIndicator: "number-only",
-    diceRollMode: "text",
-    motionStyle: "normal",
-    diceTheme: "default",
-  };
+  const defaults = { ...DEFAULT_SETTINGS };
   if (typeof window === "undefined") return defaults;
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);

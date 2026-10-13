@@ -32,6 +32,8 @@ describe("loadSettings", () => {
       diceRollMode: "text",
       motionStyle: "normal",
       diceTheme: "default",
+      attacksView: "hand",
+      journalView: "time",
     });
 
     const settings = loadSettings();

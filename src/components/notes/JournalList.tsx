@@ -8,6 +8,9 @@ import { Markdown } from "@/components/ui/Markdown";
 import { MentionTextarea } from "@/components/notes/MentionTextarea";
 import { BookOpen } from "lucide-react";
 import { TabFab } from "@/components/ui/TabFab";
+import { ViewToggle } from "@/components/ui/ViewToggle";
+import { JournalTimeMachine } from "@/components/notes/JournalTimeMachine";
+import { useViewPref } from "@/hooks/useViewPref";
 import type { JournalEntry } from "@/lib/types";
 import { toast } from "sonner";
 import {
@@ -47,6 +50,7 @@ export function JournalList({
   const [expandedPreviews, setExpandedPreviews] = useState<Set<string>>(
     new Set()
   );
+  const [journalView, setJournalView] = useViewPref("journalView");
 
   function togglePreview(id: string) {
     setExpandedPreviews((prev) => {
@@ -66,6 +70,9 @@ export function JournalList({
   if (!character) return null;
 
   const journal = character.notes.journal;
+  const newestFirst = journal.slice().reverse();
+  // A one-session stack has nowhere to travel; show the list until there are two.
+  const showTimeMachine = journalView === "time" && journal.length >= 2;
   const viewingEntry = journal.find((j) => j.id === viewingId);
 
   function openNew() {
@@ -116,10 +123,25 @@ export function JournalList({
 
   return (
     <div className="space-y-3">
-      {journal
-        .slice()
-        .reverse()
-        .map((entry) => (
+      {journal.length >= 2 && (
+        <div className="flex justify-end">
+          <ViewToggle
+            value={journalView}
+            options={[
+              { value: "time", label: "Tiempo" },
+              { value: "list", label: "Lista" },
+            ]}
+            onChange={setJournalView}
+          />
+        </div>
+      )}
+
+      {showTimeMachine && (
+        <JournalTimeMachine entries={newestFirst} onOpen={setViewingId} />
+      )}
+
+      {!showTimeMachine &&
+        newestFirst.map((entry) => (
           <div
             key={entry.id}
             onClick={() => setViewingId(entry.id)}
