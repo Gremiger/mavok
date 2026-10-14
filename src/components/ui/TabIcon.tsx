@@ -29,7 +29,8 @@ export function TabIcon({ tab, active }: { tab: TabId; active: boolean }) {
       className="inline-flex"
       initial={false}
       animate={active && !reducedMotion ? gesture : REST}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      // Leaving a tab snaps back: easing it would replay the gesture backwards.
+      transition={active ? { duration: 0.5, ease: "easeOut" } : { duration: 0 }}
     >
       <Icon size={20} strokeWidth={1.5} />
     </motion.span>
