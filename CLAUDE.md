@@ -28,7 +28,7 @@ npx tsc --noEmit     # Type check without emitting
 
 Tests are colocated as `*.test.ts` next to the source file they cover (e.g. `src/lib/migrations.test.ts`), run via Vitest. Verify changes by running `npx tsc --noEmit && npm run build && npm run lint && npm test`. **Always include lint** — `tsc`/`build`/`test` do not catch React Hooks ordering violations (see Key Constraints below); only `npm run lint`'s `react-hooks/rules-of-hooks` rule does. A change that skips lint can look clean and still ship a real bug.
 
-Current test coverage: `migrations.ts` (the full version chain), `recalculate.ts`, and the pure roll/penalty helpers (`attackRoll.ts`, `hitDice.ts`, `exhaustion.ts`). No component/UI tests yet — verifying UI changes still means running the app (dev server + a real browser, or an MCP browser tool) and exercising the flow.
+Current test coverage: `migrations.ts` (the full version chain), `recalculate.ts`, and the pure roll/penalty helpers (`attackRoll.ts`, `hitDice.ts`, `exhaustion.ts`). A few components have tests too (`src/components/**/*.test.tsx`, rendered with `react-dom/client` + `act`, no Testing Library), but verifying UI changes still means running the app (dev server + a real browser, or an MCP browser tool) and exercising the flow.
 
 `npm run lint` should report 0 errors. Two lines (in `useCharacter.ts` and `useTheme.ts`, both reading `localStorage` on mount) carry a scoped `eslint-disable-next-line react-hooks/set-state-in-effect` with an inline justification — that's deliberate (localStorage is unavailable during this static-export app's build-time prerender pass), not new debt. Don't remove those comments, and don't add a similar suppression elsewhere without the same SSR/localStorage justification.
 
@@ -51,6 +51,8 @@ Never include a "Co-authored-by" (or similar attribution) trailer in commit mess
 **Theming**: Two themes (Dark Fantasy, D&D Classic) via CSS custom properties on `[data-theme]` attribute. Variables defined in `globals.css`, toggled via `useTheme()` hook. Tailwind classes reference them as `bg-background`, `text-accent`, `bg-card`, etc.
 
 **Service worker cache-busting** (`scripts/generate-sw.ts`): Runs automatically via the `prebuild` npm script before every `npm run build`. It stamps `public/sw.js`'s `STATIC_CACHE` constant with the current git commit hash. This means `public/sw.js` will show as modified after every build — that's expected, not a stray change, and should be committed alongside whatever code change triggered the rebuild. `networkFirstWithFallback` in that same generated file must cache each navigation under its own `request` object (`cache.put(request, ...)`), never a hardcoded string key — an earlier version keyed every navigation to the literal string `"/index.html"`, which meant visiting a different static page (e.g. `/print`) online silently overwrote the cached homepage, and the next offline load served the wrong page.
+
+**UI building blocks**: `Modal` (`src/components/ui/Modal.tsx`) is a Vaul bottom sheet — every modal in the app rises from the bottom and drags down to close; keep its `open/onClose/title` API so call sites stay untouched. `LottieArt` plays the Lottie illustrations in `src/lottie/` (player and artwork are lazy chunks; pure black in the art is recoloured to `--fg` by CSS). `HandDrawn` draws rough-notation ink over text (quest strike-throughs). HP and coins use `@number-flow/react`; the HP flourish replays via `getAnimations()` instead of remounting, so the digit roll isn't cut.
 
 ## Key Constraints
 
