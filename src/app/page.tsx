@@ -17,26 +17,26 @@ import { OfflineBadge } from "@/components/OfflineBadge";
 import { DiceBoxCanvas } from "@/components/DiceBoxCanvas";
 import { QuickActionsFab } from "@/components/ui/QuickActionsFab";
 import { Toaster } from "sonner";
-import { Shield, Swords, Backpack, BookOpen, Library, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { EffectsProvider } from "@/components/effects/EffectsProvider";
 import { TabTransition } from "@/components/ui/TabTransition";
+import { TabIcon, type TabId } from "@/components/ui/TabIcon";
 import { swipeOrigin, tabDirection } from "@/lib/motion";
 import type { ReactNode } from "react";
 
-type Tab = "ficha" | "combate" | "inventario" | "notas" | "enciclopedia" | "ajustes";
+type Tab = TabId;
 
 const TAB_ORDER: Tab[] = ["ficha", "combate", "inventario", "notas", "enciclopedia", "ajustes"];
 
-const TAB_META: { id: Tab; label: string; icon: ReactNode }[] = [
-  { id: "ficha", label: "Ficha", icon: <Shield size={20} strokeWidth={1.5} /> },
-  { id: "combate", label: "Combate", icon: <Swords size={20} strokeWidth={1.5} /> },
-  { id: "inventario", label: "Inventario", icon: <Backpack size={20} strokeWidth={1.5} /> },
-  { id: "notas", label: "Notas", icon: <BookOpen size={20} strokeWidth={1.5} /> },
-  { id: "enciclopedia", label: "Enciclopedia", icon: <Library size={20} strokeWidth={1.5} /> },
-  { id: "ajustes", label: "Ajustes", icon: <Settings size={20} strokeWidth={1.5} /> },
+const TAB_META: { id: Tab; label: string }[] = [
+  { id: "ficha", label: "Ficha" },
+  { id: "combate", label: "Combate" },
+  { id: "inventario", label: "Inventario" },
+  { id: "notas", label: "Notas" },
+  { id: "enciclopedia", label: "Enciclopedia" },
+  { id: "ajustes", label: "Ajustes" },
 ];
 
 export default function Home() {
@@ -212,7 +212,7 @@ export default function Home() {
                         }}
                       />
                     )}
-                    {tab.icon}
+                    <TabIcon tab={tab.id} active={activeTab === tab.id} />
                     <span>{tab.label}</span>
                   </button>
                 ))}
