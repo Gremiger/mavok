@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Tag } from "@/components/ui/Tag";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { GhostChip } from "@/components/ui/GhostChip";
+import { HandDrawn } from "@/components/ui/HandDrawn";
 import { Markdown } from "@/components/ui/Markdown";
 import { MentionTextarea } from "@/components/notes/MentionTextarea";
 import { ScrollText } from "lucide-react";
@@ -145,7 +146,14 @@ export function QuestList({
         >
           <div className="flex items-center gap-2">
             <h4 className="font-heading text-accent text-sm flex-1">
-              {quest.title}
+              {/* Finished quests get struck out in ink; failed ones crossed off. */}
+              <HandDrawn
+                show={quest.status !== "active"}
+                type={quest.status === "failed" ? "crossed-off" : "strike-through"}
+                tone={quest.status === "failed" ? "danger" : "muted"}
+              >
+                {quest.title}
+              </HandDrawn>
             </h4>
             <button
               onClick={(e) => {
@@ -185,6 +193,7 @@ export function QuestList({
       {quests.length === 0 && (
         <EmptyState
           icon={ScrollText}
+          art="book"
           message={`Sin misiones${filter !== "all" ? ` ${STATUS_CONFIG[filter].label.toLowerCase()}s` : ""}. Toca + para agregar.`}
         />
       )}

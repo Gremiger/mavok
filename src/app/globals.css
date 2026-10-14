@@ -397,3 +397,19 @@ dialog::backdrop {
   height: 100% !important;
   display: block;
 }
+
+/* Hand-drawn ink marks (HandDrawn.tsx). The svg rough-notation inserts is a
+   sibling of the marked text, so the wrapper anchors it and gives its ink a
+   theme colour through currentColor. */
+.hand-drawn {
+  position: relative;
+}
+.hand-drawn > .rough-annotation {
+  color: var(--muted);
+}
+.hand-drawn[data-tone="danger"] > .rough-annotation {
+  color: var(--danger);
+}
+.hand-drawn[data-tone="accent"] > .rough-annotation {
+  color: var(--accent);
+}
