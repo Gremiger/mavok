@@ -413,3 +413,11 @@ dialog::backdrop {
 .hand-drawn[data-tone="accent"] > .rough-annotation {
   color: var(--accent);
 }
+
+/* Lottie illustrations (LottieArt.tsx): black ink follows the theme text. */
+.lottie-art [fill="rgb(0,0,0)"] {
+  fill: var(--fg);
+}
+.lottie-art [stroke="rgb(0,0,0)"] {
+  stroke: var(--fg);
+}

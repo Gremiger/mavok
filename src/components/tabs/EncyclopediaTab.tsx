@@ -424,6 +424,7 @@ export function EncyclopediaTab() {
           ) : (
             <EmptyState
               icon={Star}
+              art="book"
               message="Aún no tienes favoritos — toca la estrella en cualquier entrada."
             />
           )

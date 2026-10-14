@@ -180,6 +180,8 @@ export function JournalList({
       {journal.length === 0 && (
         <EmptyState
           icon={BookOpen}
+          art="quill"
+          loopArt
           message="Sin entradas de diario. Toca + después de cada sesión."
         />
       )}

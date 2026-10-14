@@ -205,6 +205,8 @@ export function QuickNotes() {
         {character.notes.quick.length === 0 && (
           <EmptyState
             icon={NotebookPen}
+            art="quill"
+            loopArt
             message="Sin notas rápidas. Escribe algo arriba para empezar."
           />
         )}
