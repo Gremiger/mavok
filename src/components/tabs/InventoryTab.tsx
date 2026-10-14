@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import NumberFlow from "@number-flow/react";
 import { useCharacterContext, useThemeContext } from "@/lib/context";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -242,7 +243,7 @@ export function InventoryTab() {
                   onClick={() => setEditingCurrency(key)}
                   className="font-numeric text-lg text-accent min-w-[2rem]"
                 >
-                  {currency[key]}
+                  <NumberFlow value={currency[key]} />
                 </button>
               )}
               <div className="text-muted text-xs">{label}</div>
@@ -490,6 +491,7 @@ export function InventoryTab() {
       {grouped.length === 0 && (
         <EmptyState
           icon={SearchX}
+          art="chest"
           message="Sin objetos que coincidan. Ajusta la búsqueda o los filtros."
         />
       )}

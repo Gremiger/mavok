@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import NumberFlow from "@number-flow/react";
 import { StatBadge } from "@/components/ui/StatBadge";
 import { useEffects } from "@/components/effects/EffectsProvider";
 import { particleSpread } from "@/lib/motion";
@@ -67,6 +68,7 @@ export function CombatVitals({
   const { play, flashy } = useEffects();
   const cardRef = useRef<HTMLDivElement>(null);
   const inspRef = useRef<HTMLSpanElement>(null);
+  const hpRef = useRef<HTMLSpanElement>(null);
   const [prevHp, setPrevHp] = useState(currentHp);
   const [hpAnim, setHpAnim] = useState<{ kind: "damage" | "heal"; n: number } | null>(null);
 
@@ -93,6 +95,16 @@ export function CombatVitals({
       ],
       { duration: 320, easing: "cubic-bezier(.36,.07,.19,.97)" }
     );
+  }, [hpAnim]);
+
+  // Replay the flinch/heal flourish on every change. The number is not
+  // remounted for it (that would cut NumberFlow's digit roll short).
+  useEffect(() => {
+    if (!hpAnim) return;
+    hpRef.current?.getAnimations?.().forEach((a) => {
+      a.cancel();
+      a.play();
+    });
   }, [hpAnim]);
 
   function toggleInspiration() {
@@ -131,22 +143,19 @@ export function CombatVitals({
               className="text-left active:scale-[0.98] transition-transform duration-150"
             >
               <span className="block font-heading italic text-sm text-muted">Puntos de golpe</span>
-              <span
-                key={hpAnim ? `hp-${hpAnim.n}` : "hp"}
-                className={`relative block ${hpAnim ? `hp-${hpAnim.kind}` : ""}`}
-              >
+              <span ref={hpRef} className={`relative block ${hpAnim ? `hp-${hpAnim.kind}` : ""}`}>
                 <span
                   className={`block font-numeric font-black text-[3.5rem] leading-[0.85] tracking-tight text-foreground ${
                     rage.active ? "hp-heartbeat" : ""
                   }`}
                 >
-                  {currentHp}
+                  <NumberFlow value={currentHp} animated={flashy} />
                   <span className="text-2xl font-semibold text-muted"> / {maxHp}</span>
                 </span>
                 {hpAnim?.kind === "heal" &&
                   particleSpread(`heal-${hpAnim.n}`, 14).map((p, i) => (
                     <i
-                      key={i}
+                      key={`${hpAnim.n}-${i}`}
                       className="hp-heal-spark"
                       style={
                         {
