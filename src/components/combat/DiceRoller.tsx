@@ -6,6 +6,7 @@ import { isD20Crit, isD20Fumble, type DiceRoll } from "@/lib/dice";
 import { rollDiceMode } from "@/lib/rollWithMode";
 import { useThemeContext } from "@/lib/context";
 import { toast } from "sonner";
+import { haptics, tapHaptic } from "@/lib/haptics";
 
 const QUICK_DICE = ["1d4", "1d6", "1d8", "1d10", "1d12", "1d20"];
 
@@ -24,6 +25,8 @@ export function DiceRoller() {
         toast("Dados 3D no disponible, usando texto");
       }
       setHistory((prev) => [result, ...prev].slice(0, 5));
+      if (isD20Crit(result)) haptics.crit();
+      else if (isD20Fumble(result)) haptics.fumble();
     } catch {
       // invalid expression, ignore
     }
@@ -42,6 +45,7 @@ export function DiceRoller() {
         {QUICK_DICE.map((d) => (
           <button
             key={d}
+            ref={tapHaptic}
             onClick={() => roll(d)}
             className="px-3 py-2 bg-card border border-border rounded-lg text-sm font-numeric text-accent active:scale-95 transition-transform"
           >
@@ -60,6 +64,7 @@ export function DiceRoller() {
           className="flex-1 bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground"
         />
         <button
+          ref={tapHaptic}
           onClick={handleCustomRoll}
           className="px-4 py-2 btn-primary rounded-lg text-sm font-heading active:scale-95 transition-transform"
         >

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/Modal";
+import { haptics, tapHaptic } from "@/lib/haptics";
 
 export function HpModal({
   open,
@@ -36,6 +37,7 @@ export function HpModal({
       onApply(currentHp, Math.max(tempHp, val));
     } else if (effectiveMode === "heal") {
       onApply(Math.min(currentHp + val, maxHp), tempHp);
+      haptics.heal();
     } else {
       let remaining = val;
       let newTemp = tempHp;
@@ -47,6 +49,7 @@ export function HpModal({
       }
       newHp = Math.max(0, newHp - remaining);
       onApply(newHp, newTemp);
+      if (newHp === 0 && currentHp > 0) haptics.down(); else haptics.damage();
     }
     if (effectiveMode === "damage") toast(`-${val} HP`, { icon: "💥" });
     else if (effectiveMode === "heal") toast(`+${val} HP`, { icon: "💚" });
@@ -105,6 +108,7 @@ export function HpModal({
         </div>
 
         <button
+          ref={tapHaptic}
           onClick={apply}
           className="w-full py-3 btn-primary rounded-lg font-heading active:scale-95 transition-transform"
         >

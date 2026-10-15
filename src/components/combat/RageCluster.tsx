@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Flame } from "lucide-react";
 import { shouldUseRageBadge } from "@/lib/rageDisplay";
 import { useEffects } from "@/components/effects/EffectsProvider";
+import { haptics, tapHaptic } from "@/lib/haptics";
 
 const EMBER_WISP_OFFSETS = [25, 55, 75];
 const EMBER_WISP_DELAYS = [0.2, 0.9, 1.6];
@@ -28,6 +29,7 @@ export function RageCluster({
   const [igniteKey, setIgniteKey] = useState(0);
   const [slashed, setSlashed] = useState<number | null>(null);
   const flameRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => tapHaptic(flameRef.current), []);
   const { play, flashy } = useEffects();
 
   function toggleActive() {
@@ -35,6 +37,7 @@ export function RageCluster({
     const r = flame?.getBoundingClientRect();
     const card = flame?.closest("[data-vitals]")?.getBoundingClientRect();
     onToggleActive();
+    if (!active) haptics.rage();
     play(active ? "rage-end" : "rage-ignite", {
       origin: r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : undefined,
       data: card ? { x: card.left, y: card.top, w: card.width, h: card.height } : undefined,
