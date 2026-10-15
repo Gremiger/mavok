@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import NumberFlow from "@number-flow/react";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { StatBadge } from "@/components/ui/StatBadge";
 import { useEffects } from "@/components/effects/EffectsProvider";
 import { particleSpread } from "@/lib/motion";
 import { RageCluster, type RageClusterProps } from "@/components/combat/RageCluster";
 import { DeathSaves } from "@/components/combat/DeathSaves";
+import { RageFlames } from "@/components/combat/RageFlames";
 import { DiceResult } from "@/components/ui/DiceResult";
 import { formatModifier } from "@/lib/utils";
 import { hpFraction } from "@/lib/hpBar";
@@ -67,6 +69,7 @@ export function CombatVitals({
 }: CombatVitalsProps) {
   const { play, flashy } = useEffects();
   const cardRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = usePrefersReducedMotion();
   const inspRef = useRef<HTMLSpanElement>(null);
   const hpRef = useRef<HTMLSpanElement>(null);
   const [prevHp, setPrevHp] = useState(currentHp);
@@ -124,8 +127,9 @@ export function CombatVitals({
     <div
       ref={cardRef}
       data-vitals
-      className={`${rage.active ? "stone-card-raging" : "stone-card"} relative rounded-2xl p-4 transition-all`}
+      className={`${rage.active ? "stone-card-raging" : "stone-card"} relative isolate rounded-2xl p-4 transition-all`}
     >
+      {rage.active && !reducedMotion && <RageFlames />}
       {isDying ? (
         <DeathSaves
           successes={deathSaves.successes}

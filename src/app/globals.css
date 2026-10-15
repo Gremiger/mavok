@@ -181,6 +181,24 @@ body::before {
     inset 0 -2px 0 var(--lip),
     0 0 16px color-mix(in srgb, var(--cord) 35%, transparent);
 }
+/* The fire canvas behind the raging vitals (RageFlames): under the content,
+   over the card's stone. `screen` keeps only its glow; its black adds nothing. */
+.rage-flames {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.45;
+  animation: rage-flames-in 0.6s ease-out both;
+}
+@keyframes rage-flames-in {
+  from { opacity: 0; }
+}
 .stone-card-raging::before {
   content: '';
   position: absolute;
